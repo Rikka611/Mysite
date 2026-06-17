@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibecoding — 个人项目分享</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: #e0e0e0;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* --- 星空粒子背景 --- */
+  .stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(2px 2px at 20% 90%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(2px 2px at 60% 30%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(2px 2px at 80% 70%, rgba(255,255,255,0.15), transparent);
+  }
+
+  /* --- 导航栏 --- */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,12,41,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 24px;
+  }
+  nav .inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  nav .logo {
+    font-size: 1.3rem; font-weight: 700;
+    background: linear-gradient(90deg, #f093fb, #f5576c);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  nav a {
+    color: #999; text-decoration: none; font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: #fff; }
+  nav .gh-icon {
+    display: flex; align-items: center; gap: 6px;
+  }
+  nav .gh-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+  /* --- Hero --- */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center; padding: 100px 24px 80px;
+  }
+  .hero .badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    font-size: 0.8rem; color: #aaa;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.03);
+  }
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #f093fb, #f5576c, #fda085);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.2; margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+  .hero p {
+    color: #889;
+    font-size: 1.1rem;
+    max-width: 500px; margin: 0 auto 36px;
+  }
+  .hero .cta {
+    display: inline-block;
+    padding: 14px 40px;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #f093fb, #f5576c);
+    color: #fff; font-size: 1rem; text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .hero .cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(245,87,108,0.35);
+  }
+  .hero .cta-arrow { margin-left: 6px; }
+
+  /* --- 项目区 --- */
+  .projects-section {
+    position: relative; z-index: 1;
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+  .projects-section h2 {
+    text-align: center; font-size: 1.8rem;
+    margin-bottom: 8px; color: #ddd;
+  }
+  .projects-section .sub {
+    text-align: center; color: #667; font-size: 0.9rem;
+    margin-bottom: 48px;
+  }
+
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+  }
+  .grid .card {
+    flex: 0 1 340px;
+  }
+
+  /* --- 项目卡片 --- */
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 32px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    display: flex; flex-direction: column;
+    backdrop-filter: blur(10px);
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245,87,108,0.4);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(245,87,108,0.15);
+  }
+  .card .icon {
+    font-size: 2.5rem; margin-bottom: 16px;
+    width: 60px; height: 60px; line-height: 60px; text-align: center;
+    background: rgba(255,255,255,0.06);
+    border-radius: 16px;
+  }
+  .card h3 { font-size: 1.25rem; color: #fff; margin-bottom: 8px; }
+  .card .desc { color: #889; font-size: 0.9rem; flex: 1; margin-bottom: 20px; }
+
+  .card .tags {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;
+  }
+  .card .tag {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 50px;
+    background: rgba(255,255,255,0.08);
+    color: #aab;
+  }
+
+  .card .actions { display: flex; gap: 12px; }
+  .card .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 50px; font-size: 0.9rem;
+    text-decoration: none; font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  .card .btn.primary {
+    background: linear-gradient(90deg, #f093fb, #f5576c);
+    color: #fff;
+  }
+  .card .btn.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(245,87,108,0.3);
+  }
+  .card .btn.outline {
+    background: transparent;
+    color: #c0c0c0;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .card .btn.outline:hover {
+    border-color: rgba(255,255,255,0.5); color: #fff;
+  }
+  .card .btn svg { width: 16px; height: 16px; }
+
+  /* --- 空态（暂无项目时的占位卡片） --- */
+  .card.placeholder {
+    border-style: dashed;
+    border-color: rgba(255,255,255,0.12);
+    justify-content: center; align-items: center;
+    min-height: 260px;
+  }
+  .card.placeholder .plus { font-size: 2.5rem; color: #445; margin-bottom: 8px; }
+  .card.placeholder .hint { color: #556; font-size: 0.9rem; }
+
+  /* --- Footer --- */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center; padding: 40px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    color: #556; font-size: 0.85rem;
+  }
+  footer a { color: #778; text-decoration: none; }
+  footer a:hover { color: #aaa; }
+
+  /* --- 响应式 --- */
+  @media (max-width: 768px) {
+    .hero { padding: 60px 20px 40px; }
+    .grid .card { flex: 0 1 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<!-- 导航 -->
+<nav>
+  <div class="inner">
+    <span class="logo">Vibecoding</span>
+    <a class="gh-icon" href="https://github.com/Rikka611" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="badge">vibecoding projects</div>
+  <h1>Build & Share</h1>
+  <p>这里收集了我的 vibecoding 项目，随手写的小工具、bot、爬虫……觉得有用就直接下载吧。</p>
+  <a class="cta" href="#projects">看看项目<span class="cta-arrow">↓</span></a>
+</section>
+
+<!-- 项目区 -->
+<section class="projects-section" id="projects">
+  <h2>项目列表</h2>
+  <p class="sub">点击卡片下载对应的 zip 包</p>
+
+  <div class="grid" id="projectGrid">
+    <!-- JS 动态渲染 -->
+  </div>
+</section>
+
+<footer>
+  &copy; 2026 Rikka · Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>
+</footer>
+
+<script>
+// ============================================================
+//  添加新项目：在下面数组里 push 一个对象
+//  ──────────────────────────────────────────────
+//  icon:      emoji 图标
+//  name:      项目名称
+//  desc:      一句话描述
+//  tags:      技术标签数组
+//  download:  下载链接 (GitHub Release 直链)
+//  source:    (可选) 源码链接
+// ============================================================
+const projects = [
+  {
+    icon: "🤖",
+    name: "QQ 群漫画机器人",
+    desc: "基于 NoneBot2 的 QQ 群漫画下载机器人，支持关键词搜索和自动打包，群友说想看什么直接 @机器人。",
+    tags: ["Python", "NoneBot2", "JMComic"],
+    download: "qq-bot.zip",
+    source: "https://github.com/Rikka611/qq-bot"
+  },
+  {
+    icon: "🚧",
+    name: "Coming Soon",
+    desc: "新的 vibecoding 项目正在折腾中……敬请期待。",
+    tags: ["..."],
+    download: null,
+    source: null
+  }
+];
+
+// 渲染卡片
+const grid = document.getElementById('projectGrid');
+
+// 下载图标 SVG
+const dlIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+const codeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
+
+if (projects.length === 0) {
+  grid.innerHTML = `
+    <div class="card placeholder">
+      <div class="plus">+</div>
+      <div class="hint">项目准备好了就来填坑</div>
+    </div>`;
+} else {
+  grid.innerHTML = projects.map(p => {
+    const dlBtn = p.download
+      ? `<a class="btn primary" href="${p.download}" ${p.download === '#' ? 'onclick="return false" style="opacity:0.5"' : ''}>${dlIcon} 下载</a>`
+      : '';
+    const srcBtn = p.source
+      ? `<a class="btn outline" href="${p.source}" target="_blank">${codeIcon} 源码</a>`
+      : '';
+    const actions = (dlBtn || srcBtn) ? `<div class="actions">${dlBtn}${srcBtn}</div>` : '';
+    return `
+    <div class="card">
+      <div class="icon">${p.icon}</div>
+      <h3>${p.name}</h3>
+      <p class="desc">${p.desc}</p>
+      <div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      ${actions}
+    </div>`;
+  }).join('');
+}
+</script>
+
+</body>
+</html>
