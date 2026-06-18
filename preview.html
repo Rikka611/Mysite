@@ -526,7 +526,7 @@ const projects = [
   },
   {
     icon: "🚧",
-    name: "敬请期待",
+    name: "Coming Soon",
     name_en: "Coming Soon",
     desc: "新的 vibecoding 项目正在折腾中……敬请期待。",
     desc_en: "Something new is brewing... stay tuned.",
@@ -569,8 +569,9 @@ const $ = id => document.getElementById(id);
 const dlIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
 const codeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
 
-function buildContent(l) {
+function buildContent(l, skipReveal) {
   const t = i18n[l];
+  const cardClass = skipReveal ? 'card reveal visible' : 'card reveal';
   const cardsHTML = projects.map(p => {
     const name = l === 'en' && p.name_en ? p.name_en : p.name;
     const desc = l === 'en' && p.desc_en ? p.desc_en : p.desc;
@@ -581,7 +582,7 @@ function buildContent(l) {
       ? `<a class="btn outline" href="${p.source}" target="_blank">${codeIcon} ${t.srcBtn}</a>`
       : '';
     const actions = (dlBtn || srcBtn) ? `<div class="actions">${dlBtn}${srcBtn}</div>` : '';
-    return `<div class="card reveal"><div class="icon">${p.icon}</div><h3>${name}</h3><p class="desc">${desc}</p><div class="tags">${p.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>${actions}</div>`;
+    return `<div class="${cardClass}"><div class="icon">${p.icon}</div><h3>${name}</h3><p class="desc">${desc}</p><div class="tags">${p.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>${actions}</div>`;
   }).join('');
 
   return `
@@ -607,15 +608,13 @@ $('footerText').innerHTML = i18n[lang].footer;
 
 // ===== FLIP 语言切换 =====
 $('langToggle').addEventListener('click', () => {
-  // 容器类（只平移，不缩放不淡入淡出，防抽搐）
-  const containers = '.card';
-  // 叶子类（平移 + 缩放 + 弹跳）
-  const leaves = '.badge, .cta, .card .btn, .card .tag';
+  // 缩放弹跳类（平移 + 缩放 + 弹跳）
+  const bouncers = '.card, .badge, .cta, .card .btn, .card .tag';
   // 文字类（平移 + 淡入淡出）
   const staticEls = '.hero h1'; // 不切换语言的元素，只平移动画
   const texts = '.hero p, .projects-section h2, .sub, .card h3, .card .desc';
 
-  const allSel = containers + ', ' + leaves + ', ' + texts + ', ' + staticEls;
+  const allSel = bouncers + ', ' + texts + ', ' + staticEls;
   const oldAll = Array.from(root.querySelectorAll(allSel));
   const firstRects = oldAll.map(el => el.getBoundingClientRect());
 
@@ -632,7 +631,7 @@ $('langToggle').addEventListener('click', () => {
     langBtn.style.transformOrigin = 'right center';
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        langBtn.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.1)';
+        langBtn.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.3)';
         langBtn.style.transform = 'scaleX(1)';
         langBtn.addEventListener('transitionend', function cleanup() {
           langBtn.style.transition = '';
@@ -644,60 +643,62 @@ $('langToggle').addEventListener('click', () => {
     });
   }
   $('footerText').innerHTML = i18n[lang].footer;
-  root.innerHTML = buildContent(lang);
-  document.querySelectorAll('.card.reveal').forEach(c => { c.classList.add('visible'); observer.observe(c); });
+  root.innerHTML = buildContent(lang, true);
+  document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
 
-  const newAll = Array.from(root.querySelectorAll(allSel));
-  const count = Math.min(firstRects.length, newAll.length);
-
-  for (let i = 0; i < count; i++) {
-    const el = newAll[i];
-    const fr = firstRects[i];
-    const lr = el.getBoundingClientRect();
-    const dx = fr.left - lr.left;
-    const dy = fr.top - lr.top;
-    const isLeaf = el.matches(leaves);
-    const isText = el.matches(texts);
-    const sx = isLeaf && lr.width > 0 ? fr.width / lr.width : 1;
-    const sy = isLeaf && lr.height > 0 ? fr.height / lr.height : 1;
-
-    if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3 && Math.abs(sx - 1) < 0.005 && Math.abs(sy - 1) < 0.005) continue;
-
-    el.style.transition = 'none';
-    if (isLeaf && (Math.abs(sx - 1) > 0.005 || Math.abs(sy - 1) > 0.005)) {
-      el.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
-      el.style.transformOrigin = 'top left';
-    } else {
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
-    }
-    if (isText) el.style.opacity = '0';
-  }
-
+  // rAF 确保 DOM 布局完成
   requestAnimationFrame(() => {
+    const newAll = Array.from(root.querySelectorAll(allSel));
+    const count = Math.min(firstRects.length, newAll.length);
+
+    for (let i = 0; i < count; i++) {
+      const el = newAll[i];
+      const fr = firstRects[i];
+      const lr = el.getBoundingClientRect();
+      const dx = fr.left - lr.left;
+      const dy = fr.top - lr.top;
+      const isLeaf = el.matches(bouncers);
+      const isText = el.matches(texts);
+      const sx = isLeaf && lr.width > 0 ? fr.width / lr.width : 1;
+      const sy = isLeaf && lr.height > 0 ? fr.height / lr.height : 1;
+
+      if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3 && Math.abs(sx - 1) < 0.01 && Math.abs(sy - 1) < 0.01) continue;
+
+      el.style.transition = 'none';
+      const hasScale = isLeaf && (Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01);
+      el.style.transform = hasScale
+        ? `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
+        : `translate(${dx}px, ${dy}px)`;
+      if (hasScale) el.style.transformOrigin = 'top left';
+      // 只有文字确实变了才做淡入淡出
+      const textChanged = isText && oldAll[i] && oldAll[i].textContent !== el.textContent;
+      if (textChanged) el.style.opacity = '0';
+    }
+
     requestAnimationFrame(() => {
       for (let i = 0; i < count; i++) {
         const el = newAll[i];
         if (el.style.transform === '') continue;
-        const isLeaf = el.matches(leaves);
+        const isLeaf = el.matches(bouncers);
         const isText = el.matches(texts);
         let props = 'transform 0.55s cubic-bezier(0.33, 0, 0.1, 1)';
-        if (isLeaf) props = 'transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.15)';
+        if (isLeaf) props = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.6)';
         if (isText) props += ', opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
         el.style.transition = props;
         el.style.transform = isLeaf ? 'translate(0, 0) scale(1, 1)' : 'translate(0, 0)';
-        if (isText) el.style.opacity = '1';
+        if (el.style.opacity === '0') el.style.opacity = '1';
       }
     });
-  });
 
-  setTimeout(() => {
-    newAll.forEach(el => {
-      el.style.transition = '';
-      el.style.transform = '';
-      el.style.transformOrigin = '';
-      el.style.opacity = '';
-    });
-  }, 600);
+    setTimeout(() => {
+      newAll.forEach(el => {
+        el.style.transition = '';
+        el.style.transform = '';
+        el.style.transformOrigin = '';
+        el.style.opacity = '';
+      });
+    }, 700);
+  });
 });
 
 // ===== 日夜模式 =====
