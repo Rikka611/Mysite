@@ -250,7 +250,7 @@
 </section>
 
 <footer>
-  &copy; 2026 Rikka · Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>
+  &copy; 2026 Rikka611 · Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>
 </footer>
 
 <script>
@@ -268,8 +268,8 @@ const projects = [
   {
     icon: "🤖",
     name: "JM-QQBot v1.0",
-    desc: "QQ 群漫画下载机器人，根据车牌号从 JM 下载图片并转成 PDF，群友 @机器人 即可使用。",
-    tags: ["Python", "NoneBot2", "JMComic"],
+    desc: "基于 NapCat 的 QQ 群漫画下载机器人，输入车牌号自动下载图片并打包成 PDF。",
+    tags: ["NapCat", "NoneBot2", "JMComic"],
     download: "https://github.com/Rikka611/Mysite/releases/download/chatbot/qq-bot-full.zip",
     source: null
   },
@@ -299,7 +299,7 @@ if (projects.length === 0) {
 } else {
   grid.innerHTML = projects.map(p => {
     const dlBtn = p.download
-      ? `<a class="btn primary" href="${p.download}" ${p.download === '#' ? 'onclick="return false" style="opacity:0.5"' : ''}>${dlIcon} 下载</a>`
+      ? `<a class="btn primary" href="${p.download}" ${p.download === '#' ? 'onclick="return false" style="opacity:0.5"' : ''}>${dlIcon} GitHub下载</a>`
       : '';
     const srcBtn = p.source
       ? `<a class="btn outline" href="${p.source}" target="_blank">${codeIcon} 源码</a>`
