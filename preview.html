@@ -20,7 +20,7 @@
     --nav-border: rgba(255,255,255,0.06);
     --nav-link: #999;
     --nav-link-hover: #fff;
-    --card-bg: rgba(255,255,255,0.03);
+    --card-bg: rgba(255,255,255,0.05);
     --card-border: rgba(255,255,255,0.08);
     --card-hover-border: rgba(245,87,108,0.4);
     --card-hover-shadow: rgba(0,0,0,0.3);
@@ -43,7 +43,7 @@
     --placeholder-plus: #445;
     --placeholder-hint: #556;
     --dash-border: rgba(255,255,255,0.12);
-    --star-color: rgba(255,255,255,0.5);
+    --star-color: rgba(255,255,255,0.7);
   }
 
   /* ===== 亮色主题：跟随系统 ===== */
@@ -136,7 +136,7 @@
     --nav-border: rgba(255,255,255,0.06);
     --nav-link: #999;
     --nav-link-hover: #fff;
-    --card-bg: rgba(255,255,255,0.03);
+    --card-bg: rgba(255,255,255,0.05);
     --card-border: rgba(255,255,255,0.08);
     --card-hover-border: rgba(245,87,108,0.4);
     --card-hover-shadow: rgba(0,0,0,0.3);
@@ -159,7 +159,7 @@
     --placeholder-plus: #445;
     --placeholder-hint: #556;
     --dash-border: rgba(255,255,255,0.12);
-    --star-color: rgba(255,255,255,0.5);
+    --star-color: rgba(255,255,255,0.7);
   }
 
   body {
@@ -186,11 +186,11 @@
     transition: opacity 0.5s ease;
   }
   html.light body::before { opacity: 1; }
-  html.light .stars { opacity: 0; }
+  html.light .stars { opacity: 0; animation: none; }
   html.light .orb { opacity: 0.35; }
   @media (prefers-color-scheme: light) {
     html:not(.dark):not(.light) body::before { opacity: 1; }
-    html:not(.dark):not(.light) .stars { opacity: 0; }
+    html:not(.dark):not(.light) .stars { opacity: 0; animation: none; }
     html:not(.dark):not(.light) .orb { opacity: 0.35; }
   }
   nav, .card, .hero .badge, .card .icon, .card .tag,
@@ -212,24 +212,49 @@
     position: fixed; inset: -40px; pointer-events: none; z-index: 0;
     animation: twinkle 3s ease-in-out infinite;
     background:
-      radial-gradient(2px 2px at 10% 20%, var(--star-color), transparent),
-      radial-gradient(2px 2px at 30% 70%, var(--star-color), transparent),
-      radial-gradient(1px 1px at 50% 15%, var(--star-color), transparent),
-      radial-gradient(2px 2px at 70% 80%, var(--star-color), transparent),
-      radial-gradient(1px 1px at 90% 40%, var(--star-color), transparent),
-      radial-gradient(1px 1px at 85% 12%, var(--star-color), transparent),
-      radial-gradient(3px 3px at 15% 55%, var(--star-color), transparent),
-      radial-gradient(2px 2px at 20% 90%, var(--star-color), transparent),
-      radial-gradient(1px 1px at 55% 25%, var(--star-color), transparent),
-      radial-gradient(2px 2px at 60% 30%, var(--star-color), transparent),
+      /* 亮星 (3-4px) */
+      radial-gradient(3px 3px at 10% 20%, var(--star-color), transparent),
+      radial-gradient(3px 3px at 30% 70%, var(--star-color), transparent),
+      radial-gradient(4px 4px at 15% 55%, var(--star-color), transparent),
+      radial-gradient(3px 3px at 20% 90%, var(--star-color), transparent),
+      radial-gradient(4px 4px at 60% 30%, var(--star-color), transparent),
       radial-gradient(3px 3px at 40% 78%, var(--star-color), transparent),
-      radial-gradient(2px 2px at 80% 60%, var(--star-color), transparent),
-      radial-gradient(1px 1px at 8% 38%, var(--star-color), transparent),
-      radial-gradient(2px 2px at 95% 72%, var(--star-color), transparent),
-      radial-gradient(1px 1px at 45% 45%, var(--star-color), transparent),
-      radial-gradient(2px 2px at 62% 12%, var(--star-color), transparent),
+      radial-gradient(4px 4px at 80% 60%, var(--star-color), transparent),
       radial-gradient(3px 3px at 25% 65%, var(--star-color), transparent),
-      radial-gradient(1px 1px at 75% 35%, var(--star-color), transparent);
+      radial-gradient(4px 4px at 55% 85%, var(--star-color), transparent),
+      radial-gradient(3px 3px at 72% 8%, var(--star-color), transparent),
+      radial-gradient(4px 4px at 35% 42%, var(--star-color), transparent),
+      radial-gradient(3px 3px at 88% 28%, var(--star-color), transparent),
+      /* 中星 (2px) */
+      radial-gradient(2px 2px at 50% 15%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 70% 80%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 85% 12%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 55% 25%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 8% 38%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 95% 72%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 62% 12%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 75% 35%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 12% 82%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 42% 6%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 28% 48%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 67% 92%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 92% 55%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 48% 68%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 33% 32%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 82% 75%, var(--star-color), transparent),
+      /* 暗星 (1px) */
+      radial-gradient(1px 1px at 90% 40%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 45% 45%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 5% 64%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 38% 17%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 78% 90%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 58% 50%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 18% 5%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 65% 45%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 98% 18%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 22% 72%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 86% 48%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 52% 95%, var(--star-color), transparent);
     transition: transform 0.2s ease-out;
   }
 
@@ -249,7 +274,7 @@
   nav .nav-right { display: flex; align-items: center; gap: 16px; }
   nav .logo {
     font-size: 1.3rem; font-weight: 700;
-    background: linear-gradient(90deg, #f093fb, #f5576c);
+    background: linear-gradient(135deg, #f093fb, #f5576c, #fda085);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     letter-spacing: -0.5px;
   }
@@ -299,7 +324,7 @@
     border-radius: 50px;
     font-size: 0.8rem; color: var(--badge-text);
     margin-bottom: 24px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(6px);
     background: var(--badge-bg);
   }
   .hero h1 {
@@ -351,6 +376,8 @@
   .orb-1 { width: 500px; height: 500px; background: #f093fb; top: -15%; left: -10%; animation-delay: 0s; }
   .orb-2 { width: 400px; height: 400px; background: #667eea; bottom: -12%; right: -8%; animation-delay: -9s; }
   .orb-3 { width: 350px; height: 350px; background: #f5576c; top: 55%; left: 60%; animation-delay: -17s; }
+  .orb-4 { width: 300px; height: 300px; background: #a18cd1; top: 30%; left: 75%; animation-delay: -5s; }
+  .orb-5 { width: 450px; height: 450px; background: #43e97b; bottom: 5%; left: 25%; animation-delay: -13s; }
   @keyframes float {
     0%   { transform: translate(5vw, 10vh) scale(0.9); }
     25%  { transform: translate(35vw, -15vh) scale(1.08); }
@@ -379,16 +406,18 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 24px;
+    perspective: 1200px;
   }
-  .grid .card { flex: 0 1 340px; }
-  /* 滚动入场动效 */
-  .card.reveal {
-    opacity: 0; transform: translateY(32px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+  .grid .card-wrap { flex: 0 1 340px; display: flex; }
+  .grid .card-wrap .card { flex: 1; width: 100%; min-height: 320px; }
+  /* 滚动入场动效 — 滚动驱动比例变换 */
+  .card-wrap.reveal {
+    --reveal: 0;
+    opacity: var(--reveal);
+    transform: translateY(calc(48px * (1 - var(--reveal)))) rotateX(calc(10deg * (1 - var(--reveal))));
   }
-  .card.reveal.visible { opacity: 1; transform: translateY(0); }
   @media (prefers-reduced-motion: reduce) {
-    .card.reveal { opacity: 1; transform: none; transition: none; }
+    .card-wrap.reveal { opacity: 1; transform: none; }
   }
 
   /* --- 项目卡片 --- */
@@ -397,15 +426,25 @@
     border: 1px solid var(--card-border);
     border-radius: 20px;
     padding: 32px;
-    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
     display: flex; flex-direction: column;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(6px);
+    position: relative; overflow: hidden;
   }
   .card:hover {
-    transform: translateY(-4px);
     border-color: var(--card-hover-border);
     box-shadow: 0 12px 40px var(--card-hover-shadow), 0 0 0 1px var(--card-hover-ring);
   }
+  .card .glare {
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    border-radius: 20px;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.14) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .card:hover .glare { opacity: 1; }
+  .card.tilting { will-change: transform; }
+  .card.tilting .glare { opacity: 1; }
   .card .icon {
     font-size: 2.5rem; margin-bottom: 16px;
     width: 60px; height: 60px; line-height: 60px; text-align: center;
@@ -463,6 +502,18 @@
   .card.placeholder .plus { font-size: 2.5rem; color: var(--placeholder-plus); margin-bottom: 8px; }
   .card.placeholder .hint { color: var(--placeholder-hint); font-size: 0.9rem; }
 
+  /* --- Click Spark --- */
+  .spark-container { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+  .spark {
+    position: absolute; width: 6px; height: 6px; border-radius: 50%;
+    background: #f5576c; pointer-events: none;
+    animation: sparkBurst 0.7s ease-out forwards;
+  }
+  @keyframes sparkBurst {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+  }
+
   /* --- Footer --- */
   footer {
     position: relative; z-index: 1;
@@ -486,6 +537,8 @@
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
+<div class="orb orb-4"></div>
+<div class="orb orb-5"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <!-- 导航 -->
@@ -571,7 +624,7 @@ const codeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 
 function buildContent(l, skipReveal) {
   const t = i18n[l];
-  const cardClass = skipReveal ? 'card reveal visible' : 'card reveal';
+  const wrapClass = skipReveal ? 'card-wrap reveal visible' : 'card-wrap reveal';
   const cardsHTML = projects.map(p => {
     const name = l === 'en' && p.name_en ? p.name_en : p.name;
     const desc = l === 'en' && p.desc_en ? p.desc_en : p.desc;
@@ -582,7 +635,7 @@ function buildContent(l, skipReveal) {
       ? `<a class="btn outline" href="${p.source}" target="_blank">${codeIcon} ${t.srcBtn}</a>`
       : '';
     const actions = (dlBtn || srcBtn) ? `<div class="actions">${dlBtn}${srcBtn}</div>` : '';
-    return `<div class="${cardClass}"><div class="icon">${p.icon}</div><h3>${name}</h3><p class="desc">${desc}</p><div class="tags">${p.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>${actions}</div>`;
+    return `<div class="${wrapClass}"><div class="card"><div class="glare"></div><div class="icon">${p.icon}</div><h3>${name}</h3><p class="desc">${desc}</p><div class="tags">${p.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>${actions}</div></div>`;
   }).join('');
 
   return `
@@ -644,7 +697,7 @@ $('langToggle').addEventListener('click', () => {
   }
   $('footerText').innerHTML = i18n[lang].footer;
   root.innerHTML = buildContent(lang, true);
-  document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
+  if (window._refreshReveal) window._refreshReveal();
 
   // rAF 确保 DOM 布局完成
   requestAnimationFrame(() => {
@@ -662,20 +715,78 @@ $('langToggle').addEventListener('click', () => {
       const sx = isLeaf && lr.width > 0 ? fr.width / lr.width : 1;
       const sy = isLeaf && lr.height > 0 ? fr.height / lr.height : 1;
 
-      if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3 && Math.abs(sx - 1) < 0.01 && Math.abs(sy - 1) < 0.01) continue;
+      const textChanged = isText && oldAll[i] && oldAll[i].textContent !== el.textContent;
+      const hasMove = Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3;
+      const hasScale = isLeaf && (Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01);
+
+      // 没位移没缩放，但文字内容变了 → 只做淡入淡出
+      if (!hasMove && !hasScale) {
+        if (textChanged) { el.style.transition = 'none'; el.style.opacity = '0'; el._fadeOnly = true; }
+        continue;
+      }
 
       el.style.transition = 'none';
-      const hasScale = isLeaf && (Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01);
       el.style.transform = hasScale
         ? `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
         : `translate(${dx}px, ${dy}px)`;
-      if (hasScale) el.style.transformOrigin = 'top left';
-      // 只有文字确实变了才做淡入淡出
-      const textChanged = isText && oldAll[i] && oldAll[i].textContent !== el.textContent;
+      if (hasScale) { el.style.transformOrigin = 'top left'; el._csx = sx; el._csy = sy; }
+      // 关闭 backdrop-filter 避免动画卡顿
+      if (isLeaf) { el._hadBf = true; el.style.backdropFilter = 'none'; el.style.willChange = 'transform'; }
       if (textChanged) el.style.opacity = '0';
     }
 
+    // 卡片缩放时，给图标反向缩放抵消弹动
+    for (let i = 0; i < count; i++) {
+      const card = newAll[i];
+      if (!card._csx) continue;
+      const icon = card.querySelector('.icon');
+      if (icon && !icon.style.transform) {
+        icon.style.transition = 'none';
+        icon.style.transform = `scale(${(1 / card._csx).toFixed(4)}, ${(1 / card._csy).toFixed(4)})`;
+        icon.style.transformOrigin = 'top left';
+        icon._inv = true;
+      }
+      delete card._csx; delete card._csy;
+    }
+
     requestAnimationFrame(() => {
+      let pending = 0;
+
+      // 图标反向缩放 → 弹回正常大小
+      const icons = root.querySelectorAll('.card .icon');
+      for (const icon of icons) {
+        if (!icon._inv) continue;
+        delete icon._inv;
+        icon.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.6)';
+        icon.style.transform = 'scale(1, 1)';
+        pending++;
+        icon.addEventListener('transitionend', function cleanup() {
+          pending--;
+          icon.style.transition = '';
+          icon.style.transform = '';
+          icon.style.transformOrigin = '';
+          if (pending <= 0) { icons.forEach(ic => { ic.style.transition = ''; ic.style.transform = ''; ic.style.transformOrigin = ''; }); }
+          icon.removeEventListener('transitionend', cleanup);
+        });
+      }
+
+      // 纯淡入淡出（文字变了但位置没变）
+      for (let i = 0; i < count; i++) {
+        const el = newAll[i];
+        if (!el._fadeOnly) continue;
+        delete el._fadeOnly;
+        el.style.transition = 'opacity 0.4s ease';
+        el.style.opacity = '1';
+        pending++;
+        el.addEventListener('transitionend', function cleanup() {
+          pending--;
+          el.style.transition = '';
+          el.style.opacity = '';
+          if (pending <= 0) { newAll.forEach(e => { e.style.transition = ''; e.style.opacity = ''; }); }
+          el.removeEventListener('transitionend', cleanup);
+        });
+      }
+
       for (let i = 0; i < count; i++) {
         const el = newAll[i];
         if (el.style.transform === '') continue;
@@ -687,17 +798,31 @@ $('langToggle').addEventListener('click', () => {
         el.style.transition = props;
         el.style.transform = isLeaf ? 'translate(0, 0) scale(1, 1)' : 'translate(0, 0)';
         if (el.style.opacity === '0') el.style.opacity = '1';
+        pending++;
+        el.addEventListener('transitionend', function cleanup() {
+          pending--;
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.transformOrigin = '';
+          el.style.opacity = '';
+          el.style.backdropFilter = '';
+          el.style.willChange = '';
+          if (pending <= 0) { newAll.forEach(e => { e.style.transition = ''; e.style.transform = ''; e.style.transformOrigin = ''; e.style.opacity = ''; e.style.backdropFilter = ''; e.style.willChange = ''; }); }
+          el.removeEventListener('transitionend', cleanup);
+        });
       }
+      // 安全兜底：800ms 后强制清理
+      setTimeout(() => {
+        newAll.forEach(el => {
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.transformOrigin = '';
+          el.style.opacity = '';
+          el.style.backdropFilter = '';
+          el.style.willChange = '';
+        });
+      }, 800);
     });
-
-    setTimeout(() => {
-      newAll.forEach(el => {
-        el.style.transition = '';
-        el.style.transform = '';
-        el.style.transformOrigin = '';
-        el.style.opacity = '';
-      });
-    }, 700);
   });
 });
 
@@ -737,31 +862,237 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
   }
 });
 
-// ===== 滚动入场 =====
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
+// ===== 滚动驱动卡片出场 =====
+(function() {
+  const cards = () => document.querySelectorAll('.card-wrap.reveal');
+  let raf = null;
+
+  function update() {
+    raf = null;
+    const vh = window.innerHeight;
+    cards().forEach(card => {
+      const rect = card.getBoundingClientRect();
+      // 卡片底部进入屏幕底部 → ratio=0; 卡片顶部到 25vh → ratio=1
+      const ratio = Math.max(0, Math.min(1, (vh - rect.top) / (vh * 0.75)));
+      card.style.setProperty('--reveal', ratio.toFixed(3));
+    });
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!raf) raf = requestAnimationFrame(update);
+  }, { passive: true });
+  // 初始触发 + resize 重算
+  update();
+  window.addEventListener('resize', update);
+  // FLIP 语言切换后重新绑定
+  window._refreshReveal = update;
+})();
 
 // ===== 鼠标光晕 + 视差 =====
 const glow = document.getElementById('cursorGlow');
 const starsEl = document.querySelector('.stars');
 if (glow) {
+  let pending = false;
   document.addEventListener('mousemove', e => {
-    glow.style.left = e.clientX + 'px';
-    glow.style.top = e.clientY + 'px';
-    glow.style.opacity = '1';
-    if (starsEl) {
-      const x = (e.clientX / window.innerWidth - 0.5) * 16;
-      const y = (e.clientY / window.innerHeight - 0.5) * 16;
-      starsEl.style.transform = `translate(${-x}px, ${-y}px)`;
-    }
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+      glow.style.opacity = '1';
+      if (starsEl) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 16;
+        const y = (e.clientY / window.innerHeight - 0.5) * 16;
+        starsEl.style.transform = `translate(${-x}px, ${-y}px)`;
+      }
+    });
   });
   document.addEventListener('mouseleave', () => {
     glow.style.opacity = '0';
     if (starsEl) starsEl.style.transform = 'translate(0, 0)';
   });
 }
+
+// ===== 卡片 3D 倾斜 + 眩光（鼠标 + 触摸） =====
+(function() {
+  const root = document.querySelector('#contentRoot');
+  if (!root) return;
+  const maxAngle = 8;
+  let cur = null, rect = null, raf = null, mx = 0, my = 0;
+
+  function updateRect() { if (cur) rect = cur.getBoundingClientRect(); }
+  window.addEventListener('scroll', updateRect, { passive: true });
+  window.addEventListener('resize', updateRect);
+
+  function begin(card, x, y) {
+    if (card !== cur) {
+      if (cur) reset(cur);
+      if (!document.contains(card)) return;
+      cur = card;
+      card.classList.add('tilting');
+      rect = card.getBoundingClientRect();
+    }
+  }
+
+  function move(x, y) {
+    if (!cur || !rect) return;
+    mx = x; my = y;
+    if (!raf) {
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        if (!cur || !rect) return;
+        const rx = (my - rect.top) / rect.height;
+        const ry = (mx - rect.left) / rect.width;
+        cur.style.setProperty('--rx', ((rx - 0.5) * -maxAngle).toFixed(2) + 'deg');
+        cur.style.setProperty('--ry', ((ry - 0.5) * maxAngle).toFixed(2) + 'deg');
+        cur.style.setProperty('--gx', (ry * 100).toFixed(1) + '%');
+        cur.style.setProperty('--gy', (rx * 100).toFixed(1) + '%');
+      });
+    }
+  }
+
+  function end(card) {
+    if (card === cur) { reset(cur); cur = null; rect = null; }
+  }
+
+  function reset(card) {
+    // 先去掉 tilting 让眩光 opacity 过渡消失
+    card.classList.remove('tilting');
+    const glare = card.querySelector('.glare');
+    const done = () => {
+      card.style.transition = 'transform 0.3s ease-out';
+      card.style.removeProperty('--rx');
+      card.style.removeProperty('--ry');
+      card.style.removeProperty('--gx');
+      card.style.removeProperty('--gy');
+      card.addEventListener('transitionend', function clean() {
+        card.style.transition = '';
+        card.removeEventListener('transitionend', clean);
+      }, { once: true });
+    };
+    if (glare) {
+      glare.addEventListener('transitionend', () => { done(); glare = null; }, { once: true });
+    } else {
+      done();
+    }
+  }
+
+  // --- 鼠标 ---
+  root.addEventListener('mouseover', e => {
+    begin(e.target.closest('.card'), e.clientX, e.clientY);
+  });
+  root.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+  root.addEventListener('mouseout', e => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    const related = e.relatedTarget;
+    if (related && card.contains(related)) return;
+    end(card);
+  });
+
+  // --- 触摸 ---
+  root.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    begin(t.target.closest('.card'), t.clientX, t.clientY);
+  }, { passive: true });
+  root.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    move(t.clientX, t.clientY);
+  }, { passive: true });
+  root.addEventListener('touchend', e => {
+    // 手指离开，找之前关联的卡片
+    if (cur) { reset(cur); cur = null; rect = null; }
+  });
+})();
+
+// ===== 点击火花 =====
+(function() {
+  const container = document.createElement('div');
+  container.className = 'spark-container';
+  document.body.appendChild(container);
+  document.addEventListener('click', e => {
+    const count = 6;
+    for (let i = 0; i < count; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'spark';
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6;
+      const dist = 18 + Math.random() * 22;
+      spark.style.left = e.clientX + 'px';
+      spark.style.top = e.clientY + 'px';
+      spark.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+      spark.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+      spark.style.background = `hsl(${330 + Math.random() * 30}, 90%, ${55 + Math.random() * 20}%)`;
+      container.appendChild(spark);
+      spark.addEventListener('animationend', () => spark.remove());
+    }
+  });
+})();
+
+// ===== 陀螺仪视差 =====
+(function() {
+  if (typeof DeviceOrientationEvent === 'undefined') return;
+  const stars = document.querySelector('.stars');
+  const orbs = document.querySelectorAll('.orb');
+  if (!stars) return;
+  let bx = 0, by = 0; // baseline
+  const maxShift = 28; // 最大位移 px
+
+  function handle(e) {
+    // gamma: 左右倾斜 (-90~90), beta: 前后倾斜 (-180~180)
+    const g = e.gamma || 0;
+    const b = e.beta || 0;
+    const x = Math.max(-1, Math.min(1, g / 45));
+    const y = Math.max(-1, Math.min(1, (b - 45) / 45));
+    stars.style.transition = 'none';
+    stars.style.transform = `translate(${x * maxShift}px, ${y * maxShift}px)`;
+    orbs.forEach((orb, i) => {
+      const d = (i + 1) * 0.6;
+      orb.style.transition = 'none';
+      orb.style.transform = `translate(${x * maxShift * d}px, ${y * maxShift * d}px)`;
+    });
+  }
+
+  function reset() {
+    stars.style.transition = 'transform 0.8s ease-out';
+    stars.style.transform = '';
+    orbs.forEach(orb => {
+      orb.style.transition = 'transform 0.8s ease-out';
+      orb.style.transform = '';
+    });
+  }
+
+  // iOS 13+ 需要用户手势授权
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // 创建一个授权提示按钮（首次触摸页面时弹出）
+    const ask = () => {
+      DeviceOrientationEvent.requestPermission()
+        .then(state => {
+          if (state === 'granted') {
+            window.addEventListener('deviceorientation', handle);
+            window.addEventListener('deviceorientation', () => {
+              // 3 秒后重置，避免持续偏移
+              clearTimeout(window._gyroTimer);
+              window._gyroTimer = setTimeout(reset, 3000);
+            });
+          }
+        })
+        .catch(() => {});
+      document.removeEventListener('click', ask);
+      document.removeEventListener('touchstart', ask);
+    };
+    document.addEventListener('click', ask, { once: true });
+    document.addEventListener('touchstart', ask, { once: true });
+  } else {
+    // 安卓直接监听
+    window.addEventListener('deviceorientation', handle);
+    let idle;
+    window.addEventListener('deviceorientation', () => {
+      clearTimeout(idle);
+      idle = setTimeout(reset, 3000);
+    });
+  }
+})();
 </script>
 
 </body>
