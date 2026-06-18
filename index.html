@@ -8,34 +8,237 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
 
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    color: #e0e0e0;
-    min-height: 100vh;
-    line-height: 1.6;
+  /* ===== 色彩变量：默认暗色主题 ===== */
+  :root {
+    --bg-start: #0f0c29;    --bg-mid: #302b63;    --bg-end: #24243e;
+    --text: #e0e0e0;
+    --text-muted: #889;
+    --text-dim: #667;
+    --heading: #ddd;
+    --hero-sub: #889;
+    --nav-bg: rgba(15,12,41,0.45);
+    --nav-border: rgba(255,255,255,0.06);
+    --nav-link: #999;
+    --nav-link-hover: #fff;
+    --card-bg: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.08);
+    --card-hover-border: rgba(245,87,108,0.4);
+    --card-hover-shadow: rgba(0,0,0,0.3);
+    --card-hover-ring: rgba(245,87,108,0.15);
+    --card-icon-bg: rgba(255,255,255,0.06);
+    --card-title: #fff;
+    --tag-bg: rgba(255,255,255,0.08);
+    --tag-text: #aab;
+    --badge-bg: rgba(255,255,255,0.03);
+    --badge-border: rgba(255,255,255,0.15);
+    --badge-text: #aaa;
+    --outline-btn-text: #c0c0c0;
+    --outline-btn-border: rgba(255,255,255,0.2);
+    --outline-btn-hover-text: #fff;
+    --outline-btn-hover-border: rgba(255,255,255,0.5);
+    --footer-text: #556;
+    --footer-link: #778;
+    --footer-link-hover: #aaa;
+    --footer-border: rgba(255,255,255,0.06);
+    --placeholder-plus: #445;
+    --placeholder-hint: #556;
+    --dash-border: rgba(255,255,255,0.12);
+    --star-color: rgba(255,255,255,0.5);
   }
 
-  /* --- 星空粒子背景 --- */
+  /* ===== 亮色主题：跟随系统 ===== */
+  @media (prefers-color-scheme: light) {
+    :root:not(.dark):not(.light) {
+      --bg-start: #f5f3ff;    --bg-mid: #fdf2f8;    --bg-end: #fce4ec;
+      --text: #3a3a4a;
+      --text-muted: #6b6b7b;
+      --text-dim: #8a8a9a;
+      --heading: #2a2a3a;
+      --hero-sub: #6b6b7b;
+      --nav-bg: rgba(255,255,255,0.35);
+      --nav-border: rgba(0,0,0,0.06);
+      --nav-link: #777;
+      --nav-link-hover: #333;
+      --card-bg: rgba(255,255,255,0.38);
+      --card-border: rgba(0,0,0,0.06);
+      --card-hover-border: rgba(245,87,108,0.5);
+      --card-hover-shadow: rgba(0,0,0,0.08);
+      --card-hover-ring: rgba(245,87,108,0.12);
+      --card-icon-bg: rgba(0,0,0,0.04);
+      --card-title: #2a2a3a;
+      --tag-bg: rgba(0,0,0,0.05);
+      --tag-text: #6b6b7b;
+      --badge-bg: rgba(0,0,0,0.02);
+      --badge-border: rgba(0,0,0,0.1);
+      --badge-text: #888;
+      --outline-btn-text: #666;
+      --outline-btn-border: rgba(0,0,0,0.15);
+      --outline-btn-hover-text: #333;
+      --outline-btn-hover-border: rgba(0,0,0,0.35);
+      --footer-text: #aaa;
+      --footer-link: #999;
+      --footer-link-hover: #666;
+      --footer-border: rgba(0,0,0,0.06);
+      --placeholder-plus: #ccc;
+      --placeholder-hint: #bbb;
+      --dash-border: rgba(0,0,0,0.1);
+      --star-color: rgba(0,0,0,0.1);
+    }
+  }
+
+  /* ===== 手动亮色（优先级高于系统媒体查询） ===== */
+  html.light {
+    --bg-start: #f5f3ff;    --bg-mid: #fdf2f8;    --bg-end: #fce4ec;
+    --text: #3a3a4a;
+    --text-muted: #6b6b7b;
+    --text-dim: #8a8a9a;
+    --heading: #2a2a3a;
+    --hero-sub: #6b6b7b;
+    --nav-bg: rgba(255,255,255,0.35);
+    --nav-border: rgba(0,0,0,0.06);
+    --nav-link: #777;
+    --nav-link-hover: #333;
+    --card-bg: rgba(255,255,255,0.38);
+    --card-border: rgba(0,0,0,0.06);
+    --card-hover-border: rgba(245,87,108,0.5);
+    --card-hover-shadow: rgba(0,0,0,0.08);
+    --card-hover-ring: rgba(245,87,108,0.12);
+    --card-icon-bg: rgba(0,0,0,0.04);
+    --card-title: #2a2a3a;
+    --tag-bg: rgba(0,0,0,0.05);
+    --tag-text: #6b6b7b;
+    --badge-bg: rgba(0,0,0,0.02);
+    --badge-border: rgba(0,0,0,0.1);
+    --badge-text: #888;
+    --outline-btn-text: #666;
+    --outline-btn-border: rgba(0,0,0,0.15);
+    --outline-btn-hover-text: #333;
+    --outline-btn-hover-border: rgba(0,0,0,0.35);
+    --footer-text: #aaa;
+    --footer-link: #999;
+    --footer-link-hover: #666;
+    --footer-border: rgba(0,0,0,0.06);
+    --placeholder-plus: #ccc;
+    --placeholder-hint: #bbb;
+    --dash-border: rgba(0,0,0,0.1);
+    --star-color: rgba(0,0,0,0.1);
+  }
+
+  /* ===== 手动暗色（覆盖系统亮色） ===== */
+  html.dark {
+    --bg-start: #0f0c29;    --bg-mid: #302b63;    --bg-end: #24243e;
+    --text: #e0e0e0;
+    --text-muted: #889;
+    --text-dim: #667;
+    --heading: #ddd;
+    --hero-sub: #889;
+    --nav-bg: rgba(15,12,41,0.45);
+    --nav-border: rgba(255,255,255,0.06);
+    --nav-link: #999;
+    --nav-link-hover: #fff;
+    --card-bg: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.08);
+    --card-hover-border: rgba(245,87,108,0.4);
+    --card-hover-shadow: rgba(0,0,0,0.3);
+    --card-hover-ring: rgba(245,87,108,0.15);
+    --card-icon-bg: rgba(255,255,255,0.06);
+    --card-title: #fff;
+    --tag-bg: rgba(255,255,255,0.08);
+    --tag-text: #aab;
+    --badge-bg: rgba(255,255,255,0.03);
+    --badge-border: rgba(255,255,255,0.15);
+    --badge-text: #aaa;
+    --outline-btn-text: #c0c0c0;
+    --outline-btn-border: rgba(255,255,255,0.2);
+    --outline-btn-hover-text: #fff;
+    --outline-btn-hover-border: rgba(255,255,255,0.5);
+    --footer-text: #556;
+    --footer-link: #778;
+    --footer-link-hover: #aaa;
+    --footer-border: rgba(255,255,255,0.06);
+    --placeholder-plus: #445;
+    --placeholder-hint: #556;
+    --dash-border: rgba(255,255,255,0.12);
+    --star-color: rgba(255,255,255,0.5);
+  }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e, #1a1040);
+    background-size: 400% 400%;
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    transition: color 0.3s ease;
+    animation: bgShift 12s ease infinite;
+  }
+  @keyframes bgShift {
+    0%, 100% { background-position: 0% 50%; }
+    25% { background-position: 100% 0%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 100%; }
+  }
+  /* 亮色渐变叠加层 — 通过 opacity 切换实现平滑过渡 */
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(135deg, #f5f3ff, #fdf2f8, #fce4ec);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  html.light body::before { opacity: 1; }
+  html.light .stars { opacity: 0; }
+  html.light .orb { opacity: 0.35; }
+  @media (prefers-color-scheme: light) {
+    html:not(.dark):not(.light) body::before { opacity: 1; }
+    html:not(.dark):not(.light) .stars { opacity: 0; }
+    html:not(.dark):not(.light) .orb { opacity: 0.35; }
+  }
+  nav, .card, .hero .badge, .card .icon, .card .tag,
+  .card .btn.outline, .stars, footer {
+    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.3s ease;
+  }
+  .card .tag { transition: background-color 0.4s ease, color 0.3s ease; }
+  .projects-section h2, .projects-section .sub, .hero p,
+  .card h3, .card .desc, footer, footer a, nav a {
+    transition: color 0.3s ease;
+  }
+
+  /* --- 粒子背景（视差层，仅暗色模式） --- */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
   .stars {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    position: fixed; inset: -40px; pointer-events: none; z-index: 0;
+    animation: twinkle 3s ease-in-out infinite;
     background:
-      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
-      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3), transparent),
-      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5), transparent),
-      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3), transparent),
-      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4), transparent),
-      radial-gradient(2px 2px at 20% 90%, rgba(255,255,255,0.2), transparent),
-      radial-gradient(2px 2px at 60% 30%, rgba(255,255,255,0.2), transparent),
-      radial-gradient(2px 2px at 80% 70%, rgba(255,255,255,0.15), transparent);
+      radial-gradient(2px 2px at 10% 20%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 30% 70%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 50% 15%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 70% 80%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 90% 40%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 85% 12%, var(--star-color), transparent),
+      radial-gradient(3px 3px at 15% 55%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 20% 90%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 55% 25%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 60% 30%, var(--star-color), transparent),
+      radial-gradient(3px 3px at 40% 78%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 80% 60%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 8% 38%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 95% 72%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 45% 45%, var(--star-color), transparent),
+      radial-gradient(2px 2px at 62% 12%, var(--star-color), transparent),
+      radial-gradient(3px 3px at 25% 65%, var(--star-color), transparent),
+      radial-gradient(1px 1px at 75% 35%, var(--star-color), transparent);
+    transition: transform 0.2s ease-out;
   }
 
   /* --- 导航栏 --- */
   nav {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(15,12,41,0.7);
+    background: var(--nav-bg);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid var(--nav-border);
     padding: 0 24px;
   }
   nav .inner {
@@ -43,6 +246,7 @@
     display: flex; align-items: center; justify-content: space-between;
     height: 60px;
   }
+  nav .nav-right { display: flex; align-items: center; gap: 16px; }
   nav .logo {
     font-size: 1.3rem; font-weight: 700;
     background: linear-gradient(90deg, #f093fb, #f5576c);
@@ -50,14 +254,38 @@
     letter-spacing: -0.5px;
   }
   nav a {
-    color: #999; text-decoration: none; font-size: 0.9rem;
+    color: var(--nav-link); text-decoration: none; font-size: 0.9rem;
     transition: color 0.2s;
   }
-  nav a:hover { color: #fff; }
+  nav a:hover { color: var(--nav-link-hover); }
   nav .gh-icon {
     display: flex; align-items: center; gap: 6px;
   }
   nav .gh-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+  /* 主题切换 & 语言切换按钮 */
+  .theme-btn, .lang-btn {
+    background: none; border: 1px solid var(--nav-border);
+    color: var(--nav-link); cursor: pointer;
+    height: 36px; border-radius: 50px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; transition: background 0.2s, color 0.2s;
+    padding: 0 12px; line-height: 1; font-weight: 600;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .theme-btn { width: 36px; padding: 0; border-radius: 50%; font-size: 1.1rem; font-weight: 400; }
+  .theme-btn:hover, .lang-btn:hover { background: var(--card-bg); color: var(--nav-link-hover); }
+  /* 默认/暗色 → 显示太阳（提示可以切到亮色） */
+  .theme-btn .icon-sun { display: inline; }
+  .theme-btn .icon-moon { display: none; }
+  /* 亮色 → 显示月亮（提示可以切回暗色） */
+  html.light .theme-btn .icon-sun { display: none; }
+  html.light .theme-btn .icon-moon { display: inline; }
+  /* auto 模式下系统亮色 → 图标也对应切换 */
+  @media (prefers-color-scheme: light) {
+    html:not(.dark):not(.light) .theme-btn .icon-sun { display: none; }
+    html:not(.dark):not(.light) .theme-btn .icon-moon { display: inline; }
+  }
 
   /* --- Hero --- */
   .hero {
@@ -67,12 +295,12 @@
   .hero .badge {
     display: inline-block;
     padding: 6px 18px;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid var(--badge-border);
     border-radius: 50px;
-    font-size: 0.8rem; color: #aaa;
+    font-size: 0.8rem; color: var(--badge-text);
     margin-bottom: 24px;
     backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.03);
+    background: var(--badge-bg);
   }
   .hero h1 {
     font-size: clamp(2.8rem, 6vw, 4.5rem);
@@ -83,7 +311,7 @@
     letter-spacing: -1px;
   }
   .hero p {
-    color: #889;
+    color: var(--hero-sub);
     font-size: 1.1rem;
     max-width: 500px; margin: 0 auto 36px;
   }
@@ -101,6 +329,35 @@
     box-shadow: 0 12px 40px rgba(245,87,108,0.35);
   }
   .hero .cta-arrow { margin-left: 6px; }
+  /* 鼠标跟随光晕（全局） */
+  .cursor-glow {
+    position: fixed; z-index: 0; top: 0; left: 0;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(240,147,251,0.12), transparent 65%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s;
+    opacity: 0;
+  }
+  @media (max-width: 768px) { .cursor-glow, .orb { display: none; } }
+
+  /* 漂浮光斑 */
+  .orb {
+    position: fixed; z-index: 0; pointer-events: none;
+    border-radius: 50%; filter: blur(80px); opacity: 0.28;
+    animation: float 25s ease-in-out infinite;
+  }
+  .orb-1 { width: 500px; height: 500px; background: #f093fb; top: -15%; left: -10%; animation-delay: 0s; }
+  .orb-2 { width: 400px; height: 400px; background: #667eea; bottom: -12%; right: -8%; animation-delay: -9s; }
+  .orb-3 { width: 350px; height: 350px; background: #f5576c; top: 55%; left: 60%; animation-delay: -17s; }
+  @keyframes float {
+    0%   { transform: translate(5vw, 10vh) scale(0.9); }
+    25%  { transform: translate(35vw, -15vh) scale(1.08); }
+    50%  { transform: translate(15vw, 35vh) scale(0.88); }
+    75%  { transform: translate(-10vw, 5vh) scale(1.04); }
+    100% { transform: translate(5vw, 10vh) scale(0.9); }
+  }
 
   /* --- 项目区 --- */
   .projects-section {
@@ -110,10 +367,10 @@
   }
   .projects-section h2 {
     text-align: center; font-size: 1.8rem;
-    margin-bottom: 8px; color: #ddd;
+    margin-bottom: 8px; color: var(--heading);
   }
   .projects-section .sub {
-    text-align: center; color: #667; font-size: 0.9rem;
+    text-align: center; color: var(--text-dim); font-size: 0.9rem;
     margin-bottom: 48px;
   }
 
@@ -123,14 +380,21 @@
     justify-content: center;
     gap: 24px;
   }
-  .grid .card {
-    flex: 0 1 340px;
+  .grid .card { flex: 0 1 340px; }
+  /* 滚动入场动效 */
+  .card.reveal {
+    opacity: 0; transform: translateY(32px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .card.reveal.visible { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .card.reveal { opacity: 1; transform: none; transition: none; }
   }
 
   /* --- 项目卡片 --- */
   .card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 20px;
     padding: 32px;
     transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
@@ -139,17 +403,17 @@
   }
   .card:hover {
     transform: translateY(-4px);
-    border-color: rgba(245,87,108,0.4);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(245,87,108,0.15);
+    border-color: var(--card-hover-border);
+    box-shadow: 0 12px 40px var(--card-hover-shadow), 0 0 0 1px var(--card-hover-ring);
   }
   .card .icon {
     font-size: 2.5rem; margin-bottom: 16px;
     width: 60px; height: 60px; line-height: 60px; text-align: center;
-    background: rgba(255,255,255,0.06);
+    background: var(--card-icon-bg);
     border-radius: 16px;
   }
-  .card h3 { font-size: 1.25rem; color: #fff; margin-bottom: 8px; }
-  .card .desc { color: #889; font-size: 0.9rem; flex: 1; margin-bottom: 20px; }
+  .card h3 { font-size: 1.25rem; color: var(--card-title); margin-bottom: 8px; }
+  .card .desc { color: var(--text-muted); font-size: 0.9rem; flex: 1; margin-bottom: 20px; }
 
   .card .tags {
     display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;
@@ -158,8 +422,8 @@
     font-size: 0.75rem;
     padding: 4px 12px;
     border-radius: 50px;
-    background: rgba(255,255,255,0.08);
-    color: #aab;
+    background: var(--tag-bg);
+    color: var(--tag-text);
   }
 
   .card .actions { display: flex; gap: 12px; }
@@ -181,33 +445,33 @@
   }
   .card .btn.outline {
     background: transparent;
-    color: #c0c0c0;
-    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--outline-btn-text);
+    border: 1px solid var(--outline-btn-border);
   }
   .card .btn.outline:hover {
-    border-color: rgba(255,255,255,0.5); color: #fff;
+    border-color: var(--outline-btn-hover-border); color: var(--outline-btn-hover-text);
   }
   .card .btn svg { width: 16px; height: 16px; }
 
-  /* --- 空态（暂无项目时的占位卡片） --- */
+  /* --- 空态 --- */
   .card.placeholder {
     border-style: dashed;
-    border-color: rgba(255,255,255,0.12);
+    border-color: var(--dash-border);
     justify-content: center; align-items: center;
     min-height: 260px;
   }
-  .card.placeholder .plus { font-size: 2.5rem; color: #445; margin-bottom: 8px; }
-  .card.placeholder .hint { color: #556; font-size: 0.9rem; }
+  .card.placeholder .plus { font-size: 2.5rem; color: var(--placeholder-plus); margin-bottom: 8px; }
+  .card.placeholder .hint { color: var(--placeholder-hint); font-size: 0.9rem; }
 
   /* --- Footer --- */
   footer {
     position: relative; z-index: 1;
     text-align: center; padding: 40px 24px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    color: #556; font-size: 0.85rem;
+    border-top: 1px solid var(--footer-border);
+    color: var(--footer-text); font-size: 0.85rem;
   }
-  footer a { color: #778; text-decoration: none; }
-  footer a:hover { color: #aaa; }
+  footer a { color: var(--footer-link); text-decoration: none; }
+  footer a:hover { color: var(--footer-link-hover); }
 
   /* --- 响应式 --- */
   @media (max-width: 768px) {
@@ -219,101 +483,262 @@
 <body>
 
 <div class="stars"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
 <!-- 导航 -->
 <nav>
   <div class="inner">
     <span class="logo">Vibecoding</span>
-    <a class="gh-icon" href="https://github.com/Rikka611" target="_blank">
-      <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
-      GitHub
-    </a>
+    <div class="nav-right">
+      <button class="lang-btn" id="langToggle">EN</button>
+      <button class="theme-btn" id="themeToggle" title="切换日夜模式">
+        <span class="icon-sun">☀️</span>
+        <span class="icon-moon">🌙</span>
+      </button>
+      <a class="gh-icon" href="https://github.com/Rikka611" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
+        GitHub
+      </a>
+    </div>
   </div>
 </nav>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="badge">vibecoding projects</div>
-  <h1>Build & Share</h1>
-  <p>这里收集了我的 vibecoding 项目，随手写的小工具、bot、爬虫……觉得有用就直接下载吧。</p>
-  <a class="cta" href="#projects">看看项目<span class="cta-arrow">↓</span></a>
-</section>
-
-<!-- 项目区 -->
-<section class="projects-section" id="projects">
-  <h2>项目列表</h2>
-  <p class="sub">点击卡片下载对应的 zip 包</p>
-
-  <div class="grid" id="projectGrid">
-    <!-- JS 动态渲染 -->
-  </div>
-</section>
+<div id="contentRoot"></div>
 
 <footer>
-  &copy; 2026 Rikka · Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>
+  <span id="footerText">&copy; 2026 Rikka611 &middot; Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a></span>
 </footer>
 
 <script>
-// ============================================================
-//  添加新项目：在下面数组里 push 一个对象
-//  ──────────────────────────────────────────────
-//  icon:      emoji 图标
-//  name:      项目名称
-//  desc:      一句话描述
-//  tags:      技术标签数组
-//  download:  下载链接 (GitHub Release 直链)
-//  source:    (可选) 源码链接
-// ============================================================
 const projects = [
   {
     icon: "🤖",
     name: "JM-QQBot v1.0",
-    desc: "QQ 群漫画下载机器人，根据车牌号从 JM 下载图片并转成 PDF，群友 @机器人 即可使用。",
-    tags: ["Python", "NoneBot2", "JMComic"],
+    name_en: "JM-QQBot v1.0",
+    desc: "基于 NapCat 的 QQ 群漫画下载机器人，输入车牌号自动下载图片并打包成 PDF。",
+    desc_en: "QQ group comic bot. Send a JM code, get images auto-downloaded and packed as PDF.",
+    tags: ["NapCat", "NoneBot2", "JMComic"],
     download: "https://github.com/Rikka611/Mysite/releases/download/chatbot/qq-bot-full.zip",
     source: null
   },
   {
     icon: "🚧",
-    name: "Coming Soon",
+    name: "敬请期待",
+    name_en: "Coming Soon",
     desc: "新的 vibecoding 项目正在折腾中……敬请期待。",
+    desc_en: "Something new is brewing... stay tuned.",
     tags: ["..."],
     download: null,
     source: null
   }
 ];
 
-// 渲染卡片
-const grid = document.getElementById('projectGrid');
+const i18n = {
+  zh: {
+    badge: 'vibecoding projects',
+    heroSub: '这里收集了我的 vibecoding 项目，随手写的小工具、bot、爬虫……觉得有用就直接下载吧。',
+    cta: '看看项目↓',
+    sectionTitle: '项目列表',
+    sectionSub: '点击卡片下载对应的 zip 包',
+    dlBtn: 'GitHub下载',
+    srcBtn: '源码',
+    emptyHint: '项目准备好了就来填坑',
+    langLabel: 'EN',
+    footer: '&copy; 2026 Rikka611 &middot; Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>'
+  },
+  en: {
+    badge: 'vibecoding projects',
+    heroSub: 'A collection of my vibecoding projects — utilities, bots, scrapers… grab whatever you find useful.',
+    cta: 'Browse Projects ↓',
+    sectionTitle: 'Projects',
+    sectionSub: 'Click a card to download',
+    dlBtn: 'GitHub Download',
+    srcBtn: 'Source',
+    emptyHint: 'Projects coming soon...',
+    langLabel: '中',
+    footer: '&copy; 2026 Rikka611 &middot; Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>'
+  }
+};
 
-// 下载图标 SVG
+let lang = localStorage.getItem('lang') || 'zh';
+const $ = id => document.getElementById(id);
+
 const dlIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
 const codeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
 
-if (projects.length === 0) {
-  grid.innerHTML = `
-    <div class="card placeholder">
-      <div class="plus">+</div>
-      <div class="hint">项目准备好了就来填坑</div>
-    </div>`;
-} else {
-  grid.innerHTML = projects.map(p => {
+function buildContent(l) {
+  const t = i18n[l];
+  const cardsHTML = projects.map(p => {
+    const name = l === 'en' && p.name_en ? p.name_en : p.name;
+    const desc = l === 'en' && p.desc_en ? p.desc_en : p.desc;
     const dlBtn = p.download
-      ? `<a class="btn primary" href="${p.download}" ${p.download === '#' ? 'onclick="return false" style="opacity:0.5"' : ''}>${dlIcon} 下载</a>`
+      ? `<a class="btn primary" href="${p.download}">${dlIcon} ${t.dlBtn}</a>`
       : '';
     const srcBtn = p.source
-      ? `<a class="btn outline" href="${p.source}" target="_blank">${codeIcon} 源码</a>`
+      ? `<a class="btn outline" href="${p.source}" target="_blank">${codeIcon} ${t.srcBtn}</a>`
       : '';
     const actions = (dlBtn || srcBtn) ? `<div class="actions">${dlBtn}${srcBtn}</div>` : '';
-    return `
-    <div class="card">
-      <div class="icon">${p.icon}</div>
-      <h3>${p.name}</h3>
-      <p class="desc">${p.desc}</p>
-      <div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-      ${actions}
-    </div>`;
+    return `<div class="card reveal"><div class="icon">${p.icon}</div><h3>${name}</h3><p class="desc">${desc}</p><div class="tags">${p.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>${actions}</div>`;
   }).join('');
+
+  return `
+    <section class="hero">
+      <div class="badge">${t.badge}</div>
+      <h1>Build & Share</h1>
+      <p>${t.heroSub}</p>
+      <a class="cta" href="#projects">${t.cta}</a>
+    </section>
+    <section class="projects-section" id="projects">
+      <h2>${t.sectionTitle}</h2>
+      <p class="sub">${t.sectionSub}</p>
+      <div class="grid">${cardsHTML}</div>
+    </section>`;
+}
+
+// 渲染初始内容
+const root = $('contentRoot');
+root.innerHTML = buildContent(lang);
+$('langToggle').textContent = i18n[lang].langLabel;
+$('footerText').innerHTML = i18n[lang].footer;
+
+// ===== FLIP 语言切换 =====
+$('langToggle').addEventListener('click', () => {
+  // 容器类（只平移，不缩放不淡入淡出，防抽搐）
+  const containers = '.card';
+  // 叶子类（平移 + 缩放 + 弹跳）
+  const leaves = '.badge, .cta, .card .btn, .card .tag';
+  // 文字类（平移 + 淡入淡出）
+  const staticEls = '.hero h1'; // 不切换语言的元素，只平移动画
+  const texts = '.hero p, .projects-section h2, .sub, .card h3, .card .desc';
+
+  const allSel = containers + ', ' + leaves + ', ' + texts + ', ' + staticEls;
+  const oldAll = Array.from(root.querySelectorAll(allSel));
+  const firstRects = oldAll.map(el => el.getBoundingClientRect());
+
+  // 切换
+  lang = lang === 'zh' ? 'en' : 'zh';
+  localStorage.setItem('lang', lang);
+  $('langToggle').textContent = i18n[lang].langLabel;
+  $('footerText').innerHTML = i18n[lang].footer;
+  root.innerHTML = buildContent(lang);
+  document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
+
+  const newAll = Array.from(root.querySelectorAll(allSel));
+  const count = Math.min(firstRects.length, newAll.length);
+
+  for (let i = 0; i < count; i++) {
+    const el = newAll[i];
+    const fr = firstRects[i];
+    const lr = el.getBoundingClientRect();
+    const dx = fr.left - lr.left;
+    const dy = fr.top - lr.top;
+    const isLeaf = el.matches(leaves);
+    const isText = el.matches(texts);
+    const sx = isLeaf && lr.width > 0 ? fr.width / lr.width : 1;
+    const sy = isLeaf && lr.height > 0 ? fr.height / lr.height : 1;
+
+    if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3 && Math.abs(sx - 1) < 0.005 && Math.abs(sy - 1) < 0.005) continue;
+
+    el.style.transition = 'none';
+    if (isLeaf && (Math.abs(sx - 1) > 0.005 || Math.abs(sy - 1) > 0.005)) {
+      el.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+      el.style.transformOrigin = 'top left';
+    } else {
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+    }
+    if (isText) el.style.opacity = '0';
+  }
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      for (let i = 0; i < count; i++) {
+        const el = newAll[i];
+        if (el.style.transform === '') continue;
+        const isLeaf = el.matches(leaves);
+        const isText = el.matches(texts);
+        let props = 'transform 0.55s cubic-bezier(0.33, 0, 0.1, 1)';
+        if (isLeaf) props = 'transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.15)';
+        if (isText) props += ', opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
+        el.style.transition = props;
+        el.style.transform = isLeaf ? 'translate(0, 0) scale(1, 1)' : 'translate(0, 0)';
+        if (isText) el.style.opacity = '1';
+      }
+    });
+  });
+
+  setTimeout(() => {
+    newAll.forEach(el => {
+      el.style.transition = '';
+      el.style.transform = '';
+      el.style.transformOrigin = '';
+      el.style.opacity = '';
+    });
+  }, 600);
+});
+
+// ===== 日夜模式 =====
+const html = document.documentElement;
+const toggle = $('themeToggle');
+
+function applyTheme(mode) {
+  html.classList.remove('light', 'dark');
+  if (mode === 'light') html.classList.add('light');
+  if (mode === 'dark') html.classList.add('dark');
+}
+
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) applyTheme(savedTheme);
+
+toggle.addEventListener('click', () => {
+  const current = html.classList.contains('light') ? 'light'
+    : html.classList.contains('dark') ? 'dark'
+    : 'auto';
+  if (current === 'auto') {
+    const sysIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    localStorage.setItem('theme', sysIsDark ? 'light' : 'dark');
+    applyTheme(sysIsDark ? 'light' : 'dark');
+  } else if (current === 'dark') {
+    localStorage.setItem('theme', 'light');
+    applyTheme('light');
+  } else {
+    localStorage.setItem('theme', 'dark');
+    applyTheme('dark');
+  }
+});
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (!localStorage.getItem('theme')) {
+    applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+});
+
+// ===== 滚动入场 =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
+
+// ===== 鼠标光晕 + 视差 =====
+const glow = document.getElementById('cursorGlow');
+const starsEl = document.querySelector('.stars');
+if (glow) {
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+    glow.style.opacity = '1';
+    if (starsEl) {
+      const x = (e.clientX / window.innerWidth - 0.5) * 16;
+      const y = (e.clientY / window.innerHeight - 0.5) * 16;
+      starsEl.style.transform = `translate(${-x}px, ${-y}px)`;
+    }
+  });
+  document.addEventListener('mouseleave', () => {
+    glow.style.opacity = '0';
+    if (starsEl) starsEl.style.transform = 'translate(0, 0)';
+  });
 }
 </script>
 
