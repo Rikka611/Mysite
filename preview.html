@@ -623,12 +623,26 @@ $('langToggle').addEventListener('click', () => {
   lang = lang === 'zh' ? 'en' : 'zh';
   localStorage.setItem('lang', lang);
   const langBtn = $('langToggle');
-  langBtn.style.transition = 'opacity 0.15s ease';
-  langBtn.style.opacity = '0';
-  setTimeout(() => {
-    langBtn.textContent = i18n[lang].langLabel;
-    langBtn.style.opacity = '1';
-  }, 150);
+  const oldWidth = langBtn.offsetWidth;
+  langBtn.textContent = i18n[lang].langLabel;
+  const newWidth = langBtn.offsetWidth;
+  if (oldWidth > 0 && newWidth > 0 && Math.abs(oldWidth - newWidth) > 1) {
+    langBtn.style.transition = 'none';
+    langBtn.style.transform = `scaleX(${oldWidth / newWidth})`;
+    langBtn.style.transformOrigin = 'right center';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        langBtn.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.1)';
+        langBtn.style.transform = 'scaleX(1)';
+        langBtn.addEventListener('transitionend', function cleanup() {
+          langBtn.style.transition = '';
+          langBtn.style.transform = '';
+          langBtn.style.transformOrigin = '';
+          langBtn.removeEventListener('transitionend', cleanup);
+        });
+      });
+    });
+  }
   $('footerText').innerHTML = i18n[lang].footer;
   root.innerHTML = buildContent(lang);
   document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
