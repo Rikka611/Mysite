@@ -602,6 +602,7 @@ function buildContent(l) {
 const root = $('contentRoot');
 root.innerHTML = buildContent(lang);
 $('langToggle').textContent = i18n[lang].langLabel;
+$('langToggle').style.transition = 'opacity 0.15s ease';
 $('footerText').innerHTML = i18n[lang].footer;
 
 // ===== FLIP 语言切换 =====
@@ -621,7 +622,13 @@ $('langToggle').addEventListener('click', () => {
   // 切换
   lang = lang === 'zh' ? 'en' : 'zh';
   localStorage.setItem('lang', lang);
-  $('langToggle').textContent = i18n[lang].langLabel;
+  const langBtn = $('langToggle');
+  langBtn.style.transition = 'opacity 0.15s ease';
+  langBtn.style.opacity = '0';
+  setTimeout(() => {
+    langBtn.textContent = i18n[lang].langLabel;
+    langBtn.style.opacity = '1';
+  }, 150);
   $('footerText').innerHTML = i18n[lang].footer;
   root.innerHTML = buildContent(lang);
   document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
