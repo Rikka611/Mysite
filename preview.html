@@ -645,7 +645,7 @@ $('langToggle').addEventListener('click', () => {
   }
   $('footerText').innerHTML = i18n[lang].footer;
   root.innerHTML = buildContent(lang);
-  document.querySelectorAll('.card.reveal').forEach(c => observer.observe(c));
+  document.querySelectorAll('.card.reveal').forEach(c => { c.classList.add('visible'); observer.observe(c); });
 
   const newAll = Array.from(root.querySelectorAll(allSel));
   const count = Math.min(firstRects.length, newAll.length);
