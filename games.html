@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏合集 — Vibecoding</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --bg-start: #0f0c29;    --bg-mid: #302b63;    --bg-end: #24243e;
+  --text: #e0e0e0;        --text-muted: #889;   --text-dim: #667;
+  --heading: #ddd;        --hero-sub: #889;
+  --nav-bg: rgba(15,12,41,0.45);  --nav-border: rgba(255,255,255,0.06);
+  --nav-link: #999;       --nav-link-hover: #fff;
+  --card-bg: rgba(255,255,255,0.05);  --card-border: rgba(255,255,255,0.08);
+  --card-hover-border: rgba(245,87,108,0.4);
+  --card-hover-shadow: rgba(0,0,0,0.3);
+  --card-hover-ring: rgba(245,87,108,0.15);
+  --card-icon-bg: rgba(255,255,255,0.06);
+  --card-title: #fff;
+  --tag-bg: rgba(255,255,255,0.08);  --tag-text: #aab;
+  --footer-text: #556;    --footer-link: #778;  --footer-link-hover: #aaa;
+  --footer-border: rgba(255,255,255,0.06);
+  --star-color: rgba(255,255,255,0.7);
+  --dash-border: rgba(255,255,255,0.12);
+  --placeholder-plus: #445;  --placeholder-hint: #556;
+}
+@media (prefers-color-scheme: light) {
+  html:not(.dark):not(.light) {
+    --bg-start: #f5f3ff;    --bg-mid: #fdf2f8;    --bg-end: #fce4ec;
+    --text: #3a3a4a;        --text-muted: #6b6b7b; --text-dim: #8a8a9a;
+    --heading: #2a2a3a;     --hero-sub: #6b6b7b;
+    --nav-bg: rgba(255,255,255,0.35);  --nav-border: rgba(0,0,0,0.06);
+    --nav-link: #777;       --nav-link-hover: #333;
+    --card-bg: rgba(255,255,255,0.38);  --card-border: rgba(0,0,0,0.06);
+    --card-hover-border: rgba(245,87,108,0.5);
+    --card-hover-shadow: rgba(0,0,0,0.08);
+    --card-hover-ring: rgba(245,87,108,0.12);
+    --card-icon-bg: rgba(0,0,0,0.04);
+    --card-title: #2a2a3a;
+    --tag-bg: rgba(0,0,0,0.05);  --tag-text: #6b6b7b;
+    --footer-text: #aaa;    --footer-link: #999;   --footer-link-hover: #666;
+    --footer-border: rgba(0,0,0,0.06);
+    --star-color: rgba(0,0,0,0.1);
+    --dash-border: rgba(0,0,0,0.1);
+    --placeholder-plus: #ccc;  --placeholder-hint: #bbb;
+  }
+}
+html.light {
+  --bg-start: #f5f3ff;    --bg-mid: #fdf2f8;    --bg-end: #fce4ec;
+  --text: #3a3a4a;        --text-muted: #6b6b7b; --text-dim: #8a8a9a;
+  --heading: #2a2a3a;     --hero-sub: #6b6b7b;
+  --nav-bg: rgba(255,255,255,0.35);  --nav-border: rgba(0,0,0,0.06);
+  --nav-link: #777;       --nav-link-hover: #333;
+  --card-bg: rgba(255,255,255,0.38);  --card-border: rgba(0,0,0,0.06);
+  --card-hover-border: rgba(245,87,108,0.5);
+  --card-hover-shadow: rgba(0,0,0,0.08);
+  --card-hover-ring: rgba(245,87,108,0.12);
+  --card-icon-bg: rgba(0,0,0,0.04);
+  --card-title: #2a2a3a;
+  --tag-bg: rgba(0,0,0,0.05);  --tag-text: #6b6b7b;
+  --footer-text: #aaa;    --footer-link: #999;   --footer-link-hover: #666;
+  --footer-border: rgba(0,0,0,0.06);
+  --star-color: rgba(0,0,0,0.1);
+  --dash-border: rgba(0,0,0,0.1);
+  --placeholder-plus: #ccc;  --placeholder-hint: #bbb;
+}
+html.dark {
+  --bg-start: #0f0c29;    --bg-mid: #302b63;    --bg-end: #24243e;
+  --text: #e0e0e0;        --text-muted: #889;   --text-dim: #667;
+  --heading: #ddd;        --hero-sub: #889;
+  --nav-bg: rgba(15,12,41,0.45);  --nav-border: rgba(255,255,255,0.06);
+  --nav-link: #999;       --nav-link-hover: #fff;
+  --card-bg: rgba(255,255,255,0.05);  --card-border: rgba(255,255,255,0.08);
+  --card-hover-border: rgba(245,87,108,0.4);
+  --card-hover-shadow: rgba(0,0,0,0.3);
+  --card-hover-ring: rgba(245,87,108,0.15);
+  --card-icon-bg: rgba(255,255,255,0.06);
+  --card-title: #fff;
+  --tag-bg: rgba(255,255,255,0.08);  --tag-text: #aab;
+  --footer-text: #556;    --footer-link: #778;  --footer-link-hover: #aaa;
+  --footer-border: rgba(255,255,255,0.06);
+  --star-color: rgba(255,255,255,0.7);
+  --dash-border: rgba(255,255,255,0.12);
+  --placeholder-plus: #445;  --placeholder-hint: #556;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e, #1a1040);
+  background-size: 400% 400%;
+  color: var(--text); min-height: 100vh; line-height: 1.6;
+  transition: color 0.3s ease;
+  animation: bgShift 12s ease infinite;
+}
+@keyframes bgShift {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(135deg, #f5f3ff, #fdf2f8, #fce4ec);
+  opacity: 0; transition: opacity 0.5s ease;
+}
+html.light body::before { opacity: 1; }
+html.light .stars { opacity: 0; animation: none; }
+html.light .orb { opacity: 0.35; }
+@media (prefers-color-scheme: light) {
+  html:not(.dark):not(.light) body::before { opacity: 1; }
+  html:not(.dark):not(.light) .stars { opacity: 0; animation: none; }
+  html:not(.dark):not(.light) .orb { opacity: 0.35; }
+}
+
+nav, .card, .card .icon, .card .tag, .stars, footer {
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.3s ease;
+}
+
+/* stars */
+@keyframes twinkle { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+.stars {
+  position: fixed; inset: -40px; pointer-events: none; z-index: 0;
+  animation: twinkle 3s ease-in-out infinite;
+  background:
+    radial-gradient(3px 3px at 10% 20%, var(--star-color), transparent),
+    radial-gradient(3px 3px at 30% 70%, var(--star-color), transparent),
+    radial-gradient(4px 4px at 15% 55%, var(--star-color), transparent),
+    radial-gradient(3px 3px at 70% 30%, var(--star-color), transparent),
+    radial-gradient(4px 4px at 60% 30%, var(--star-color), transparent),
+    radial-gradient(3px 3px at 80% 60%, var(--star-color), transparent),
+    radial-gradient(4px 4px at 40% 78%, var(--star-color), transparent),
+    radial-gradient(3px 3px at 25% 65%, var(--star-color), transparent),
+    radial-gradient(4px 4px at 55% 85%, var(--star-color), transparent),
+    radial-gradient(2px 2px at 50% 15%, var(--star-color), transparent),
+    radial-gradient(2px 2px at 70% 80%, var(--star-color), transparent),
+    radial-gradient(2px 2px at 85% 12%, var(--star-color), transparent),
+    radial-gradient(2px 2px at 8% 38%, var(--star-color), transparent),
+    radial-gradient(2px 2px at 95% 72%, var(--star-color), transparent),
+    radial-gradient(1px 1px at 90% 40%, var(--star-color), transparent),
+    radial-gradient(1px 1px at 45% 45%, var(--star-color), transparent),
+    radial-gradient(1px 1px at 5% 64%, var(--star-color), transparent);
+  transition: transform 0.2s ease-out;
+}
+
+/* orbs */
+.orb { position: fixed; z-index: 0; pointer-events: none; border-radius: 50%; filter: blur(80px); opacity: 0.28; animation: float 25s ease-in-out infinite; }
+.orb-1 { width: 500px; height: 500px; background: #f093fb; top: -15%; left: -10%; }
+.orb-2 { width: 400px; height: 400px; background: #667eea; bottom: -12%; right: -8%; animation-delay: -9s; }
+.orb-3 { width: 350px; height: 350px; background: #f5576c; top: 55%; left: 60%; animation-delay: -17s; }
+@keyframes float {
+  0%   { transform: translate(5vw, 10vh) scale(0.9); }
+  25%  { transform: translate(35vw, -15vh) scale(1.08); }
+  50%  { transform: translate(15vw, 35vh) scale(0.88); }
+  75%  { transform: translate(-10vw, 5vh) scale(1.04); }
+  100% { transform: translate(5vw, 10vh) scale(0.9); }
+}
+
+/* nav */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--nav-bg); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--nav-border); padding: 0 24px;
+}
+nav .inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+nav .nav-right { display: flex; align-items: center; gap: 16px; }
+nav .logo {
+  font-size: 1.3rem; font-weight: 700;
+  background: linear-gradient(135deg, #f093fb, #f5576c, #fda085);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+nav a {
+  color: var(--nav-link); text-decoration: none; font-size: 0.9rem;
+  transition: color 0.2s;
+}
+nav a:hover { color: var(--nav-link-hover); }
+nav .nav-game-link {
+  font-weight: 600;
+  background: linear-gradient(135deg, #f093fb, #f5576c, #fda085);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+nav .gh-icon { display: flex; align-items: center; gap: 6px; }
+nav .gh-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+.theme-btn {
+  background: none; border: 1px solid var(--nav-border); color: var(--nav-link);
+  cursor: pointer; width: 36px; height: 36px; border-radius: 50%;
+  font-size: 1.1rem; transition: background 0.2s, color 0.2s;
+}
+.theme-btn:hover { background: var(--card-bg); color: var(--nav-link-hover); }
+.theme-btn .icon-sun { display: inline; }
+.theme-btn .icon-moon { display: none; }
+html.light .theme-btn .icon-sun { display: none; }
+html.light .theme-btn .icon-moon { display: inline; }
+@media (prefers-color-scheme: light) {
+  html:not(.dark):not(.light) .theme-btn .icon-sun { display: none; }
+  html:not(.dark):not(.light) .theme-btn .icon-moon { display: inline; }
+}
+
+/* hero */
+.hero {
+  position: relative; z-index: 1;
+  text-align: center; padding: 80px 24px 60px;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800;
+  background: linear-gradient(135deg, #f093fb, #f5576c, #fda085);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1.2; margin-bottom: 12px; letter-spacing: -1px;
+}
+.hero p { color: var(--hero-sub); font-size: 1.05rem; }
+
+/* projects section */
+.games-section {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto; padding: 0 24px 80px;
+}
+.games-section h2 { text-align: center; font-size: 1.5rem; margin-bottom: 8px; color: var(--heading); }
+.games-section .sub { text-align: center; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 40px; }
+
+.grid {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 24px;
+  perspective: 1200px;
+}
+.grid .card-wrap { flex: 0 1 320px; display: flex; }
+.grid .card-wrap .card { flex: 1; width: 100%; min-height: 280px; }
+
+/* cards */
+.card {
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 20px; padding: 32px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  display: flex; flex-direction: column;
+  backdrop-filter: blur(6px); position: relative; overflow: hidden;
+}
+.card:hover {
+  border-color: var(--card-hover-border);
+  box-shadow: 0 12px 40px var(--card-hover-shadow), 0 0 0 1px var(--card-hover-ring);
+}
+.card .icon { font-size: 2.5rem; margin-bottom: 16px; }
+.card h3 { font-size: 1.2rem; color: var(--card-title); margin-bottom: 8px; }
+.card .desc { color: var(--text-muted); font-size: 0.9rem; flex: 1; margin-bottom: 20px; }
+.card .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.card .tag {
+  font-size: 0.75rem; padding: 4px 12px; border-radius: 50px;
+  background: var(--tag-bg); color: var(--tag-text);
+}
+.card .actions { display: flex; gap: 12px; }
+.card .btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 50px; font-size: 0.9rem;
+  text-decoration: none; font-weight: 500;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card .btn.primary {
+  background: linear-gradient(90deg, #f093fb, #f5576c);
+  color: #fff;
+}
+.card .btn.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,87,108,0.3); }
+
+/* placeholder */
+.card.placeholder {
+  border-style: dashed; border-color: var(--dash-border);
+  justify-content: center; align-items: center; min-height: 240px;
+}
+.card.placeholder .plus { font-size: 2.5rem; color: var(--placeholder-plus); margin-bottom: 8px; }
+.card.placeholder .hint { color: var(--placeholder-hint); font-size: 0.9rem; }
+
+/* footer */
+footer {
+  position: relative; z-index: 1; text-align: center; padding: 30px 24px;
+  border-top: 1px solid var(--footer-border);
+  color: var(--footer-text); font-size: 0.85rem;
+}
+footer a { color: var(--footer-link); text-decoration: none; }
+footer a:hover { color: var(--footer-link-hover); }
+
+@media (max-width: 768px) { .hero { padding: 50px 20px 30px; } }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav>
+  <div class="inner">
+    <a href="index.html" class="logo">Vibecoding</a>
+    <div class="nav-right">
+      <a href="games.html" class="nav-game-link">🎮 小游戏</a>
+      <button class="theme-btn" id="themeToggle" title="切换日夜模式">
+        <span class="icon-sun">☀️</span>
+        <span class="icon-moon">🌙</span>
+      </button>
+      <a class="gh-icon" href="https://github.com/Rikka611" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>小游戏合集</h1>
+  <p>摸鱼小游戏，浏览器即开即玩</p>
+</section>
+
+<section class="games-section">
+  <div class="grid">
+    <div class="card-wrap">
+      <div class="card">
+        <div class="icon">💣</div>
+        <h3>扫雷</h3>
+        <p class="desc">经典扫雷游戏，9×9 格子 10 颗雷。右键插旗，右键/长按标雷，支持暗色模式。</p>
+        <div class="tags">
+          <span class="tag">经典</span>
+          <span class="tag">鼠标/触屏</span>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="minesweeper.html">开始游戏</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-wrap">
+      <div class="card placeholder">
+        <div class="plus">+</div>
+        <p class="hint">更多游戏即将到来...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="index.html">← 返回首页</a>
+  &nbsp;&middot;&nbsp;
+  &copy; 2026 Rikka611
+</footer>
+
+<script>
+// Theme
+const html = document.documentElement;
+function applyTheme(mode) {
+  html.classList.remove('light', 'dark');
+  if (mode === 'light') html.classList.add('light');
+  if (mode === 'dark') html.classList.add('dark');
+}
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) applyTheme(savedTheme);
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = html.classList.contains('light') ? 'light' : html.classList.contains('dark') ? 'dark' : 'auto';
+  if (current === 'auto') {
+    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    localStorage.setItem('theme', sysDark ? 'light' : 'dark');
+    applyTheme(sysDark ? 'light' : 'dark');
+  } else if (current === 'dark') {
+    localStorage.setItem('theme', 'light');
+    applyTheme('light');
+  } else {
+    localStorage.setItem('theme', 'dark');
+    applyTheme('dark');
+  }
+});
+</script>
+
+</body>
+</html>

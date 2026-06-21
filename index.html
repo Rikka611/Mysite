@@ -283,6 +283,11 @@
     transition: color 0.2s;
   }
   nav a:hover { color: var(--nav-link-hover); }
+  nav .nav-game-link {
+    font-weight: 600;
+    background: linear-gradient(135deg, #f093fb, #f5576c, #fda085);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
   nav .gh-icon {
     display: flex; align-items: center; gap: 6px;
   }
@@ -546,6 +551,7 @@
   <div class="inner">
     <span class="logo">Vibecoding</span>
     <div class="nav-right">
+      <a href="games.html" class="nav-game-link">🎮 小游戏</a>
       <button class="lang-btn" id="langToggle">EN</button>
       <button class="theme-btn" id="themeToggle" title="切换日夜模式">
         <span class="icon-sun">☀️</span>
