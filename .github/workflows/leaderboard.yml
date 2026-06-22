@@ -1,48 +1,36 @@
 name: Update Leaderboard
 
 on:
-  issues:
-    types: [opened]
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Player name'
+        required: true
+      time:
+        description: 'Score in seconds'
+        required: true
+      mode:
+        description: 'Difficulty (easy/normal/hard)'
+        required: true
 
 jobs:
   update:
-    if: contains(github.event.issue.labels.*.name, 'score')
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      issues: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Parse score from issue
-        id: parse
-        run: |
-          BODY="${{ github.event.issue.body }}"
-          NAME=$(echo "$BODY" | grep -oP 'name:\s*\K.*' | head -1 | xargs)
-          TIME=$(echo "$BODY" | grep -oP 'time:\s*\K[\d.]+' | head -1)
-          MODE=$(echo "$BODY" | grep -oP 'mode:\s*\K\w+' | head -1)
-          echo "name=$NAME" >> $GITHUB_OUTPUT
-          echo "time=$TIME" >> $GITHUB_OUTPUT
-          echo "mode=$MODE" >> $GITHUB_OUTPUT
-
       - name: Update scores.json
         run: |
-          NAME="${{ steps.parse.outputs.name }}"
-          TIME="${{ steps.parse.outputs.time }}"
-          MODE="${{ steps.parse.outputs.mode }}"
-
-          if [ -z "$NAME" ] || [ -z "$TIME" ] || [ -z "$MODE" ]; then
-            echo "Invalid score data, skipping"
-            exit 0
-          fi
-
           node -e "
             const fs = require('fs');
             const data = JSON.parse(fs.readFileSync('scores.json', 'utf-8'));
-            const scores = (data[\"$MODE\"] || []).slice();
-            scores.push({ name: \"$NAME\", time: parseFloat(\"$TIME\") });
+            const mode = '${{ inputs.mode }}';
+            const scores = (data[mode] || []).slice();
+            scores.push({ name: '${{ inputs.name }}', time: parseFloat('${{ inputs.time }}') });
             scores.sort((a, b) => a.time - b.time);
-            data[\"$MODE\"] = scores.slice(0, 10);
+            data[mode] = scores.slice(0, 10);
             fs.writeFileSync('scores.json', JSON.stringify(data, null, 2) + '\n');
           "
 
@@ -51,13 +39,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add scores.json
-          git commit -m "Update leaderboard: ${{ steps.parse.outputs.name }} ${{ steps.parse.outputs.time }}s [${{ steps.parse.outputs.mode }}]" || true
+          git commit -m "Update leaderboard: ${{ inputs.name }} ${{ inputs.time }}s [${{ inputs.mode }}]" || true
           git push
-
-      - name: Close issue
-        run: |
-          gh issue close ${{ github.event.issue.number }} \
-            --comment "✅ 成绩已录入！[查看排行榜](https://rikka611.github.io/Mysite/minesweeper.html)" \
-            --repo ${{ github.repository }}
-        env:
-          GH_TOKEN: ${{ github.token }}
