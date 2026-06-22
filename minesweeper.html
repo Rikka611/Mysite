@@ -419,6 +419,7 @@ footer a:hover { color: var(--footer-link-hover); }
   .game-reset { width: 36px; height: 36px; font-size: 1.2rem; line-height: 36px; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -798,48 +799,50 @@ async function submitScoreOverlay() {
   const name = inp ? inp.value.trim() : '';
   if (!name || !window._pendingLbTime) return;
   const row = document.querySelector('.lb-overlay-row');
-  submitScore(name, window._pendingLbTime);
-  window._pendingLbTime = null;
-  if (row) row.innerHTML = `<span style="color:#34d399;font-size:0.9rem;">${t('submitted')}</span>`;
+  if (row) row.innerHTML = '<span style="color:var(--text-dim);font-size:0.85rem;">提交中...</span>';
 
-  // 轮询等待 Actions 完成后刷新
-  let attempts = 0;
-  const poll = setInterval(() => {
-    attempts++;
-    renderLeaderboard();
-    if (attempts >= 15) clearInterval(poll);
-  }, 2000);
+  const ok = await submitScore(name, window._pendingLbTime);
+  window._pendingLbTime = null;
+  if (row) row.innerHTML = ok
+    ? `<span style="color:#34d399;font-size:0.9rem;">${t('submitted')}</span>`
+    : '<span style="color:#ef4444;font-size:0.85rem;">提交失败</span>';
+  await renderLeaderboard();
 }
 
-// ===== GitHub 在线排行榜 =====
-// 读取：raw.githubusercontent.com（公开仓库无需鉴权）
-// 提交：打开预填 Issue，Actions 自动处理（无需 token）
+// ===== Supabase 在线排行榜 =====
+// 1. 在 supabase.com 创建项目
+// 2. SQL Editor 执行 supabase-setup.sql
+// 3. Settings > API 复制 URL 和 anon key 填到下面
 
-const LB_RAW = 'https://raw.githubusercontent.com/Rikka611/Mysite/main/scores.json';
-const LB_ISSUE = 'https://github.com/Rikka611/Mysite/issues/new';
+const SB_URL = 'https://YOUR_PROJECT.supabase.co';
+const SB_KEY = 'YOUR_ANON_KEY';
 
-let _lbCache = null;
+const sb = supabase.createClient(SB_URL, SB_KEY);
 
 async function fetchLeaderboard() {
   try {
-    const res = await fetch(LB_RAW + '?t=' + Date.now());
-    if (!res.ok) { return _lbCache || []; }
-    const data = await res.json();
-    _lbCache = (data && data[diff]) ? data[diff] : [];
-    return _lbCache;
+    const { data, error } = await sb
+      .from('scores')
+      .select('name, time')
+      .eq('mode', diff)
+      .order('time', { ascending: true })
+      .limit(10);
+    if (error) throw error;
+    return data || [];
   } catch (e) {
-    return _lbCache || [];
+    return [];
   }
 }
 
-function submitScore(name, time) {
-  const modeLabels = { easy: '6×6', normal: '10×10', hard: '16×16' };
-  const title = encodeURIComponent(`[成绩] ${name} - ${time.toFixed(3)}s (${modeLabels[diff]})`);
-  const body = encodeURIComponent(
-    `name: ${name}\ntime: ${time.toFixed(3)}\nmode: ${diff}\n---\n自动提交，请勿手动编辑。`
-  );
-  window.open(`${LB_ISSUE}?title=${title}&body=${body}&labels=score`, '_blank');
-  return true;
+async function submitScore(name, time) {
+  try {
+    const { error } = await sb
+      .from('scores')
+      .insert({ name: name.trim(), time, mode: diff });
+    return !error;
+  } catch (e) {
+    return false;
+  }
 }
 
 async function renderLeaderboard() {
