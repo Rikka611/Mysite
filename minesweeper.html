@@ -798,36 +798,25 @@ async function submitScoreOverlay() {
   const name = inp ? inp.value.trim() : '';
   if (!name || !window._pendingLbTime) return;
   const row = document.querySelector('.lb-overlay-row');
-  if (row) row.innerHTML = '<span style="color:var(--text-dim);font-size:0.85rem;">提交中...</span>';
-
-  const ok = await submitScore(name, window._pendingLbTime);
+  submitScore(name, window._pendingLbTime);
   window._pendingLbTime = null;
-  if (row) row.innerHTML = ok
-    ? `<span style="color:#34d399;font-size:0.9rem;">${t('submitted')}</span>`
-    : '<span style="color:#ef4444;font-size:0.85rem;">提交失败</span>';
+  if (row) row.innerHTML = `<span style="color:#34d399;font-size:0.9rem;">${t('submitted')}</span>`;
 
   // 轮询等待 Actions 完成后刷新
-  if (ok) {
-    let attempts = 0;
-    const poll = setInterval(() => {
-      attempts++;
-      renderLeaderboard();
-      if (attempts >= 15) clearInterval(poll);
-    }, 2000);
-  }
+  let attempts = 0;
+  const poll = setInterval(() => {
+    attempts++;
+    renderLeaderboard();
+    if (attempts >= 15) clearInterval(poll);
+  }, 2000);
 }
 
 // ===== GitHub 在线排行榜 =====
 // 读取：raw.githubusercontent.com（公开仓库无需鉴权）
-// 提交：通过 workflow_dispatch API 触发 Actions 自动更新
+// 提交：打开预填 Issue，Actions 自动处理（无需 token）
 
 const LB_RAW = 'https://raw.githubusercontent.com/Rikka611/Mysite/main/scores.json';
-const LB_API = 'https://api.github.com/repos/Rikka611/Mysite/actions/workflows/leaderboard.yml/dispatches';
-
-// === 在这填你的 GitHub Token ===
-// 去 https://github.com/settings/tokens/new?scopes=workflow&description=minesweeper-lb
-// 点 Generate token，把生成的 token 粘贴到下面引号里：
-const GH_TOKEN = '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';
+const LB_ISSUE = 'https://github.com/Rikka611/Mysite/issues/new';
 
 let _lbCache = null;
 
@@ -843,28 +832,14 @@ async function fetchLeaderboard() {
   }
 }
 
-async function submitScore(name, time) {
-  if (!GH_TOKEN) {
-    alert('请先在代码中配置 GH_TOKEN\n详见 minesweeper.html 第 818 行注释');
-    return false;
-  }
-  try {
-    const res = await fetch(LB_API, {
-      method: 'POST',
-      headers: {
-        Authorization: `token ${GH_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        ref: 'main',
-        inputs: { name: name.trim(), time: String(time), mode: diff }
-      })
-    });
-    return res.ok;
-  } catch (e) {
-    return false;
-  }
+function submitScore(name, time) {
+  const modeLabels = { easy: '6×6', normal: '10×10', hard: '16×16' };
+  const title = encodeURIComponent(`[成绩] ${name} - ${time.toFixed(3)}s (${modeLabels[diff]})`);
+  const body = encodeURIComponent(
+    `name: ${name}\ntime: ${time.toFixed(3)}\nmode: ${diff}\n---\n自动提交，请勿手动编辑。`
+  );
+  window.open(`${LB_ISSUE}?title=${title}&body=${body}&labels=score`, '_blank');
+  return true;
 }
 
 async function renderLeaderboard() {
