@@ -841,8 +841,9 @@ async function sbApi(path, options = {}) {
     console.error('Supabase error:', res.status, err);
     throw new Error(err);
   }
-  if (res.status === 204) return null;
-  return res.json();
+  if (res.status === 204) return [];
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
 }
 
 async function fetchLeaderboard() {

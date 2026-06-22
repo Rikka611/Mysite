@@ -16,6 +16,8 @@ CREATE INDEX idx_scores_mode_time ON scores (mode, time ASC);
 ALTER TABLE scores ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "anyone can read" ON scores FOR SELECT USING (true);
 CREATE POLICY "anyone can insert" ON scores FOR INSERT WITH CHECK (true);
+GRANT USAGE ON SEQUENCE scores_id_seq TO anon;
+GRANT INSERT ON public.scores TO anon;
 
 -- 4. 每个 mode 只保留前 10 名（通过触发器自动清理）
 CREATE OR REPLACE FUNCTION cleanup_scores()
