@@ -551,7 +551,7 @@
   <div class="inner">
     <span class="logo">Vibecoding</span>
     <div class="nav-right">
-      <a href="games.html" class="nav-game-link">🎮 小游戏</a>
+      <a href="games.html" class="nav-game-link" id="navGameLink">🎮 小游戏</a>
       <button class="lang-btn" id="langToggle">EN</button>
       <button class="theme-btn" id="themeToggle" title="切换日夜模式">
         <span class="icon-sun">☀️</span>
@@ -616,6 +616,7 @@ const i18n = {
     srcBtn: '源码',
     emptyHint: '项目准备好了就来填坑',
     langLabel: 'EN',
+    gameLink: '🎮 小游戏',
     footer: '&copy; 2026 Rikka611 &middot; Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>'
   },
   en: {
@@ -628,6 +629,7 @@ const i18n = {
     srcBtn: 'Source',
     emptyHint: 'Projects coming soon...',
     langLabel: '中',
+    gameLink: '🎮 Games',
     footer: '&copy; 2026 Rikka611 &middot; Powered by <a href="https://pages.github.com" target="_blank">GitHub Pages</a>'
   }
 };
@@ -674,6 +676,7 @@ root.innerHTML = buildContent(lang);
 $('langToggle').textContent = i18n[lang].langLabel;
 $('langToggle').style.transition = 'opacity 0.15s ease';
 $('footerText').innerHTML = i18n[lang].footer;
+$('navGameLink').textContent = i18n[lang].gameLink;
 
 // ===== FLIP 语言切换 =====
 $('langToggle').addEventListener('click', () => {
@@ -712,6 +715,7 @@ $('langToggle').addEventListener('click', () => {
     });
   }
   $('footerText').innerHTML = i18n[lang].footer;
+  $('navGameLink').textContent = i18n[lang].gameLink;
   root.innerHTML = buildContent(lang, true);
   if (window._refreshReveal) window._refreshReveal();
 

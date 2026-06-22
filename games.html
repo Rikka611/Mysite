@@ -158,6 +158,19 @@ nav, .card, .card .icon, .card .tag, .stars, footer {
   100% { transform: translate(5vw, 10vh) scale(0.9); }
 }
 
+/* cursor glow */
+.cursor-glow {
+  position: fixed; z-index: 0; top: 0; left: 0;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,147,251,0.12), transparent 65%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.5s;
+  opacity: 0;
+}
+@media (max-width: 768px) { .cursor-glow, .orb { display: none; } }
+
 /* nav */
 nav {
   position: sticky; top: 0; z-index: 100;
@@ -200,6 +213,17 @@ html.light .theme-btn .icon-moon { display: inline; }
   html:not(.dark):not(.light) .theme-btn .icon-moon { display: inline; }
 }
 
+.lang-btn {
+  background: none; border: 1px solid var(--nav-border);
+  color: var(--nav-link); cursor: pointer;
+  height: 36px; border-radius: 50px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; transition: background 0.2s, color 0.2s;
+  padding: 0 12px; line-height: 1; font-weight: 600;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.lang-btn:hover { background: var(--card-bg); color: var(--nav-link-hover); }
+
 /* hero */
 .hero {
   position: relative; z-index: 1;
@@ -228,11 +252,22 @@ html.light .theme-btn .icon-moon { display: inline; }
 .grid .card-wrap { flex: 0 1 320px; display: flex; }
 .grid .card-wrap .card { flex: 1; width: 100%; min-height: 280px; }
 
+/* scroll reveal */
+.card-wrap.reveal {
+  --reveal: 0;
+  opacity: var(--reveal);
+  transform: translateY(calc(48px * (1 - var(--reveal)))) rotateX(calc(10deg * (1 - var(--reveal))));
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-wrap.reveal { opacity: 1; transform: none; }
+}
+
 /* cards */
 .card {
   background: var(--card-bg); border: 1px solid var(--card-border);
   border-radius: 20px; padding: 32px;
   transition: border-color 0.25s, box-shadow 0.25s;
+  transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   display: flex; flex-direction: column;
   backdrop-filter: blur(6px); position: relative; overflow: hidden;
 }
@@ -240,6 +275,15 @@ html.light .theme-btn .icon-moon { display: inline; }
   border-color: var(--card-hover-border);
   box-shadow: 0 12px 40px var(--card-hover-shadow), 0 0 0 1px var(--card-hover-ring);
 }
+.card .glare {
+  position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  border-radius: 20px;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.14) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.card:hover .glare { opacity: 1; }
+.card.tilting { will-change: transform; }
+.card.tilting .glare { opacity: 1; }
 .card .icon { font-size: 2.5rem; margin-bottom: 16px; }
 .card h3 { font-size: 1.2rem; color: var(--card-title); margin-bottom: 8px; }
 .card .desc { color: var(--text-muted); font-size: 0.9rem; flex: 1; margin-bottom: 20px; }
@@ -269,6 +313,18 @@ html.light .theme-btn .icon-moon { display: inline; }
 .card.placeholder .plus { font-size: 2.5rem; color: var(--placeholder-plus); margin-bottom: 8px; }
 .card.placeholder .hint { color: var(--placeholder-hint); font-size: 0.9rem; }
 
+/* click spark */
+.spark-container { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+.spark {
+  position: absolute; width: 6px; height: 6px; border-radius: 50%;
+  background: #f5576c; pointer-events: none;
+  animation: sparkBurst 0.7s ease-out forwards;
+}
+@keyframes sparkBurst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+}
+
 /* footer */
 footer {
   position: relative; z-index: 1; text-align: center; padding: 30px 24px;
@@ -287,12 +343,14 @@ footer a:hover { color: var(--footer-link-hover); }
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
 <nav>
   <div class="inner">
     <a href="index.html" class="logo">Vibecoding</a>
     <div class="nav-right">
-      <a href="games.html" class="nav-game-link">🎮 小游戏</a>
+      <a href="games.html" class="nav-game-link" id="navGameLink">🎮 小游戏</a>
+      <button class="lang-btn" id="langToggle">EN</button>
       <button class="theme-btn" id="themeToggle" title="切换日夜模式">
         <span class="icon-sun">☀️</span>
         <span class="icon-moon">🌙</span>
@@ -305,45 +363,211 @@ footer a:hover { color: var(--footer-link-hover); }
   </div>
 </nav>
 
-<section class="hero">
-  <h1>小游戏合集</h1>
-  <p>摸鱼小游戏，浏览器即开即玩</p>
-</section>
+<div id="contentRoot"></div>
 
-<section class="games-section">
-  <div class="grid">
-    <div class="card-wrap">
-      <div class="card">
-        <div class="icon">💣</div>
-        <h3>扫雷</h3>
-        <p class="desc">经典扫雷游戏，9×9 格子 10 颗雷。右键插旗，右键/长按标雷，支持暗色模式。</p>
-        <div class="tags">
-          <span class="tag">经典</span>
-          <span class="tag">鼠标/触屏</span>
-        </div>
-        <div class="actions">
-          <a class="btn primary" href="minesweeper.html">开始游戏</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-wrap">
-      <div class="card placeholder">
-        <div class="plus">+</div>
-        <p class="hint">更多游戏即将到来...</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <a href="index.html">← 返回首页</a>
-  &nbsp;&middot;&nbsp;
-  &copy; 2026 Rikka611
-</footer>
+<footer id="footerText"></footer>
 
 <script>
-// Theme
+// ===== i18n =====
+const i18n = {
+  zh: {
+    heroTitle: '小游戏合集',
+    heroSub: '摸鱼小游戏，浏览器即开即玩',
+    gameTitle: '扫雷',
+    gameDesc: '经典扫雷游戏，9×9/10×10/16×16 三种难度。右键插旗，双击快速展开，支持暗色模式。',
+    tag1: '经典',
+    tag2: '鼠标/触屏',
+    playBtn: '开始游戏',
+    placeholder: '更多游戏即将到来...',
+    footer: '← 返回首页',
+    langLabel: 'EN',
+    gameLink: '🎮 小游戏'
+  },
+  en: {
+    heroTitle: 'Mini Games',
+    heroSub: 'Casual browser games, play instantly',
+    gameTitle: 'Minesweeper',
+    gameDesc: 'Classic minesweeper with 3 difficulties. Right-click to flag, double-click to chord. Dark mode supported.',
+    tag1: 'Classic',
+    tag2: 'Mouse/Touch',
+    playBtn: 'Play',
+    placeholder: 'More games coming soon...',
+    footer: '← Back to Home',
+    langLabel: '中',
+    gameLink: '🎮 Games'
+  }
+};
+
+let lang = localStorage.getItem('lang') || 'zh';
+const $ = id => document.getElementById(id);
+
+function buildContent(l) {
+  const t = i18n[l];
+  return `
+    <section class="hero">
+      <h1>${t.heroTitle}</h1>
+      <p>${t.heroSub}</p>
+    </section>
+    <section class="games-section">
+      <div class="grid">
+        <div class="card-wrap reveal">
+          <div class="card">
+            <div class="glare"></div>
+            <div class="icon">💣</div>
+            <h3>${t.gameTitle}</h3>
+            <p class="desc">${t.gameDesc}</p>
+            <div class="tags">
+              <span class="tag">${t.tag1}</span>
+              <span class="tag">${t.tag2}</span>
+            </div>
+            <div class="actions">
+              <a class="btn primary" href="minesweeper.html">${t.playBtn}</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-wrap reveal">
+          <div class="card placeholder">
+            <div class="plus">+</div>
+            <p class="hint">${t.placeholder}</p>
+          </div>
+        </div>
+      </div>
+    </section>`;
+}
+
+// Initial render
+const root = $('contentRoot');
+root.innerHTML = buildContent(lang);
+$('langToggle').textContent = i18n[lang].langLabel;
+$('footerText').innerHTML = `<a href="index.html">${i18n[lang].footer}</a> &nbsp;&middot;&nbsp; &copy; 2026 Rikka611`;
+$('navGameLink').textContent = i18n[lang].gameLink;
+
+// ===== FLIP language switch =====
+$('langToggle').addEventListener('click', () => {
+  const bouncers = '.card, .card .btn, .card .tag';
+  const texts = '.hero h1, .hero p, .card h3, .card .desc, .card.placeholder .plus, .card.placeholder .hint';
+  const allSel = bouncers + ', ' + texts;
+  const oldAll = Array.from(root.querySelectorAll(allSel));
+  const firstRects = oldAll.map(el => el.getBoundingClientRect());
+
+  lang = lang === 'zh' ? 'en' : 'zh';
+  localStorage.setItem('lang', lang);
+  const langBtn = $('langToggle');
+  const oldWidth = langBtn.offsetWidth;
+  langBtn.textContent = i18n[lang].langLabel;
+  const newWidth = langBtn.offsetWidth;
+  if (oldWidth > 0 && newWidth > 0 && Math.abs(oldWidth - newWidth) > 1) {
+    langBtn.style.transition = 'none';
+    langBtn.style.transform = `scaleX(${oldWidth / newWidth})`;
+    langBtn.style.transformOrigin = 'right center';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        langBtn.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.3)';
+        langBtn.style.transform = 'scaleX(1)';
+        langBtn.addEventListener('transitionend', function cleanup() {
+          langBtn.style.transition = '';
+          langBtn.style.transform = '';
+          langBtn.style.transformOrigin = '';
+          langBtn.removeEventListener('transitionend', cleanup);
+        });
+      });
+    });
+  }
+  $('footerText').innerHTML = `<a href="index.html">${i18n[lang].footer}</a> &nbsp;&middot;&nbsp; &copy; 2026 Rikka611`;
+  $('navGameLink').textContent = i18n[lang].gameLink;
+  root.innerHTML = buildContent(lang);
+  if (window._refreshReveal) window._refreshReveal();
+
+  requestAnimationFrame(() => {
+    const newAll = Array.from(root.querySelectorAll(allSel));
+    const count = Math.min(firstRects.length, newAll.length);
+
+    for (let i = 0; i < count; i++) {
+      const el = newAll[i];
+      const fr = firstRects[i];
+      const lr = el.getBoundingClientRect();
+      const dx = fr.left - lr.left;
+      const dy = fr.top - lr.top;
+      const isLeaf = el.matches(bouncers);
+      const isText = el.matches(texts);
+      const sx = isLeaf && lr.width > 0 ? fr.width / lr.width : 1;
+      const sy = isLeaf && lr.height > 0 ? fr.height / lr.height : 1;
+      const textChanged = isText && oldAll[i] && oldAll[i].textContent !== el.textContent;
+      const hasMove = Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3;
+      const hasScale = isLeaf && (Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01);
+
+      if (!hasMove && !hasScale) {
+        if (textChanged) { el.style.transition = 'none'; el.style.opacity = '0'; el._fadeOnly = true; }
+        continue;
+      }
+
+      el.style.transition = 'none';
+      el.style.transform = hasScale
+        ? `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
+        : `translate(${dx}px, ${dy}px)`;
+      if (hasScale) { el.style.transformOrigin = 'top left'; el._hadScale = true; }
+      if (isLeaf) { el.style.backdropFilter = 'none'; el.style.willChange = 'transform'; }
+      if (textChanged) el.style.opacity = '0';
+    }
+
+    requestAnimationFrame(() => {
+      let pending = 0;
+
+      for (let i = 0; i < count; i++) {
+        const el = newAll[i];
+        if (!el._fadeOnly) continue;
+        delete el._fadeOnly;
+        el.style.transition = 'opacity 0.4s ease';
+        el.style.opacity = '1';
+        pending++;
+        el.addEventListener('transitionend', function cleanup() {
+          pending--;
+          el.style.transition = '';
+          el.style.opacity = '';
+          if (pending <= 0) { newAll.forEach(e => { e.style.transition = ''; e.style.opacity = ''; }); }
+          el.removeEventListener('transitionend', cleanup);
+        });
+      }
+
+      for (let i = 0; i < count; i++) {
+        const el = newAll[i];
+        if (el.style.transform === '') continue;
+        const isLeaf = el.matches(bouncers);
+        const isText = el.matches(texts);
+        let props = 'transform 0.55s cubic-bezier(0.33, 0, 0.1, 1)';
+        if (isLeaf) props = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.6)';
+        if (isText) props += ', opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
+        el.style.transition = props;
+        el.style.transform = isLeaf ? 'translate(0, 0) scale(1, 1)' : 'translate(0, 0)';
+        if (el.style.opacity === '0') el.style.opacity = '1';
+        pending++;
+        el.addEventListener('transitionend', function cleanup() {
+          pending--;
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.transformOrigin = '';
+          el.style.opacity = '';
+          el.style.backdropFilter = '';
+          el.style.willChange = '';
+          if (pending <= 0) { newAll.forEach(e => { e.style.transition = ''; e.style.transform = ''; e.style.transformOrigin = ''; e.style.opacity = ''; e.style.backdropFilter = ''; e.style.willChange = ''; }); }
+          el.removeEventListener('transitionend', cleanup);
+        });
+      }
+      setTimeout(() => {
+        newAll.forEach(el => {
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.transformOrigin = '';
+          el.style.opacity = '';
+          el.style.backdropFilter = '';
+          el.style.willChange = '';
+        });
+      }, 800);
+    });
+  });
+});
+
+// ===== Theme =====
 const html = document.documentElement;
 function applyTheme(mode) {
   html.classList.remove('light', 'dark');
@@ -352,7 +576,7 @@ function applyTheme(mode) {
 }
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme) applyTheme(savedTheme);
-document.getElementById('themeToggle').addEventListener('click', () => {
+$('themeToggle').addEventListener('click', () => {
   const current = html.classList.contains('light') ? 'light' : html.classList.contains('dark') ? 'dark' : 'auto';
   if (current === 'auto') {
     const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -366,6 +590,227 @@ document.getElementById('themeToggle').addEventListener('click', () => {
     applyTheme('dark');
   }
 });
+
+// ===== Scroll reveal =====
+(function() {
+  const cards = () => document.querySelectorAll('.card-wrap.reveal');
+  let raf = null;
+
+  function update() {
+    raf = null;
+    const vh = window.innerHeight;
+    cards().forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (vh - rect.top) / (vh * 0.75)));
+      card.style.setProperty('--reveal', ratio.toFixed(3));
+    });
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!raf) raf = requestAnimationFrame(update);
+  }, { passive: true });
+  update();
+  window.addEventListener('resize', update);
+  window._refreshReveal = update;
+})();
+
+// ===== Cursor glow + starfield parallax =====
+const glow = document.getElementById('cursorGlow');
+const starsEl = document.querySelector('.stars');
+if (glow) {
+  let pending = false;
+  document.addEventListener('mousemove', e => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+      glow.style.opacity = '1';
+      if (starsEl) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 16;
+        const y = (e.clientY / window.innerHeight - 0.5) * 16;
+        starsEl.style.transform = `translate(${-x}px, ${-y}px)`;
+      }
+    });
+  });
+  document.addEventListener('mouseleave', () => {
+    glow.style.opacity = '0';
+    if (starsEl) starsEl.style.transform = 'translate(0, 0)';
+  });
+}
+
+// ===== Card 3D tilt + glare (mouse + touch) =====
+(function() {
+  const root = document.getElementById('contentRoot');
+  if (!root) return;
+  const maxAngle = 8;
+  let cur = null, rect = null, raf = null, mx = 0, my = 0;
+
+  function updateRect() { if (cur) rect = cur.getBoundingClientRect(); }
+  window.addEventListener('scroll', updateRect, { passive: true });
+  window.addEventListener('resize', updateRect);
+
+  function begin(card, x, y) {
+    if (card !== cur) {
+      if (cur) reset(cur);
+      if (!document.contains(card)) return;
+      cur = card;
+      card.classList.add('tilting');
+      rect = card.getBoundingClientRect();
+    }
+  }
+
+  function move(x, y) {
+    if (!cur || !rect) return;
+    mx = x; my = y;
+    if (!raf) {
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        if (!cur || !rect) return;
+        const rx = (my - rect.top) / rect.height;
+        const ry = (mx - rect.left) / rect.width;
+        cur.style.setProperty('--rx', ((rx - 0.5) * -maxAngle).toFixed(2) + 'deg');
+        cur.style.setProperty('--ry', ((ry - 0.5) * maxAngle).toFixed(2) + 'deg');
+        cur.style.setProperty('--gx', (ry * 100).toFixed(1) + '%');
+        cur.style.setProperty('--gy', (rx * 100).toFixed(1) + '%');
+      });
+    }
+  }
+
+  function end(card) {
+    if (card === cur) { reset(cur); cur = null; rect = null; }
+  }
+
+  function reset(card) {
+    card.classList.remove('tilting');
+    const glare = card.querySelector('.glare');
+    const done = () => {
+      card.style.transition = 'transform 0.3s ease-out';
+      card.style.removeProperty('--rx');
+      card.style.removeProperty('--ry');
+      card.style.removeProperty('--gx');
+      card.style.removeProperty('--gy');
+      card.addEventListener('transitionend', function clean() {
+        card.style.transition = '';
+        card.removeEventListener('transitionend', clean);
+      }, { once: true });
+    };
+    if (glare) {
+      glare.addEventListener('transitionend', () => { done(); glare = null; }, { once: true });
+    } else {
+      done();
+    }
+  }
+
+  // --- mouse ---
+  root.addEventListener('mouseover', e => {
+    begin(e.target.closest('.card'), e.clientX, e.clientY);
+  });
+  root.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+  root.addEventListener('mouseout', e => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    const related = e.relatedTarget;
+    if (related && card.contains(related)) return;
+    end(card);
+  });
+
+  // --- touch ---
+  root.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    begin(t.target.closest('.card'), t.clientX, t.clientY);
+  }, { passive: true });
+  root.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    move(t.clientX, t.clientY);
+  }, { passive: true });
+  root.addEventListener('touchend', e => {
+    if (cur) { reset(cur); cur = null; rect = null; }
+  });
+})();
+
+// ===== Click spark =====
+(function() {
+  const container = document.createElement('div');
+  container.className = 'spark-container';
+  document.body.appendChild(container);
+  document.addEventListener('click', e => {
+    const count = 6;
+    for (let i = 0; i < count; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'spark';
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6;
+      const dist = 18 + Math.random() * 22;
+      spark.style.left = e.clientX + 'px';
+      spark.style.top = e.clientY + 'px';
+      spark.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+      spark.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+      spark.style.background = `hsl(${330 + Math.random() * 30}, 90%, ${55 + Math.random() * 20}%)`;
+      container.appendChild(spark);
+      spark.addEventListener('animationend', () => spark.remove());
+    }
+  });
+})();
+
+// ===== Gyroscope parallax =====
+(function() {
+  if (typeof DeviceOrientationEvent === 'undefined') return;
+  const stars = document.querySelector('.stars');
+  const orbs = document.querySelectorAll('.orb');
+  if (!stars) return;
+  const maxShift = 28;
+
+  function handle(e) {
+    const g = e.gamma || 0;
+    const b = e.beta || 0;
+    const x = Math.max(-1, Math.min(1, g / 45));
+    const y = Math.max(-1, Math.min(1, (b - 45) / 45));
+    stars.style.transition = 'none';
+    stars.style.transform = `translate(${x * maxShift}px, ${y * maxShift}px)`;
+    orbs.forEach((orb, i) => {
+      const d = (i + 1) * 0.6;
+      orb.style.transition = 'none';
+      orb.style.transform = `translate(${x * maxShift * d}px, ${y * maxShift * d}px)`;
+    });
+  }
+
+  function resetGyro() {
+    stars.style.transition = 'transform 0.8s ease-out';
+    stars.style.transform = '';
+    orbs.forEach(orb => {
+      orb.style.transition = 'transform 0.8s ease-out';
+      orb.style.transform = '';
+    });
+  }
+
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    const ask = () => {
+      DeviceOrientationEvent.requestPermission()
+        .then(state => {
+          if (state === 'granted') {
+            window.addEventListener('deviceorientation', handle);
+            window.addEventListener('deviceorientation', () => {
+              clearTimeout(window._gyroTimer);
+              window._gyroTimer = setTimeout(resetGyro, 3000);
+            });
+          }
+        })
+        .catch(() => {});
+      document.removeEventListener('click', ask);
+      document.removeEventListener('touchstart', ask);
+    };
+    document.addEventListener('click', ask, { once: true });
+    document.addEventListener('touchstart', ask, { once: true });
+  } else {
+    window.addEventListener('deviceorientation', handle);
+    let idle;
+    window.addEventListener('deviceorientation', () => {
+      clearTimeout(idle);
+      idle = setTimeout(resetGyro, 3000);
+    });
+  }
+})();
 </script>
 
 </body>

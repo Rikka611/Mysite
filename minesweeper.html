@@ -157,6 +157,17 @@ html.light .theme-btn .icon-moon { display: inline; }
   html:not(.dark):not(.light) .theme-btn .icon-moon { display: inline; }
 }
 
+.lang-btn {
+  background: none; border: 1px solid var(--nav-border);
+  color: var(--nav-link); cursor: pointer;
+  height: 36px; border-radius: 50px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; transition: background 0.2s, color 0.2s;
+  padding: 0 12px; line-height: 1; font-weight: 600;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.lang-btn:hover { background: var(--card-bg); color: var(--nav-link-hover); }
+
 /* ---- Minesweeper ---- */
 .game-wrapper {
   position: relative; z-index: 1;
@@ -184,9 +195,13 @@ html.light .theme-btn .icon-moon { display: inline; }
 
 /* header bar */
 .game-header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   width: 100%; max-width: 360px;
 }
+.game-header .game-stat:first-child { justify-self: start; }
+.game-header .game-reset { justify-self: center; }
+.game-header .game-stat:last-child { justify-self: end; }
 .game-stat {
   background: rgba(0,0,0,0.2); border-radius: 10px;
   padding: 8px 16px; font-size: 1.3rem; font-weight: 700;
@@ -340,6 +355,20 @@ html.light .game-overlay {
 .lb-list .name { flex: 1; margin-left: 8px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lb-list .time { font-weight: 700; font-variant-numeric: tabular-nums; color: #f5576c; }
 .lb-empty { text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 12px 0; }
+.lb-loading { text-align: center; color: var(--text-dim); font-size: 0.8rem; padding: 12px 0; display: none; }
+.lb-error { text-align: center; color: #ef4444; font-size: 0.8rem; padding: 8px 0; }
+
+/* click spark */
+.spark-container { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+.spark {
+  position: absolute; width: 6px; height: 6px; border-radius: 50%;
+  background: #f5576c; pointer-events: none;
+  animation: sparkBurst 0.7s ease-out forwards;
+}
+@keyframes sparkBurst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+}
 
 /* footer */
 footer {
@@ -351,8 +380,43 @@ footer a { color: var(--footer-link); text-decoration: none; }
 footer a:hover { color: var(--footer-link-hover); }
 
 @media (max-width: 480px) {
-  .game-card { padding: 20px; }
-  .game-grid { gap: 1px; padding: 3px; }
+  .game-card { padding: 12px; }
+  .game-grid { gap: 1px; padding: 2px; }
+  .game-stat { padding: 5px 8px; font-size: 0.95rem; min-width: 55px; }
+  #timer { min-width: 65px; }
+  .diff-btn { padding: 5px 12px; font-size: 0.75rem; }
+  .diff-selector { gap: 4px; }
+  .game-header { max-width: 100%; }
+  nav { padding: 0 8px; }
+  nav .inner { gap: 4px; }
+  nav .logo { font-size: 1rem; }
+  nav a { font-size: 0.75rem; white-space: nowrap; }
+  nav .nav-back-link { font-size: 0.7rem; padding: 3px 8px; }
+  nav .nav-right { gap: 4px; }
+  nav .nav-game-link { font-size: 0.75rem; }
+  nav .gh-icon span { display: none; }
+  nav .gh-icon svg { width: 18px; height: 18px; }
+  .lang-btn { padding: 0 8px; font-size: 0.7rem; height: 30px; }
+  .theme-btn { width: 30px; height: 30px; font-size: 0.9rem; }
+  .lb-wrapper { max-width: 100%; }
+}
+@media (max-width: 380px) {
+  .game-card { padding: 8px; }
+  .game-grid { padding: 1px; }
+  .game-stat { padding: 4px 6px; font-size: 0.85rem; min-width: 50px; }
+  #timer { min-width: 58px; }
+  .diff-btn { padding: 4px 10px; font-size: 0.7rem; }
+  .diff-selector { gap: 3px; }
+  nav { padding: 0 4px; }
+  nav .inner { gap: 2px; }
+  nav .logo { font-size: 0.95rem; }
+  nav a { font-size: 0.7rem; }
+  nav .nav-back-link { font-size: 0.65rem; padding: 2px 6px; }
+  nav .nav-game-link { font-size: 0.7rem; }
+  nav .gh-icon svg { width: 16px; height: 16px; }
+  .lang-btn { padding: 0 6px; font-size: 0.65rem; height: 28px; }
+  .theme-btn { width: 28px; height: 28px; font-size: 0.8rem; }
+  .game-reset { width: 36px; height: 36px; font-size: 1.2rem; line-height: 36px; }
 }
 </style>
 </head>
@@ -367,10 +431,11 @@ footer a:hover { color: var(--footer-link-hover); }
   <div class="inner">
     <div style="display:flex;align-items:center;gap:16px;">
       <a href="index.html" class="logo">Vibecoding</a>
-      <a href="index.html" class="nav-back-link">← 返回</a>
+      <a href="index.html" class="nav-back-link" id="navBackLink">← 返回</a>
     </div>
     <div class="nav-right">
-      <a href="games.html" class="nav-game-link">🎮 小游戏</a>
+      <a href="games.html" class="nav-game-link" id="navGameLink">🎮 小游戏</a>
+      <button class="lang-btn" id="langToggle">EN</button>
       <button class="theme-btn" id="themeToggle" title="切换日夜模式">
         <span class="icon-sun">☀️</span>
         <span class="icon-moon">🌙</span>
@@ -395,13 +460,16 @@ footer a:hover { color: var(--footer-link-hover); }
 
     <div class="lb-wrapper" id="lbWrapper" style="display:none;">
       <div class="lb-card">
-        <h3>🏆 排行榜 <span>16×16</span></h3>
+        <h3 id="lbTitle">🏆 排行榜 <span>16×16</span></h3>
         <ul class="lb-list" id="lbList"></ul>
         <div class="lb-empty" id="lbEmpty">暂无记录</div>
+        <div class="lb-loading" id="lbLoading">加载中...</div>
       </div>
     </div>
   </div>
 </div>
+
+<footer id="footerText"></footer>
 
 <div id="overlayRoot"></div>
 
@@ -430,6 +498,46 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   }
 });
 
+// ===== i18n =====
+const i18n = {
+  zh: {
+    backLink: '← 返回',
+    gameLink: '🎮 小游戏',
+    leaderboardTitle: '🏆 排行榜',
+    noRecords: '暂无记录',
+    youWin: '🎉 你赢了！',
+    youLose: '💥 踩雷了',
+    winSub: (t) => `用时 ${t} 秒`,
+    loseSub: '再来一局吧',
+    playAgain: '再来一局',
+    enterId: '输入你的 ID',
+    submit: '上榜',
+    submitted: '✓ 已上榜',
+    footer: '← 返回首页',
+    langLabel: 'EN'
+  },
+  en: {
+    backLink: '← Back',
+    gameLink: '🎮 Games',
+    leaderboardTitle: '🏆 Leaderboard',
+    noRecords: 'No records yet',
+    youWin: '🎉 You Win!',
+    youLose: '💥 You hit a mine!',
+    winSub: (t) => `Time: ${t} seconds`,
+    loseSub: 'Try again',
+    playAgain: 'Play Again',
+    enterId: 'Enter your ID',
+    submit: 'Submit',
+    submitted: '✓ Submitted',
+    footer: '← Back to Home',
+    langLabel: '中'
+  }
+};
+
+let lang = localStorage.getItem('lang') || 'zh';
+function t(key) { return i18n[lang][key]; }
+function tf(key, ...args) { const v = i18n[lang][key]; return typeof v === 'function' ? v(...args) : v; }
+
 // ===== Minesweeper =====
 const DIFFICULTY = {
   easy:   { rows: 6, cols: 6, mines: 5 },
@@ -445,14 +553,34 @@ let board, revealed, flagged, mineMap, gameOver, started, timerId, startTime;
 function setDifficulty(mode) {
   if (diff === mode && started) return;
 
+  // Record old game-card rect for FLIP
+  const card = document.querySelector('.game-card');
+  const oldRect = card.getBoundingClientRect();
+
   diff = mode;
   const cfg = DIFFICULTY[mode];
   ROWS = cfg.rows; COLS = cfg.cols; MINES = cfg.mines;
   document.querySelectorAll('.diff-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
   document.getElementById('lbWrapper').style.display = mode === 'hard' ? '' : 'none';
+  const isMobile = window.innerWidth <= 480;
+  document.getElementById('timer').style.minWidth = mode === 'hard' ? (isMobile ? '85px' : '110px') : (isMobile ? '60px' : '75px');
+  document.getElementById('mineCount').style.minWidth = mode === 'hard' ? (isMobile ? '70px' : '90px') : (isMobile ? '60px' : '75px');
   init();
-  document.querySelector('.game-card').offsetHeight;
 
+  // FLIP: same pattern as index.html card animation
+  const newRect = card.getBoundingClientRect();
+  const dx = oldRect.left - newRect.left;
+  const dy = oldRect.top - newRect.top;
+  const sx = newRect.width > 0 ? oldRect.width / newRect.width : 1;
+  const sy = newRect.height > 0 ? oldRect.height / newRect.height : 1;
+
+  card.style.transition = 'none';
+  card.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+  card.style.transformOrigin = 'top left';
+  card.style.backdropFilter = 'none';
+  card.style.willChange = 'transform';
+
+  // Cell center-spread animation
   const cells = Array.from(document.getElementById('grid').children);
   const cx = (ROWS - 1) / 2, cy = (COLS - 1) / 2;
   const maxDist = Math.sqrt(cx * cx + cy * cy);
@@ -464,6 +592,19 @@ function setDifficulty(mode) {
   });
 
   requestAnimationFrame(() => {
+    // Game-card FLIP — same easing as index.html, slightly bouncier overshoot
+    card.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.8)';
+    card.style.transform = 'translate(0, 0) scale(1, 1)';
+    card.addEventListener('transitionend', function cleanup() {
+      card.style.transition = '';
+      card.style.transform = '';
+      card.style.transformOrigin = '';
+      card.style.backdropFilter = '';
+      card.style.willChange = '';
+      card.removeEventListener('transitionend', cleanup);
+    }, { once: true });
+
+    // Cell spread
     cells.forEach((cell, i) => {
       const r = Math.floor(i / COLS), c = i % COLS;
       const dist = Math.sqrt((r - cx) ** 2 + (c - cy) ** 2) / maxDist;
@@ -491,7 +632,7 @@ function init() {
   gameOver = false; started = false; startTime = 0;
   clearInterval(timerId);
   updateMineCount();
-  document.getElementById('timer').textContent = '000.000';
+  document.getElementById('timer').textContent = diff === 'hard' ? '000.000' : '000';
   document.getElementById('resetBtn').textContent = '😊';
   renderGrid();
   renderLeaderboard();
@@ -630,7 +771,7 @@ function checkWin() {
 
 function endGame(won) {
   gameOver = true; clearInterval(timerId);
-  const elapsed = started ? getElapsed() : '0.000';
+  const elapsed = started ? getElapsed() : (diff === 'hard' ? '0.000' : '0');
   document.getElementById('resetBtn').textContent = won ? '😎' : '😵';
   if (!won) revealAllMines();
   renderGrid();
@@ -639,11 +780,11 @@ function endGame(won) {
   let lbForm = '';
   if (won && diff === 'hard') {
     window._pendingLbTime = parseFloat(elapsed);
-    lbForm = `<div class="lb-overlay-row"><input id="lbOverlayName" placeholder="输入你的 ID" maxlength="12"><button onclick="submitScoreOverlay()">上榜</button></div>`;
+    lbForm = `<div class="lb-overlay-row"><input id="lbOverlayName" placeholder="${t('enterId')}" maxlength="12"><button onclick="submitScoreOverlay()">${t('submit')}</button></div>`;
   }
-  const msg = won ? '<h2>🎉 你赢了！</h2>' : '<h2>💥 踩雷了</h2>';
-  const sub = won ? `用时 ${elapsed} 秒` : '再来一局吧';
-  overlay.innerHTML = `<div class="game-overlay"><div class="msg">${msg}<p>${sub}</p>${lbForm}<button onclick="init();this.parentElement.parentElement.remove()">再来一局</button></div></div>`;
+  const msg = won ? `<h2>${t('youWin')}</h2>` : `<h2>${t('youLose')}</h2>`;
+  const sub = won ? tf('winSub', elapsed) : t('loseSub');
+  overlay.innerHTML = `<div class="game-overlay"><div class="msg">${msg}<p>${sub}</p>${lbForm}<button onclick="init();this.parentElement.parentElement.remove()">${t('playAgain')}</button></div></div>`;
   if (won && diff === 'hard') {
     setTimeout(() => {
       const inp = document.getElementById('lbOverlayName');
@@ -652,42 +793,80 @@ function endGame(won) {
   }
 }
 
-function submitScoreOverlay() {
+async function submitScoreOverlay() {
   const inp = document.getElementById('lbOverlayName');
   const name = inp ? inp.value.trim() : '';
   if (!name || !window._pendingLbTime) return;
-  const data = loadLeaderboard();
-  const scores = (data.hard || []).slice();
-  scores.push({ name, time: window._pendingLbTime });
-  scores.sort((a, b) => a.time - b.time);
-  data.hard = scores.slice(0, 10);
-  saveLeaderboard(data);
-  window._pendingLbTime = null;
   const row = document.querySelector('.lb-overlay-row');
-  if (row) row.innerHTML = '<span style="color:#34d399;font-size:0.9rem;">✓ 已上榜</span>';
-  renderLeaderboard();
+  submitScore(name, window._pendingLbTime);
+  window._pendingLbTime = null;
+  if (row) row.innerHTML = `<span style="color:#34d399;font-size:0.9rem;">${t('submitted')}</span>`;
+
+  // 轮询等待 GitHub Actions 处理后刷新排行榜
+  let attempts = 0;
+  const poll = setInterval(() => {
+    attempts++;
+    renderLeaderboard();
+    if (attempts >= 20) clearInterval(poll);
+  }, 3000);
 }
 
-function loadLeaderboard() {
-  try { return JSON.parse(localStorage.getItem('minesweeper_lb') || '{}'); }
-  catch (e) { return {}; }
-}
-function saveLeaderboard(data) { localStorage.setItem('minesweeper_lb', JSON.stringify(data)); }
+// ===== GitHub 在线排行榜 =====
+// 读取：直接从 raw.githubusercontent.com 拉取（公开仓库无需 token）
+// 提交：打开预填的 GitHub Issue，Actions 工作流自动处理
 
-function renderLeaderboard() {
-  const data = loadLeaderboard();
-  const scores = data.hard || [];
+const LB_RAW = 'https://raw.githubusercontent.com/Rikka611/Mysite/main/scores.json';
+const LB_ISSUE = 'https://github.com/Rikka611/Mysite/issues/new';
+
+let _lbCache = null;
+
+async function fetchLeaderboard() {
+  try {
+    const res = await fetch(LB_RAW + '?t=' + Date.now());
+    if (!res.ok) { return _lbCache || []; }
+    const data = await res.json();
+    _lbCache = (data && data[diff]) ? data[diff] : [];
+    return _lbCache;
+  } catch (e) {
+    return _lbCache || [];
+  }
+}
+
+function submitScore(name, time) {
+  const modeLabels = { easy: '6×6', normal: '10×10', hard: '16×16' };
+  const title = encodeURIComponent(`[成绩] ${name} - ${time.toFixed(3)}s (${modeLabels[diff]})`);
+  const body = encodeURIComponent(
+    `name: ${name}\ntime: ${time.toFixed(3)}\nmode: ${diff}\n---\n自动提交，请勿手动编辑。`
+  );
+  window.open(`${LB_ISSUE}?title=${title}&body=${body}&labels=score`, '_blank');
+  return true; // 返回 true 显示"已提交"，实际处理在 Actions 中
+}
+
+async function renderLeaderboard() {
   const list = document.getElementById('lbList');
   const empty = document.getElementById('lbEmpty');
-  if (scores.length === 0) {
-    list.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  const loading = document.getElementById('lbLoading');
+
+  list.innerHTML = '';
   empty.style.display = 'none';
-  list.innerHTML = scores.map((s, i) =>
-    `<li><span class="rank">#${i + 1}</span><span class="name">${s.name}</span><span class="time">${s.time.toFixed(3)}s</span></li>`
-  ).join('');
+  loading.style.display = 'block';
+
+  try {
+    const scores = await fetchLeaderboard();
+    loading.style.display = 'none';
+    if (scores.length === 0) {
+      empty.style.display = 'block';
+      empty.textContent = t('noRecords');
+      return;
+    }
+    list.innerHTML = scores.map((s, i) =>
+      `<li><span class="rank">#${i + 1}</span><span class="name">${s.name}</span><span class="time">${typeof s.time === 'number' ? s.time.toFixed(3) : s.time}s</span></li>`
+    ).join('');
+  } catch (e) {
+    loading.style.display = 'none';
+    empty.style.display = 'block';
+    empty.textContent = t('noRecords');
+  }
 }
 
 function handleClick(r, c) {
@@ -765,22 +944,33 @@ function updateTimer() {
   if (!started || gameOver) return;
   const elapsed = (performance.now() - startTime) / 1000;
   const s = Math.floor(elapsed);
-  const ms = Math.floor((elapsed - s) * 1000);
-  document.getElementById('timer').textContent =
-    String(Math.min(s, 999)).padStart(3, '0') + '.' + String(ms).padStart(3, '0');
+  if (diff === 'hard') {
+    const ms = Math.floor((elapsed - s) * 1000);
+    document.getElementById('timer').textContent =
+      String(Math.min(s, 999)).padStart(3, '0') + '.' + String(ms).padStart(3, '0');
+  } else {
+    document.getElementById('timer').textContent = String(Math.min(s, 999)).padStart(3, '0');
+  }
   if (!gameOver) requestAnimationFrame(updateTimer);
 }
 
 function getElapsed() {
-  return ((performance.now() - startTime) / 1000).toFixed(3);
+  const sec = (performance.now() - startTime) / 1000;
+  return diff === 'hard' ? sec.toFixed(3) : String(Math.floor(sec));
 }
 
 function renderGrid() {
   const grid = document.getElementById('grid');
   grid.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
-  const sizes = { easy: 44, normal: 36, hard: 28 };
+  const w = window.innerWidth;
+  const sizes = w <= 380
+    ? { easy: 32, normal: 24, hard: 18 }
+    : w <= 480
+    ? { easy: 38, normal: 30, hard: 20 }
+    : { easy: 44, normal: 36, hard: 28 };
   grid.style.setProperty('--cell-size', (sizes[diff] || 36) + 'px');
-  grid.style.setProperty('--cell-font', diff === 'hard' ? '0.75rem' : '1rem');
+  const fs = w <= 380 ? '0.6rem' : w <= 480 ? (diff === 'hard' ? '0.65rem' : '0.8rem') : (diff === 'hard' ? '0.75rem' : '1rem');
+  grid.style.setProperty('--cell-font', fs);
   grid.innerHTML = '';
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
@@ -846,7 +1036,221 @@ document.getElementById('diffSelector').addEventListener('click', (e) => {
   setDifficulty(btn.dataset.mode);
 });
 
+// ===== Language initialization =====
+function updateStaticText() {
+  document.getElementById('navBackLink').textContent = t('backLink');
+  document.getElementById('navGameLink').textContent = t('gameLink');
+  document.getElementById('footerText').innerHTML = `<a href="index.html">${t('footer')}</a> &nbsp;&middot;&nbsp; &copy; 2026 Rikka611`;
+  document.getElementById('langToggle').textContent = i18n[lang].langLabel;
+}
+updateStaticText();
+
+// ===== FLIP language switch =====
+document.getElementById('langToggle').addEventListener('click', () => {
+  const bouncers = '.diff-btn, .game-reset';
+  const texts = '.nav-back-link, .nav-game-link, #footerText';
+  const allSel = bouncers + ', ' + texts;
+  const oldAll = Array.from(document.querySelectorAll(allSel));
+  const firstRects = oldAll.map(el => el.getBoundingClientRect());
+
+  lang = lang === 'zh' ? 'en' : 'zh';
+  localStorage.setItem('lang', lang);
+  const langBtn = document.getElementById('langToggle');
+  const oldWidth = langBtn.offsetWidth;
+  langBtn.textContent = i18n[lang].langLabel;
+  const newWidth = langBtn.offsetWidth;
+  if (oldWidth > 0 && newWidth > 0 && Math.abs(oldWidth - newWidth) > 1) {
+    langBtn.style.transition = 'none';
+    langBtn.style.transform = `scaleX(${oldWidth / newWidth})`;
+    langBtn.style.transformOrigin = 'right center';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        langBtn.style.transition = 'transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1.3)';
+        langBtn.style.transform = 'scaleX(1)';
+        langBtn.addEventListener('transitionend', function cleanup() {
+          langBtn.style.transition = '';
+          langBtn.style.transform = '';
+          langBtn.style.transformOrigin = '';
+          langBtn.removeEventListener('transitionend', cleanup);
+        });
+      });
+    });
+  }
+  updateStaticText();
+  renderLeaderboard();
+
+  requestAnimationFrame(() => {
+    const newAll = Array.from(document.querySelectorAll(allSel));
+    const count = Math.min(firstRects.length, newAll.length);
+
+    for (let i = 0; i < count; i++) {
+      const el = newAll[i];
+      const fr = firstRects[i];
+      const lr = el.getBoundingClientRect();
+      const dx = fr.left - lr.left;
+      const dy = fr.top - lr.top;
+      const isLeaf = el.matches(bouncers);
+      const isText = el.matches(texts);
+      const sx = isLeaf && lr.width > 0 ? fr.width / lr.width : 1;
+      const sy = isLeaf && lr.height > 0 ? fr.height / lr.height : 1;
+      const textChanged = isText && oldAll[i] && oldAll[i].textContent !== el.textContent;
+      const hasMove = Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3;
+      const hasScale = isLeaf && (Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01);
+
+      if (!hasMove && !hasScale) {
+        if (textChanged) { el.style.transition = 'none'; el.style.opacity = '0'; el._fadeOnly = true; }
+        continue;
+      }
+
+      el.style.transition = 'none';
+      el.style.transform = hasScale
+        ? `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
+        : `translate(${dx}px, ${dy}px)`;
+      if (hasScale) { el.style.transformOrigin = 'top left'; }
+      if (isLeaf) { el.style.backdropFilter = 'none'; el.style.willChange = 'transform'; }
+      if (textChanged) el.style.opacity = '0';
+    }
+
+    requestAnimationFrame(() => {
+      let pending = 0;
+
+      for (let i = 0; i < count; i++) {
+        const el = newAll[i];
+        if (!el._fadeOnly) continue;
+        delete el._fadeOnly;
+        el.style.transition = 'opacity 0.4s ease';
+        el.style.opacity = '1';
+        pending++;
+        el.addEventListener('transitionend', function cleanup() {
+          pending--;
+          el.style.transition = '';
+          el.style.opacity = '';
+          if (pending <= 0) { newAll.forEach(e => { e.style.transition = ''; e.style.opacity = ''; }); }
+          el.removeEventListener('transitionend', cleanup);
+        });
+      }
+
+      for (let i = 0; i < count; i++) {
+        const el = newAll[i];
+        if (el.style.transform === '') continue;
+        const isLeaf = el.matches(bouncers);
+        const isText = el.matches(texts);
+        let props = 'transform 0.55s cubic-bezier(0.33, 0, 0.1, 1)';
+        if (isLeaf) props = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.6)';
+        if (isText) props += ', opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
+        el.style.transition = props;
+        el.style.transform = isLeaf ? 'translate(0, 0) scale(1, 1)' : 'translate(0, 0)';
+        if (el.style.opacity === '0') el.style.opacity = '1';
+        pending++;
+        el.addEventListener('transitionend', function cleanup() {
+          pending--;
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.transformOrigin = '';
+          el.style.opacity = '';
+          el.style.backdropFilter = '';
+          el.style.willChange = '';
+          if (pending <= 0) { newAll.forEach(e => { e.style.transition = ''; e.style.transform = ''; e.style.transformOrigin = ''; e.style.opacity = ''; e.style.backdropFilter = ''; e.style.willChange = ''; }); }
+          el.removeEventListener('transitionend', cleanup);
+        });
+      }
+      setTimeout(() => {
+        newAll.forEach(el => {
+          el.style.transition = '';
+          el.style.transform = '';
+          el.style.transformOrigin = '';
+          el.style.opacity = '';
+          el.style.backdropFilter = '';
+          el.style.willChange = '';
+        });
+      }, 800);
+    });
+  });
+});
+
 init();
+
+// ===== Click spark =====
+(function() {
+  const container = document.createElement('div');
+  container.className = 'spark-container';
+  document.body.appendChild(container);
+  document.addEventListener('click', e => {
+    const count = 6;
+    for (let i = 0; i < count; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'spark';
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6;
+      const dist = 18 + Math.random() * 22;
+      spark.style.left = e.clientX + 'px';
+      spark.style.top = e.clientY + 'px';
+      spark.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+      spark.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+      spark.style.background = `hsl(${330 + Math.random() * 30}, 90%, ${55 + Math.random() * 20}%)`;
+      container.appendChild(spark);
+      spark.addEventListener('animationend', () => spark.remove());
+    }
+  });
+})();
+
+// ===== Gyroscope parallax =====
+(function() {
+  if (typeof DeviceOrientationEvent === 'undefined') return;
+  const stars = document.querySelector('.stars');
+  const orbs = document.querySelectorAll('.orb');
+  if (!stars) return;
+  const maxShift = 28;
+
+  function handle(e) {
+    const g = e.gamma || 0;
+    const b = e.beta || 0;
+    const x = Math.max(-1, Math.min(1, g / 45));
+    const y = Math.max(-1, Math.min(1, (b - 45) / 45));
+    stars.style.transition = 'none';
+    stars.style.transform = `translate(${x * maxShift}px, ${y * maxShift}px)`;
+    orbs.forEach((orb, i) => {
+      const d = (i + 1) * 0.6;
+      orb.style.transition = 'none';
+      orb.style.transform = `translate(${x * maxShift * d}px, ${y * maxShift * d}px)`;
+    });
+  }
+
+  function resetGyro() {
+    stars.style.transition = 'transform 0.8s ease-out';
+    stars.style.transform = '';
+    orbs.forEach(orb => {
+      orb.style.transition = 'transform 0.8s ease-out';
+      orb.style.transform = '';
+    });
+  }
+
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    const ask = () => {
+      DeviceOrientationEvent.requestPermission()
+        .then(state => {
+          if (state === 'granted') {
+            window.addEventListener('deviceorientation', handle);
+            window.addEventListener('deviceorientation', () => {
+              clearTimeout(window._gyroTimer);
+              window._gyroTimer = setTimeout(resetGyro, 3000);
+            });
+          }
+        })
+        .catch(() => {});
+      document.removeEventListener('click', ask);
+      document.removeEventListener('touchstart', ask);
+    };
+    document.addEventListener('click', ask, { once: true });
+    document.addEventListener('touchstart', ask, { once: true });
+  } else {
+    window.addEventListener('deviceorientation', handle);
+    let idle;
+    window.addEventListener('deviceorientation', () => {
+      clearTimeout(idle);
+      idle = setTimeout(resetGyro, 3000);
+    });
+  }
+})();
 </script>
 
 </body>
