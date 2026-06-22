@@ -793,19 +793,28 @@ function endGame(won) {
   }
 }
 
-async function submitScoreOverlay() {
+async function doSubmit() {
   const inp = document.getElementById('lbOverlayName');
   const name = inp ? inp.value.trim() : '';
   if (!name || !window._pendingLbTime) return;
   const row = document.querySelector('.lb-overlay-row');
   if (row) row.innerHTML = '<span style="color:var(--text-dim);font-size:0.85rem;">提交中...</span>';
 
-  const ok = await submitScore(name, window._pendingLbTime);
-  window._pendingLbTime = null;
-  if (row) row.innerHTML = ok
-    ? `<span style="color:#34d399;font-size:0.9rem;">${t('submitted')}</span>`
-    : '<span style="color:#ef4444;font-size:0.85rem;">提交失败</span>';
+  const result = await submitScore(name, window._pendingLbTime);
+  if (row) {
+    if (result.ok) {
+      row.innerHTML = `<span style="color:#34d399;font-size:0.9rem;">${t('submitted')}</span>`;
+      window._pendingLbTime = null;
+    } else {
+      const msg = result.error || '网络错误';
+      row.innerHTML = `<span style="color:#ef4444;font-size:0.8rem;">${msg}</span> <button onclick="doSubmit()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);cursor:pointer;font-size:0.8rem;">重试</button>`;
+    }
+  }
   await renderLeaderboard();
+}
+
+async function submitScoreOverlay() {
+  doSubmit();
 }
 
 // ===== Supabase 在线排行榜 =====
@@ -822,11 +831,17 @@ async function sbApi(path, options = {}) {
       apikey: SB_KEY,
       Authorization: `Bearer ${SB_KEY}`,
       'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
       ...options.headers
     },
     ...options
   });
-  if (!res.ok) throw new Error(res.status);
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('Supabase error:', res.status, err);
+    throw new Error(err);
+  }
+  if (res.status === 204) return null;
   return res.json();
 }
 
@@ -847,9 +862,9 @@ async function submitScore(name, time) {
       method: 'POST',
       body: JSON.stringify({ name: name.trim(), time, mode: diff })
     });
-    return true;
+    return { ok: true };
   } catch (e) {
-    return false;
+    return { ok: false, error: e.message };
   }
 }
 
