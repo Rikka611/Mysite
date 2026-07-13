@@ -368,7 +368,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   <div class="modal">
     <h3 style="text-align:center;font-size:1.1rem;margin-bottom:20px;color:var(--heading)">提交分享码</h3>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">六位分享码 *</label>
-    <input type="text" id="inputCode" placeholder="ABC123" maxlength="6" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
+    <input type="text" id="inputCode" placeholder="ABC123" maxlength="6" style="text-transform:uppercase" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">曲名 *</label>
     <input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">你的昵称</label>
@@ -462,7 +462,7 @@ document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');['inputCode','inputTitle','inputAuthor','inputDesc','inputTags'].forEach(id=>document.getElementById(id).value='')}
 
 async function doSubmit(){
-  const code=document.getElementById('inputCode').value.trim();
+  const code=document.getElementById('inputCode').value.trim().toUpperCase();
   const title=document.getElementById('inputTitle').value.trim();
   const author=document.getElementById('inputAuthor').value.trim()||'匿名';
   const desc=document.getElementById('inputDesc').value.trim();
