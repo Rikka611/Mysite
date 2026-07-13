@@ -299,6 +299,8 @@ html.light .modal{background:#fff}
 @keyframes sparkBurst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0}}
 
 /* ===== Skeleton loading ===== */
+.no-anim .row,.no-anim .skeleton{animation:none!important}
+.no-anim .row{opacity:1!important;transform:none!important}
 .skeleton{
   height:52px;background:var(--card-bg);border:1px solid var(--card-border);
   border-radius:12px;animation:shimmer 1.5s ease-in-out infinite;
@@ -375,7 +377,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
 <div class="content">
   <div class="list" id="grid"></div>
   <div class="pagination" id="pager"></div>
-  <div class="empty" id="empty">加载中...</div>
+  <div class="empty" id="empty">修bug中...</div>
 </div>
 
 <button class="fab" id="fab" title="提交分享码">+</button>
@@ -466,7 +468,7 @@ async function doLike(id,e){
   const f=btoa(navigator.userAgent+screen.width+'x'+screen.height).slice(0,32);
   try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}
   liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));
-  render();
+  render(true);
   if(e){const rect=e.target.getBoundingClientRect();for(let i=0;i<8;i++){const h=document.createElement('div');h.className='heart-burst';h.textContent='❤';h.style.left=rect.left+rect.width/2+'px';h.style.top=rect.top+rect.height/2+'px';const a=Math.PI*2*i/8;h.style.setProperty('--hx',Math.cos(a)*40+'px');h.style.setProperty('--hy',Math.sin(a)*40+'px');h.style.color=`hsl(${350+Math.random()*20},90%,${55+Math.random()*20}%)`;document.body.appendChild(h);h.addEventListener('animationend',()=>h.remove())}}
 }
 
@@ -539,9 +541,9 @@ function renderPager(){
 }
 function goPage(n){if(n<1||n>totalPages)return;page=n;render();window.scrollTo({top:0,behavior:'smooth'})}
 
-async function render(){
+async function render(skipAnim){
   const grid=document.getElementById('grid'),empty=document.getElementById('empty');
-  // Show skeleton
+  if(skipAnim)grid.classList.add('no-anim');
   grid.innerHTML='';empty.style.display='none';
   for(let i=0;i<5;i++){const s=document.createElement('div');s.className='skeleton';s.style.animationDelay=i*0.1+'s';grid.appendChild(s)}
 
@@ -558,6 +560,7 @@ async function render(){
     slice.forEach((item,i)=>{const d=document.createElement('div');d.innerHTML=buildRow(item,(page-1)*pageSize+i);grid.appendChild(d.firstElementChild);trackView(item.id)});
     renderPager();
   }catch(e){grid.innerHTML='';empty.style.display='block';empty.textContent='加载失败，请刷新重试'}
+  if(skipAnim)setTimeout(()=>grid.classList.remove('no-anim'),100)
 }
 
 // Cursor glow + parallax (enhanced)
