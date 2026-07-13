@@ -3,81 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>林离 MIDI 分享码</title>
+<title>林离 分享码</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
 :root {
-  --bg: #0a0a1a; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.06);
+  --bg-start: #0f0c29; --bg-mid: #302b63; --bg-end: #24243e;
   --text: #e0e0e0; --text-muted: #889; --text-dim: #667;
+  --heading: #ddd;
+  --nav-bg: rgba(15,12,41,0.45); --nav-border: rgba(255,255,255,0.06);
+  --nav-link: #999; --nav-link-hover: #fff;
+  --card-bg: rgba(255,255,255,0.05); --card-border: rgba(255,255,255,0.08);
+  --card-hover-border: rgba(56,189,248,0.4); --card-hover-shadow: rgba(0,0,0,0.3);
+  --card-hover-ring: rgba(56,189,248,0.15);
+  --tag-bg: rgba(255,255,255,0.08); --tag-text: #aab;
+  --footer-text: #556; --footer-link: #778;
+  --footer-border: rgba(255,255,255,0.06);
+  --star-color: rgba(255,255,255,0.7);
   --accent: #38bdf8; --accent2: #818cf8;
 }
 @media (prefers-color-scheme: light) {
-  :root { --bg: #f5f7fa; --surface: rgba(0,0,0,0.03); --border: rgba(0,0,0,0.06); --text: #334; --text-muted: #667; --text-dim: #889; }
+  html:not(.dark):not(.light) {
+    --bg-start: #f0f9ff; --bg-mid: #f5f3ff; --bg-end: #fce4ec;
+    --text: #3a3a4a; --text-muted: #6b6b7b; --text-dim: #8a8a9a;
+    --heading: #2a2a3a;
+    --nav-bg: rgba(255,255,255,0.35); --nav-border: rgba(0,0,0,0.06);
+    --nav-link: #777; --nav-link-hover: #333;
+    --card-bg: rgba(255,255,255,0.38); --card-border: rgba(0,0,0,0.06);
+    --card-hover-border: rgba(56,189,248,0.5); --card-hover-shadow: rgba(0,0,0,0.08);
+    --card-hover-ring: rgba(56,189,248,0.12);
+    --tag-bg: rgba(0,0,0,0.05); --tag-text: #6b6b7b;
+    --footer-text: #aaa; --footer-link: #999;
+    --footer-border: rgba(0,0,0,0.06);
+    --star-color: rgba(0,0,0,0.1);
+  }
 }
+html.light {
+  --bg-start: #f0f9ff; --bg-mid: #f5f3ff; --bg-end: #fce4ec;
+  --text: #3a3a4a; --text-muted: #6b6b7b; --text-dim: #8a8a9a;
+  --heading: #2a2a3a;
+  --nav-bg: rgba(255,255,255,0.35); --nav-border: rgba(0,0,0,0.06);
+  --nav-link: #777; --nav-link-hover: #333;
+  --card-bg: rgba(255,255,255,0.38); --card-border: rgba(0,0,0,0.06);
+  --card-hover-border: rgba(56,189,248,0.5); --card-hover-shadow: rgba(0,0,0,0.08);
+  --card-hover-ring: rgba(56,189,248,0.12);
+  --tag-bg: rgba(0,0,0,0.05); --tag-text: #6b6b7b;
+  --footer-text: #aaa; --footer-link: #999;
+  --footer-border: rgba(0,0,0,0.06);
+  --star-color: rgba(0,0,0,0.1);
+}
+html.dark {
+  --bg-start: #0f0c29; --bg-mid: #302b63; --bg-end: #24243e;
+  --text: #e0e0e0; --text-muted: #889; --text-dim: #667;
+  --heading: #ddd;
+  --nav-bg: rgba(15,12,41,0.45); --nav-border: rgba(255,255,255,0.06);
+  --nav-link: #999; --nav-link-hover: #fff;
+  --card-bg: rgba(255,255,255,0.05); --card-border: rgba(255,255,255,0.08);
+  --card-hover-border: rgba(56,189,248,0.4); --card-hover-shadow: rgba(0,0,0,0.3);
+  --card-hover-ring: rgba(56,189,248,0.15);
+  --tag-bg: rgba(255,255,255,0.08); --tag-text: #aab;
+  --footer-text: #556; --footer-link: #778;
+  --footer-border: rgba(255,255,255,0.06);
+  --star-color: rgba(255,255,255,0.7);
+}
+
 body {
   font-family: system-ui, -apple-system, sans-serif;
-  background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6;
+  background: linear-gradient(135deg, var(--bg-start), var(--bg-mid), var(--bg-end));
+  background-size: 400% 400%;
+  color: var(--text); min-height: 100vh; line-height: 1.6;
+  transition: color 0.3s ease;
+  animation: bgShift 12s ease infinite;
 }
+@keyframes bgShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 100%; }
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(135deg, #f0f9ff, #f5f3ff, #fce4ec);
+  opacity: 0; transition: opacity 0.5s ease;
+}
+html.light body::before { opacity: 1; }
+html.light .stars { opacity: 0; animation: none; }
+html.light .orb { opacity: 0.35; }
+@media (prefers-color-scheme: light) {
+  html:not(.dark):not(.light) body::before { opacity: 1; }
+  html:not(.dark):not(.light) .stars { opacity: 0; animation: none; }
+  html:not(.dark):not(.light) .orb { opacity: 0.35; }
+}
+
+/* stars */
+@keyframes twinkle { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+.stars {
+  position: fixed; inset: -40px; pointer-events: none; z-index: 0;
+  animation: twinkle 3s ease-in-out infinite;
+  background:
+    radial-gradient(3px 3px at 10% 20%, var(--star-color), transparent),
+    radial-gradient(3px 3px at 30% 70%, var(--star-color), transparent),
+    radial-gradient(4px 4px at 15% 55%, var(--star-color), transparent),
+    radial-gradient(3px 3px at 70% 30%, var(--star-color), transparent),
+    radial-gradient(4px 4px at 60% 30%, var(--star-color), transparent),
+    radial-gradient(3px 3px at 80% 60%, var(--star-color), transparent),
+    radial-gradient(4px 4px at 40% 78%, var(--star-color), transparent),
+    radial-gradient(2px 2px at 50% 15%, var(--star-color), transparent),
+    radial-gradient(2px 2px at 85% 12%, var(--star-color), transparent),
+    radial-gradient(1px 1px at 45% 45%, var(--star-color), transparent),
+    radial-gradient(1px 1px at 90% 40%, var(--star-color), transparent);
+  transition: transform 0.2s ease-out;
+}
+
+/* orbs */
+.orb { position: fixed; z-index: 0; pointer-events: none; border-radius: 50%; filter: blur(80px); opacity: 0.28; animation: float 25s ease-in-out infinite; }
+.orb-1 { width: 500px; height: 500px; background: #38bdf8; top: -15%; left: -10%; }
+.orb-2 { width: 400px; height: 400px; background: #818cf8; bottom: -12%; right: -8%; animation-delay: -9s; }
+.orb-3 { width: 350px; height: 350px; background: #c084fc; top: 55%; left: 60%; animation-delay: -17s; }
+@keyframes float {
+  0% { transform: translate(5vw, 10vh) scale(0.9); }
+  25% { transform: translate(35vw, -15vh) scale(1.08); }
+  50% { transform: translate(15vw, 35vh) scale(0.88); }
+  75% { transform: translate(-10vw, 5vh) scale(1.04); }
+  100% { transform: translate(5vw, 10vh) scale(0.9); }
+}
+
+/* cursor glow */
+.cursor-glow {
+  position: fixed; z-index: 0; top: 0; left: 0;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(56,189,248,0.10), transparent 65%);
+  pointer-events: none; transform: translate(-50%, -50%);
+  transition: opacity 0.5s; opacity: 0;
+}
+@media (max-width: 768px) { .cursor-glow, .orb { display: none; } }
 
 /* nav */
 nav {
-  position: sticky; top: 0; z-index: 100; padding: 0 24px;
-  background: rgba(10,10,26,0.8); backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  background: var(--nav-bg); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--nav-border); padding: 0 24px;
 }
-nav .inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+nav .inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
 nav .logo { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-nav a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
 .theme-btn {
-  background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;
-  width: 32px; height: 32px; border-radius: 50%; font-size: 0.9rem;
+  background: none; border: 1px solid var(--nav-border); color: var(--nav-link); cursor: pointer;
+  width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem;
+}
+.theme-btn .icon-sun { display: inline; }
+.theme-btn .icon-moon { display: none; }
+html.light .theme-btn .icon-sun { display: none; }
+html.light .theme-btn .icon-moon { display: inline; }
+@media (prefers-color-scheme: light) {
+  html:not(.dark):not(.light) .theme-btn .icon-sun { display: none; }
+  html:not(.dark):not(.light) .theme-btn .icon-moon { display: inline; }
 }
 
 /* hero */
-.hero { text-align: center; padding: 64px 24px 40px; }
+.hero { text-align: center; padding: 60px 24px 40px; position: relative; z-index: 1; }
 .hero h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; }
 .hero p { color: var(--text-muted); font-size: 1rem; }
 
 /* tabs */
-.tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 28px; }
-.tab { padding: 8px 20px; border-radius: 50px; border: none; background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 0.85rem; font-weight: 500; font-family: system-ui, -apple-system, sans-serif; }
+.tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 28px; position: relative; z-index: 1; }
+.tab { padding: 8px 20px; border-radius: 50px; border: none; background: var(--card-bg); color: var(--text-muted); cursor: pointer; font-size: 0.85rem; font-weight: 500; font-family: system-ui, -apple-system, sans-serif; }
 .tab:hover { color: var(--text); }
 .tab.active { background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; }
 
 /* search */
-.search-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; }
+.search-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; position: relative; z-index: 1; }
 .search-bar.hidden { display: none; }
-.search-bar input { padding: 10px 18px; border-radius: 50px; width: 280px; max-width: 60vw; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.9rem; outline: none; font-family: system-ui, -apple-system, sans-serif; }
+.search-bar input { padding: 10px 18px; border-radius: 50px; width: 280px; max-width: 60vw; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; outline: none; font-family: system-ui, -apple-system, sans-serif; }
 .search-bar input:focus { border-color: var(--accent); }
 .search-bar button { padding: 10px 20px; border-radius: 50px; border: none; background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 600; font-family: system-ui, -apple-system, sans-serif; }
 
 /* content */
-.content { max-width: 1000px; margin: 0 auto; padding: 0 24px 60px; }
-.grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.content { max-width: 1000px; margin: 0 auto; padding: 0 24px 60px; position: relative; z-index: 1; }
+.grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; perspective: 1200px; }
 .card {
-  flex: 0 1 290px; background: var(--surface); border: 1px solid var(--border);
+  flex: 0 1 290px; background: var(--card-bg); border: 1px solid var(--card-border);
   border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
   transition: border-color 0.25s, box-shadow 0.25s;
+  transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  backdrop-filter: blur(6px); position: relative; overflow: hidden;
 }
-.card:hover { border-color: rgba(56,189,248,0.4); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+.card:hover { border-color: var(--card-hover-border); box-shadow: 0 12px 40px var(--card-hover-shadow), 0 0 0 1px var(--card-hover-ring); }
+.card .glare {
+  position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  border-radius: 16px;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.12) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.card:hover .glare { opacity: 1; }
+.card.tilting { will-change: transform; }
+.card.tilting .glare { opacity: 1; }
 .card .code {
   font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; text-align: center;
   background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  cursor: pointer; user-select: all; font-variant-numeric: tabular-nums;
+  cursor: pointer; user-select: all; font-variant-numeric: tabular-nums; position: relative; z-index: 3;
 }
-.card .code:active { opacity: 0.7; }
-.card .title { font-size: 1.05rem; font-weight: 600; text-align: center; }
-.card .desc { color: var(--text-muted); font-size: 0.85rem; text-align: center; flex: 1; }
-.card .meta { display: flex; justify-content: center; gap: 16px; font-size: 0.75rem; color: var(--text-dim); }
-.card .tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-.card .tag { font-size: 0.7rem; padding: 3px 10px; border-radius: 50px; background: rgba(56,189,248,0.1); color: var(--accent); }
-.card .actions { display: flex; gap: 8px; justify-content: center; }
+.card .title { font-size: 1.05rem; font-weight: 600; color: var(--heading); text-align: center; position: relative; z-index: 3; }
+.card .desc { color: var(--text-muted); font-size: 0.85rem; text-align: center; flex: 1; position: relative; z-index: 3; }
+.card .meta { display: flex; justify-content: center; gap: 16px; font-size: 0.75rem; color: var(--text-dim); position: relative; z-index: 3; }
+.card .tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; position: relative; z-index: 3; }
+.card .tag { font-size: 0.7rem; padding: 3px 10px; border-radius: 50px; background: var(--tag-bg); color: var(--tag-text); }
+.card .actions { display: flex; gap: 8px; justify-content: center; position: relative; z-index: 3; }
 .card .btn {
   padding: 6px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 500; cursor: pointer;
   border: none; font-family: system-ui, -apple-system, sans-serif; transition: opacity 0.2s;
 }
 .btn-copy { background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; }
-.btn-like { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+.btn-like { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); }
 .btn-like.liked { color: #ef4444; border-color: rgba(239,68,68,0.4); }
 .card.pending { border-color: rgba(251,191,36,0.3); }
 
@@ -94,31 +229,38 @@ nav a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
 /* modal */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; display: none; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
 .modal-overlay.show { display: flex; }
-.modal { background: #1a1a2e; border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 400px; max-width: 90vw; max-height: 85vh; overflow-y: auto; }
-@media (prefers-color-scheme: light) { .modal { background: #fff; } }
-.modal h3 { text-align: center; font-size: 1.1rem; margin-bottom: 20px; }
+.modal { background: #1a1a2e; border: 1px solid var(--card-border); border-radius: 20px; padding: 32px; width: 400px; max-width: 90vw; max-height: 85vh; overflow-y: auto; }
+html.light .modal { background: #fff; }
+.modal h3 { text-align: center; font-size: 1.1rem; margin-bottom: 20px; color: var(--heading); }
 .modal label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; margin-top: 12px; }
-.modal input, .modal textarea { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 0.9rem; outline: none; resize: vertical; font-family: system-ui, -apple-system, sans-serif; }
+.modal input, .modal textarea { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 0.9rem; outline: none; resize: vertical; font-family: system-ui, -apple-system, sans-serif; }
 .modal input:focus, .modal textarea:focus { border-color: var(--accent); }
 .modal textarea { min-height: 60px; }
 .modal .btn-row { display: flex; gap: 8px; margin-top: 20px; justify-content: center; }
 .modal .btn { padding: 10px 28px; border-radius: 50px; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 600; font-family: system-ui, -apple-system, sans-serif; }
 .modal .btn.primary { background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; }
-.modal .btn.cancel { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); }
+.modal .btn.cancel { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); }
 .modal .error { color: #ef4444; font-size: 0.8rem; text-align: center; margin-top: 8px; }
+
+/* spark */
+.spark-container { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+.spark { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; pointer-events: none; animation: sparkBurst 0.7s ease-out forwards; }
+@keyframes sparkBurst { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; } }
 
 /* toast */
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 300; background: #333; color: #fff; padding: 10px 24px; border-radius: 50px; font-size: 0.85rem; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
 .toast.show { opacity: 1; }
 
 /* admin */
-.admin-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+.admin-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; position: relative; z-index: 1; }
 .admin-bar.hidden { display: none; }
-.admin-btn { padding: 6px 14px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 0.8rem; font-family: system-ui, -apple-system, sans-serif; }
+.admin-btn { padding: 6px 14px; border-radius: 50px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-muted); cursor: pointer; font-size: 0.8rem; font-family: system-ui, -apple-system, sans-serif; }
+.admin-btn:hover { color: var(--text); }
 .admin-btn.danger { border-color: rgba(239,68,68,0.4); color: #ef4444; }
 .admin-btn.approve { border-color: rgba(52,211,153,0.4); color: #34d399; }
-.empty { text-align: center; color: var(--text-dim); padding: 48px 0; font-size: 0.9rem; }
-footer { text-align: center; padding: 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 0.8rem; }
+.admin-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.empty { text-align: center; color: var(--text-dim); padding: 48px 0; font-size: 0.9rem; position: relative; z-index: 1; }
+footer { text-align: center; padding: 24px; border-top: 1px solid var(--footer-border); color: var(--footer-text); font-size: 0.8rem; position: relative; z-index: 1; }
 
 @media (max-width: 480px) {
   .hero { padding: 40px 16px 20px; }
@@ -133,15 +275,23 @@ footer { text-align: center; padding: 24px; border-top: 1px solid var(--border);
 </head>
 <body>
 
+<div class="stars"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
 <nav>
   <div class="inner">
-    <span class="logo">林离 MIDI 分享码</span>
-    <button class="theme-btn" id="themeToggle" title="切换日夜模式">🌓</button>
+    <span class="logo">林离 分享码</span>
+    <button class="theme-btn" id="themeToggle" title="切换日夜模式">
+      <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
+    </button>
   </div>
 </nav>
 
 <div class="hero">
-  <h1>林离 MIDI 分享码</h1>
+  <h1>林离 分享码</h1>
   <p>分享你生成的林离钢琴曲，发现热门乐谱</p>
 </div>
 
@@ -161,6 +311,7 @@ footer { text-align: center; padding: 24px; border-top: 1px solid var(--border);
   <button class="admin-btn approve" onclick="approveAll()">全部通过</button>
   <button class="admin-btn danger" onclick="rejectAll()">全部拒绝</button>
   <button class="admin-btn danger" onclick="deleteRejected()">清理已拒绝</button>
+  <button class="admin-btn" id="autoApproveBtn" onclick="toggleAutoApprove()">自动通过：关</button>
   <button class="admin-btn" onclick="exitAdmin()">退出</button>
 </div>
 
@@ -198,7 +349,7 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 async function sbApi(path, options = {}) {
   const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
-    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation', ...options.headers },
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal', ...options.headers },
     ...options
   });
   if (!res.ok) throw new Error(await res.text());
@@ -208,15 +359,31 @@ async function sbApi(path, options = {}) {
 
 // ===== Theme =====
 const html = document.documentElement;
-(function() {
-  const st = localStorage.getItem('theme');
-  if (st === 'dark') html.classList.add('dark');
-  else if (st === 'light') html.classList.add('light');
-})();
+function applyTheme(mode) {
+  html.classList.remove('light', 'dark');
+  if (mode === 'light') html.classList.add('light');
+  if (mode === 'dark') html.classList.add('dark');
+}
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) applyTheme(savedTheme);
+
 document.getElementById('themeToggle').addEventListener('click', () => {
-  if (html.classList.contains('dark')) { html.classList.remove('dark'); html.classList.add('light'); localStorage.setItem('theme', 'light'); }
-  else if (html.classList.contains('light')) { html.classList.remove('light'); localStorage.removeItem('theme'); }
-  else { html.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
+  const current = html.classList.contains('light') ? 'light'
+    : html.classList.contains('dark') ? 'dark' : 'auto';
+  if (current === 'auto') {
+    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    localStorage.setItem('theme', sysDark ? 'light' : 'dark');
+    applyTheme(sysDark ? 'light' : 'dark');
+  } else if (current === 'dark') {
+    localStorage.setItem('theme', 'light'); applyTheme('light');
+  } else {
+    localStorage.setItem('theme', 'dark'); applyTheme('dark');
+  }
+});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (!localStorage.getItem('theme')) {
+    applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
 });
 
 // ===== State =====
@@ -224,6 +391,20 @@ let tab = 'hot';
 const liked = JSON.parse(localStorage.getItem('linli_liked') || '[]');
 const viewed = JSON.parse(localStorage.getItem('linli_viewed') || '[]');
 let adminMode = false;
+let autoApprove = localStorage.getItem('linli_auto_approve') !== 'false'; // default true
+
+updateAutoApproveBtn();
+
+function updateAutoApproveBtn() {
+  const btn = document.getElementById('autoApproveBtn');
+  if (btn) { btn.textContent = '自动通过：' + (autoApprove ? '开' : '关'); btn.classList.toggle('active', autoApprove); }
+}
+function toggleAutoApprove() {
+  autoApprove = !autoApprove;
+  localStorage.setItem('linli_auto_approve', autoApprove);
+  updateAutoApproveBtn();
+  showToast(autoApprove ? '新提交将自动通过' : '新提交需手动审核');
+}
 
 // ===== Toast =====
 const toast = document.getElementById('toast');
@@ -249,11 +430,9 @@ async function fetchApproved() {
   q += tab === 'hot' ? '&order=views.desc&limit=30' : '&order=created_at.desc&limit=30';
   return sbApi(`linli_codes?select=*&${q}`);
 }
-
 async function fetchAll() {
   return sbApi('linli_codes?select=*&order=created_at.desc&limit=50');
 }
-
 async function searchCodes(q) {
   return sbApi(`linli_codes?select=*&status=eq.approved&or=(title.ilike.*${q}*,description.ilike.*${q}*,author.ilike.*${q}*,tags.ilike.*${q}*)&order=views.desc&limit=30`);
 }
@@ -292,9 +471,12 @@ async function doSubmit() {
   const errEl = document.getElementById('modalError');
   if (!/^[A-Za-z0-9]{6}$/.test(code)) { errEl.textContent = '请输入六位分享码（字母或数字）'; return; }
   if (!title || title.length > 50) { errEl.textContent = '曲名不能为空且不超过50字'; return; }
+  const status = autoApprove ? 'approved' : 'pending';
   try {
-    await sbApi('linli_codes', { method: 'POST', body: JSON.stringify({ code, title, description: desc, author, tags, status: 'pending' }) });
-    closeModal(); showToast('提交成功，审核后显示'); render();
+    await sbApi('linli_codes', { method: 'POST', body: JSON.stringify({ code, title, description: desc, author, tags, status }) });
+    closeModal();
+    showToast(autoApprove ? '提交成功！' : '提交成功，审核后显示');
+    render();
   } catch (e) {
     let msg = e.message;
     try { msg = JSON.parse(e.message).message || msg; } catch (_) {}
@@ -308,25 +490,21 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     if (adminMode) { exitAdmin(); return; }
     const pw = prompt('管理密码：');
-    if (pw === 'linli2026') { adminMode = true; document.getElementById('adminBar').classList.remove('hidden'); showToast('管理模式已开启'); render(); }
+    if (pw === 'linli2026') { adminMode = true; document.getElementById('adminBar').classList.remove('hidden'); updateAutoApproveBtn(); showToast('管理模式已开启'); render(); }
     else if (pw) showToast('密码错误');
   }
 });
-
 function exitAdmin() { adminMode = false; document.getElementById('adminBar').classList.add('hidden'); showToast('已退出管理模式'); render(); }
-
 async function approveAll() {
   const data = await fetchAll();
   for (const item of data) { if (item.status === 'pending') { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); } catch (e) {} } }
   showToast('已全部通过'); render();
 }
-
 async function rejectAll() {
   const data = await fetchAll();
   for (const item of data) { if (item.status === 'pending') { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); } catch (e) {} } }
   showToast('已全部拒绝'); render();
 }
-
 async function approveOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); showToast('已通过'); render(); } catch (e) {} }
 async function rejectOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); showToast('已拒绝'); render(); } catch (e) {} }
 async function deleteOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'DELETE' }); showToast('已删除'); render(); } catch (e) { showToast('删除失败'); } }
@@ -346,18 +524,14 @@ function buildCard(item) {
     if (item.status === 'pending') adminBtns += `<button class="btn btn-copy" onclick="approveOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;">通过</button><button class="btn btn-like" onclick="rejectOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;">拒绝</button>`;
     adminBtns += `<button class="btn btn-like" onclick="deleteOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;color:#ef4444;border-color:rgba(239,68,68,0.4);">删除</button></div>`;
   }
-
   return `
     <div class="card${adminMode && item.status === 'pending' ? ' pending' : ''}">
+      <div class="glare"></div>
       <div class="code" onclick="copyCode('${item.code}')" title="点击复制">${item.code}</div>
       <div class="title">${item.title}</div>
       ${item.description ? `<div class="desc">${item.description}</div>` : ''}
       ${tagList.length ? `<div class="tags">${tagList.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
-      <div class="meta">
-        <span>👤 ${item.author}</span>
-        <span>👁 ${item.views || 0}</span>
-        <span>❤ ${item.likes || 0}</span>
-      </div>
+      <div class="meta"><span>👤 ${item.author}</span><span>👁 ${item.views || 0}</span><span>❤ ${item.likes || 0}</span></div>
       <div class="actions">
         <button class="btn btn-copy" onclick="copyCode('${item.code}')">📋 复制</button>
         <button class="btn btn-like${isLiked ? ' liked' : ''}" onclick="doLike(${item.id})">${isLiked ? '❤' : '🤍'} ${item.likes || 0}</button>
@@ -369,11 +543,8 @@ function buildCard(item) {
 async function render() {
   const grid = document.getElementById('grid');
   const empty = document.getElementById('empty');
-
   if (adminMode) { loadAll(); return; }
-
   grid.innerHTML = ''; empty.style.display = 'none';
-
   try {
     let data;
     if (tab === 'search') {
@@ -381,7 +552,6 @@ async function render() {
       if (!q) { empty.style.display = 'block'; empty.textContent = '输入关键词搜索'; return; }
       data = await searchCodes(encodeURIComponent(q));
     } else { data = await fetchApproved(); }
-
     if (!data.length) { empty.style.display = 'block'; empty.textContent = tab === 'search' ? '没有找到匹配的分享码' : '暂无分享码，点右下角 + 提交第一个吧！'; return; }
     data.forEach(item => { const d = document.createElement('div'); d.innerHTML = buildCard(item); grid.appendChild(d.firstElementChild); trackView(item.id); });
   } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败，请刷新重试'; }
@@ -397,6 +567,83 @@ async function loadAll() {
 }
 
 render();
+
+// ===== Cursor glow + star parallax =====
+const glow = document.getElementById('cursorGlow');
+const starsEl = document.querySelector('.stars');
+if (glow) {
+  let pending = false;
+  document.addEventListener('mousemove', e => {
+    if (pending) return; pending = true;
+    requestAnimationFrame(() => { pending = false;
+      glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; glow.style.opacity = '1';
+      if (starsEl) { const x = (e.clientX / innerWidth - 0.5) * 16; const y = (e.clientY / innerHeight - 0.5) * 16; starsEl.style.transform = `translate(${-x}px, ${-y}px)`; }
+    });
+  });
+  document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; if (starsEl) starsEl.style.transform = ''; });
+}
+
+// ===== Card 3D tilt + glare =====
+(function() {
+  const maxAngle = 8; let cur = null, rect = null, raf = null;
+  function updateRect() { if (cur) rect = cur.getBoundingClientRect(); }
+  window.addEventListener('scroll', updateRect, { passive: true });
+  window.addEventListener('resize', updateRect);
+  function begin(card, x, y) {
+    if (card !== cur) { if (cur) reset(cur); if (!document.contains(card)) return; cur = card; card.classList.add('tilting'); rect = card.getBoundingClientRect(); }
+  }
+  function move(x, y) {
+    if (!cur || !rect) return;
+    if (!raf) { raf = requestAnimationFrame(() => { raf = null; if (!cur || !rect) return;
+      const rx = (y - rect.top) / rect.height, ry = (x - rect.left) / rect.width;
+      cur.style.setProperty('--rx', ((rx - 0.5) * -maxAngle).toFixed(2) + 'deg');
+      cur.style.setProperty('--ry', ((ry - 0.5) * maxAngle).toFixed(2) + 'deg');
+      cur.style.setProperty('--gx', (ry * 100).toFixed(1) + '%');
+      cur.style.setProperty('--gy', (rx * 100).toFixed(1) + '%');
+    }); }
+  }
+  function end(card) { if (card === cur) { reset(cur); cur = null; rect = null; } }
+  function reset(card) {
+    card.classList.remove('tilting'); const glare = card.querySelector('.glare');
+    const done = () => { card.style.transition = 'transform 0.3s ease-out'; card.style.removeProperty('--rx'); card.style.removeProperty('--ry'); card.style.removeProperty('--gx'); card.style.removeProperty('--gy'); card.addEventListener('transitionend', function c(){card.style.transition='';card.removeEventListener('transitionend',c);},{once:true}); };
+    if (glare) glare.addEventListener('transitionend', () => { done(); }, { once: true }); else done();
+  }
+  document.addEventListener('mouseover', e => { begin(e.target.closest('.card'), e.clientX, e.clientY); });
+  document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+  document.addEventListener('mouseout', e => { const card = e.target.closest('.card'); if (!card) return; if (e.relatedTarget && card.contains(e.relatedTarget)) return; end(card); });
+  document.addEventListener('touchstart', e => { const t = e.touches[0]; begin(t.target.closest('.card'), t.clientX, t.clientY); }, { passive: true });
+  document.addEventListener('touchmove', e => { const t = e.touches[0]; move(t.clientX, t.clientY); }, { passive: true });
+  document.addEventListener('touchend', () => { if (cur) { reset(cur); cur = null; rect = null; } });
+})();
+
+// ===== Click spark =====
+(function() {
+  const c = document.createElement('div'); c.className = 'spark-container'; document.body.appendChild(c);
+  document.addEventListener('click', e => {
+    for (let i = 0; i < 6; i++) {
+      const s = document.createElement('div'); s.className = 'spark';
+      const a = (Math.PI * 2 * i) / 6 + (Math.random() - 0.5) * 0.6;
+      s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px';
+      s.style.setProperty('--sx', Math.cos(a) * (18 + Math.random() * 22) + 'px');
+      s.style.setProperty('--sy', Math.sin(a) * (18 + Math.random() * 22) + 'px');
+      s.style.background = `hsl(${200 + Math.random() * 60}, 90%, ${55 + Math.random() * 20}%)`;
+      c.appendChild(s); s.addEventListener('animationend', () => s.remove());
+    }
+  });
+})();
+
+// ===== Gyroscope =====
+(function() {
+  if (typeof DeviceOrientationEvent === 'undefined') return;
+  const stars = document.querySelector('.stars'), orbs = document.querySelectorAll('.orb');
+  if (!stars) return; const maxShift = 28;
+  function handle(e) { const g = e.gamma || 0, b = e.beta || 0; const x = Math.max(-1, Math.min(1, g / 45)), y = Math.max(-1, Math.min(1, (b - 45) / 45)); stars.style.transition = 'none'; stars.style.transform = `translate(${x * maxShift}px, ${y * maxShift}px)`; orbs.forEach((o, i) => { o.style.transition = 'none'; o.style.transform = `translate(${x * maxShift * (i + 1) * 0.6}px, ${y * maxShift * (i + 1) * 0.6}px)`; }); }
+  function reset() { stars.style.transition = 'transform 0.8s ease-out'; stars.style.transform = ''; orbs.forEach(o => { o.style.transition = 'transform 0.8s ease-out'; o.style.transform = ''; }); }
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    const ask = () => { DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') { window.addEventListener('deviceorientation', handle); let t; window.addEventListener('deviceorientation', () => { clearTimeout(t); t = setTimeout(reset, 3000); }); } }).catch(() => {}); };
+    document.addEventListener('click', ask, { once: true }); document.addEventListener('touchstart', ask, { once: true });
+  } else { window.addEventListener('deviceorientation', handle); let t; window.addEventListener('deviceorientation', () => { clearTimeout(t); t = setTimeout(reset, 3000); }); }
+})();
 </script>
 
 </body>
