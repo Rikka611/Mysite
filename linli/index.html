@@ -198,7 +198,8 @@ html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{di
 .row .sub{font-size:0.75rem;color:var(--text-dim);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .row .tag{font-size:0.65rem;padding:2px 8px;border-radius:50px;background:var(--tag-bg);color:var(--tag-text);transition:all 0.3s}
 .row:hover .tag{background:rgba(56,189,248,0.15);color:var(--accent)}
-.row .stats{display:flex;gap:10px;font-size:0.75rem;color:var(--text-dim);white-space:nowrap;position:relative;z-index:3;transition:all 0.3s}
+.row .stats{display:flex;gap:10px;font-size:0.75rem;color:var(--text-dim);white-space:nowrap;position:relative;z-index:3;transition:all 0.3s;width:80px;flex-shrink:0;justify-content:center}
+.row .actions{display:flex;gap:6px;position:relative;z-index:3;width:90px;flex-shrink:0;justify-content:center}
 .row .btn{
   padding:6px 14px;border-radius:50px;font-size:0.75rem;font-weight:500;cursor:pointer;
   border:none;font-family:system-ui,-apple-system,sans-serif;transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1.2);white-space:nowrap;position:relative;overflow:hidden;
@@ -458,7 +459,7 @@ function buildRow(item,idx){
       <div class="sub">${desc?`<span>${esc(desc)}</span>`:''}${tagList.length?tagList.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):''}</div>
     </div>
     <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
-    <div style="display:flex;gap:6px;position:relative;z-index:3">
+    <div class="actions">
       <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}',event)">📋</button>
       <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id},event)">${isLiked?'❤':'🤍'}</button>
     </div></div>`;
