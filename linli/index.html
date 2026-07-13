@@ -434,8 +434,6 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 
 // State
 let tab='hot';
-const liked=JSON.parse(localStorage.getItem('linli_liked')||'[]');
-const viewed=JSON.parse(localStorage.getItem('linli_viewed')||'[]');
 let autoApprove=localStorage.getItem('linli_auto_approve')!=='false';
 let page=1,pageSize=15,totalPages=1;
 
@@ -459,17 +457,15 @@ async function fetchApproved(){
 async function searchCodes(q){return sbApi(`linli_codes?select=*&status=eq.approved&or=(title.ilike.*${q}*,description.ilike.*${q}*,author.ilike.*${q}*,tags.ilike.*${q}*)&order=likes.desc&limit=200`)}
 
 async function trackView(id){
-  if(viewed.includes(id))return;
-  try{const d=await sbApi(`linli_codes?select=views&id=eq.${id}`);await sbApi(`linli_codes?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({views:(d[0]?.views||0)+1})});viewed.push(id);localStorage.setItem('linli_viewed',JSON.stringify(viewed))}catch(e){}
+  const f=btoa(navigator.userAgent+screen.width+'x'+screen.height).slice(0,32);
+  try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'view'})})}catch(e){}
 }
 
 async function doLike(id,e){
-  if(liked.includes(id))return;
-  try{const d=await sbApi(`linli_codes?select=likes&id=eq.${id}`);await sbApi(`linli_codes?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({likes:(d[0]?.likes||0)+1})});liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));
-    // Heart burst effect
-    if(e){const rect=e.target.getBoundingClientRect();for(let i=0;i<8;i++){const h=document.createElement('div');h.className='heart-burst';h.textContent='❤';h.style.left=rect.left+rect.width/2+'px';h.style.top=rect.top+rect.height/2+'px';const a=Math.PI*2*i/8;h.style.setProperty('--hx',Math.cos(a)*40+'px');h.style.setProperty('--hy',Math.sin(a)*40+'px');h.style.color=`hsl(${350+Math.random()*20},90%,${55+Math.random()*20}%)`;document.body.appendChild(h);h.addEventListener('animationend',()=>h.remove())}}
-    render();
-  }catch(e){}
+  const f=btoa(navigator.userAgent+screen.width+'x'+screen.height).slice(0,32);
+  try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}
+  render();
+  if(e){const rect=e.target.getBoundingClientRect();for(let i=0;i<8;i++){const h=document.createElement('div');h.className='heart-burst';h.textContent='❤';h.style.left=rect.left+rect.width/2+'px';h.style.top=rect.top+rect.height/2+'px';const a=Math.PI*2*i/8;h.style.setProperty('--hx',Math.cos(a)*40+'px');h.style.setProperty('--hy',Math.sin(a)*40+'px');h.style.color=`hsl(${350+Math.random()*20},90%,${55+Math.random()*20}%)`;document.body.appendChild(h);h.addEventListener('animationend',()=>h.remove())}}
 }
 
 function copyCode(code,e){
@@ -512,7 +508,6 @@ async function doSubmit(){
 function esc(s){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
 
 function buildRow(item,idx){
-  const isLiked=liked.includes(item.id);
   const tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[];
   const rank=tab==='hot'?idx+1:null;
   const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');
@@ -527,7 +522,7 @@ function buildRow(item,idx){
     <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
     <div class="actions">
       <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}',event)">📋</button>
-      <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id},event)">${isLiked?'❤':'🤍'}</button>
+      <button class="btn btn-like" onclick="doLike(${item.id},event)">🤍 ${item.likes||0}</button>
     </div></div>`;
 }
 
