@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>林离 MIDI 分享码</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a1a; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.06);
+  --text: #e0e0e0; --text-muted: #889; --text-dim: #667;
+  --accent: #38bdf8; --accent2: #818cf8;
+}
+@media (prefers-color-scheme: light) {
+  :root { --bg: #f5f7fa; --surface: rgba(0,0,0,0.03); --border: rgba(0,0,0,0.06); --text: #334; --text-muted: #667; --text-dim: #889; }
+}
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6;
+}
+
+/* nav */
+nav {
+  position: sticky; top: 0; z-index: 100; padding: 0 24px;
+  background: rgba(10,10,26,0.8); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+nav .inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+nav .logo { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+nav a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; }
+.theme-btn {
+  background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;
+  width: 32px; height: 32px; border-radius: 50%; font-size: 0.9rem;
+}
+
+/* hero */
+.hero { text-align: center; padding: 64px 24px 40px; }
+.hero h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px; }
+.hero p { color: var(--text-muted); font-size: 1rem; }
+
+/* tabs */
+.tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 28px; }
+.tab { padding: 8px 20px; border-radius: 50px; border: none; background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 0.85rem; font-weight: 500; font-family: system-ui, -apple-system, sans-serif; }
+.tab:hover { color: var(--text); }
+.tab.active { background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; }
+
+/* search */
+.search-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; }
+.search-bar.hidden { display: none; }
+.search-bar input { padding: 10px 18px; border-radius: 50px; width: 280px; max-width: 60vw; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 0.9rem; outline: none; font-family: system-ui, -apple-system, sans-serif; }
+.search-bar input:focus { border-color: var(--accent); }
+.search-bar button { padding: 10px 20px; border-radius: 50px; border: none; background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 600; font-family: system-ui, -apple-system, sans-serif; }
+
+/* content */
+.content { max-width: 1000px; margin: 0 auto; padding: 0 24px 60px; }
+.grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.card {
+  flex: 0 1 290px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.card:hover { border-color: rgba(56,189,248,0.4); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+.card .code {
+  font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; text-align: center;
+  background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  cursor: pointer; user-select: all; font-variant-numeric: tabular-nums;
+}
+.card .code:active { opacity: 0.7; }
+.card .title { font-size: 1.05rem; font-weight: 600; text-align: center; }
+.card .desc { color: var(--text-muted); font-size: 0.85rem; text-align: center; flex: 1; }
+.card .meta { display: flex; justify-content: center; gap: 16px; font-size: 0.75rem; color: var(--text-dim); }
+.card .tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.card .tag { font-size: 0.7rem; padding: 3px 10px; border-radius: 50px; background: rgba(56,189,248,0.1); color: var(--accent); }
+.card .actions { display: flex; gap: 8px; justify-content: center; }
+.card .btn {
+  padding: 6px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 500; cursor: pointer;
+  border: none; font-family: system-ui, -apple-system, sans-serif; transition: opacity 0.2s;
+}
+.btn-copy { background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; }
+.btn-like { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+.btn-like.liked { color: #ef4444; border-color: rgba(239,68,68,0.4); }
+.card.pending { border-color: rgba(251,191,36,0.3); }
+
+/* fab */
+.fab {
+  position: fixed; bottom: 32px; right: 32px; z-index: 50;
+  width: 56px; height: 56px; border-radius: 50%; border: none;
+  background: linear-gradient(135deg, #38bdf8, #818cf8); color: #fff;
+  font-size: 1.6rem; cursor: pointer; box-shadow: 0 4px 20px rgba(56,189,248,0.4);
+  transition: transform 0.2s;
+}
+.fab:hover { transform: scale(1.1); }
+
+/* modal */
+.modal-overlay { position: fixed; inset: 0; z-index: 200; display: none; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #1a1a2e; border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 400px; max-width: 90vw; max-height: 85vh; overflow-y: auto; }
+@media (prefers-color-scheme: light) { .modal { background: #fff; } }
+.modal h3 { text-align: center; font-size: 1.1rem; margin-bottom: 20px; }
+.modal label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; margin-top: 12px; }
+.modal input, .modal textarea { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 0.9rem; outline: none; resize: vertical; font-family: system-ui, -apple-system, sans-serif; }
+.modal input:focus, .modal textarea:focus { border-color: var(--accent); }
+.modal textarea { min-height: 60px; }
+.modal .btn-row { display: flex; gap: 8px; margin-top: 20px; justify-content: center; }
+.modal .btn { padding: 10px 28px; border-radius: 50px; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 600; font-family: system-ui, -apple-system, sans-serif; }
+.modal .btn.primary { background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; }
+.modal .btn.cancel { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); }
+.modal .error { color: #ef4444; font-size: 0.8rem; text-align: center; margin-top: 8px; }
+
+/* toast */
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 300; background: #333; color: #fff; padding: 10px 24px; border-radius: 50px; font-size: 0.85rem; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+.toast.show { opacity: 1; }
+
+/* admin */
+.admin-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+.admin-bar.hidden { display: none; }
+.admin-btn { padding: 6px 14px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; font-size: 0.8rem; font-family: system-ui, -apple-system, sans-serif; }
+.admin-btn.danger { border-color: rgba(239,68,68,0.4); color: #ef4444; }
+.admin-btn.approve { border-color: rgba(52,211,153,0.4); color: #34d399; }
+.empty { text-align: center; color: var(--text-dim); padding: 48px 0; font-size: 0.9rem; }
+footer { text-align: center; padding: 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 0.8rem; }
+
+@media (max-width: 480px) {
+  .hero { padding: 40px 16px 20px; }
+  .hero h1 { font-size: 1.6rem; }
+  .content { padding: 0 12px 40px; }
+  .grid { gap: 12px; }
+  .card { flex: 0 1 100%; padding: 18px; }
+  nav { padding: 0 12px; }
+  .fab { bottom: 20px; right: 20px; width: 48px; height: 48px; font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <span class="logo">林离 MIDI 分享码</span>
+    <button class="theme-btn" id="themeToggle" title="切换日夜模式">🌓</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>林离 MIDI 分享码</h1>
+  <p>分享你生成的林离钢琴曲，发现热门乐谱</p>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-tab="hot">🔥 热门</button>
+  <button class="tab" data-tab="new">🆕 最新</button>
+  <button class="tab" data-tab="search">🔍 搜索</button>
+</div>
+
+<div class="search-bar hidden" id="searchBar">
+  <input type="text" id="searchInput" placeholder="搜索曲名、作者、标签..." maxlength="50">
+  <button onclick="doSearch()">搜索</button>
+</div>
+
+<div class="admin-bar hidden" id="adminBar">
+  <span style="font-size:0.8rem;color:var(--text-dim)">审核 · </span>
+  <button class="admin-btn approve" onclick="approveAll()">全部通过</button>
+  <button class="admin-btn danger" onclick="rejectAll()">全部拒绝</button>
+  <button class="admin-btn" onclick="exitAdmin()">退出</button>
+</div>
+
+<div class="content">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">加载中...</div>
+</div>
+
+<button class="fab" id="fab" title="提交分享码">+</button>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>提交分享码</h3>
+    <label>六位分享码 *</label><input type="text" id="inputCode" placeholder="000000" maxlength="6">
+    <label>曲名 *</label><input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50">
+    <label>你的昵称</label><input type="text" id="inputAuthor" placeholder="匿名" maxlength="30">
+    <label>简介</label><textarea id="inputDesc" placeholder="简单介绍一下..." maxlength="200"></textarea>
+    <label>标签（空格分隔）</label><input type="text" id="inputTags" placeholder="原神 璃月 抒情" maxlength="100">
+    <div class="error" id="modalError"></div>
+    <div class="btn-row">
+      <button class="btn cancel" onclick="closeModal()">取消</button>
+      <button class="btn primary" onclick="doSubmit()">提交</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>数据由社区提供，与米哈游无关</footer>
+
+<script>
+// ===== Supabase =====
+const SB_URL = 'https://naivizrdefonlelndzqr.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5haXZpenJkZWZvbmxlbG5kenFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTU4MjcsImV4cCI6MjA5NzY5MTgyN30.66G4T_7JDVjsw0RGRC_OwcYBgMwPk33c3sCrlmzrxvI';
+
+async function sbApi(path, options = {}) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation', ...options.headers },
+    ...options
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+// ===== Theme =====
+const html = document.documentElement;
+(function() {
+  const st = localStorage.getItem('theme');
+  if (st === 'dark') html.classList.add('dark');
+  else if (st === 'light') html.classList.add('light');
+})();
+document.getElementById('themeToggle').addEventListener('click', () => {
+  if (html.classList.contains('dark')) { html.classList.remove('dark'); html.classList.add('light'); localStorage.setItem('theme', 'light'); }
+  else if (html.classList.contains('light')) { html.classList.remove('light'); localStorage.removeItem('theme'); }
+  else { html.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
+});
+
+// ===== State =====
+let tab = 'hot';
+const liked = JSON.parse(localStorage.getItem('linli_liked') || '[]');
+const viewed = JSON.parse(localStorage.getItem('linli_viewed') || '[]');
+let adminMode = false;
+
+// ===== Toast =====
+const toast = document.getElementById('toast');
+function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
+
+// ===== Tabs =====
+document.getElementById('tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab'); if (!btn) return;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tab = btn.dataset.tab;
+  document.getElementById('searchBar').classList.toggle('hidden', tab !== 'search');
+  render();
+});
+
+// ===== Search =====
+document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+function doSearch() { render(); }
+
+// ===== Fetch =====
+async function fetchApproved() {
+  let q = 'status=eq.approved';
+  q += tab === 'hot' ? '&order=views.desc&limit=30' : '&order=created_at.desc&limit=30';
+  return sbApi(`linli_codes?select=*&${q}`);
+}
+
+async function fetchAll() {
+  return sbApi('linli_codes?select=*&order=created_at.desc&limit=50');
+}
+
+async function searchCodes(q) {
+  return sbApi(`linli_codes?select=*&status=eq.approved&or=(title.ilike.*${q}*,description.ilike.*${q}*,author.ilike.*${q}*,tags.ilike.*${q}*)&order=views.desc&limit=30`);
+}
+
+// ===== View tracking =====
+async function trackView(id) {
+  if (viewed.includes(id)) return;
+  viewed.push(id); localStorage.setItem('linli_viewed', JSON.stringify(viewed));
+  try { const d = await sbApi(`linli_codes?select=views&id=eq.${id}`); await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ views: (d[0]?.views || 0) + 1 }) }); } catch (e) {}
+}
+
+// ===== Like =====
+async function doLike(id) {
+  if (liked.includes(id)) return;
+  liked.push(id); localStorage.setItem('linli_liked', JSON.stringify(liked));
+  try { const d = await sbApi(`linli_codes?select=likes&id=eq.${id}`); await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ likes: (d[0]?.likes || 0) + 1 }) }); } catch (e) {}
+  render();
+}
+
+// ===== Copy =====
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(() => showToast('已复制: ' + code)).catch(() => showToast('复制失败'));
+}
+
+// ===== Modal =====
+document.getElementById('fab').addEventListener('click', () => { document.getElementById('modalOverlay').classList.add('show'); document.getElementById('modalError').textContent = ''; });
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.getElementById('inputCode').value = ''; document.getElementById('inputTitle').value = ''; document.getElementById('inputAuthor').value = ''; document.getElementById('inputDesc').value = ''; document.getElementById('inputTags').value = ''; }
+
+async function doSubmit() {
+  const code = document.getElementById('inputCode').value.trim();
+  const title = document.getElementById('inputTitle').value.trim();
+  const author = document.getElementById('inputAuthor').value.trim() || '匿名';
+  const desc = document.getElementById('inputDesc').value.trim();
+  const tags = document.getElementById('inputTags').value.trim();
+  const errEl = document.getElementById('modalError');
+  if (!/^\d{6}$/.test(code)) { errEl.textContent = '请输入六位数字分享码'; return; }
+  if (!title || title.length > 50) { errEl.textContent = '曲名不能为空且不超过50字'; return; }
+  try {
+    await sbApi('linli_codes', { method: 'POST', body: JSON.stringify({ code, title, description: desc, author, tags, status: 'pending' }) });
+    closeModal(); showToast('提交成功，审核后显示'); render();
+  } catch (e) { errEl.textContent = '提交失败，请重试'; }
+}
+
+// ===== Admin =====
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'm') {
+    e.preventDefault();
+    if (adminMode) { exitAdmin(); return; }
+    const pw = prompt('管理密码：');
+    if (pw === 'linli2026') { adminMode = true; document.getElementById('adminBar').classList.remove('hidden'); showToast('管理模式已开启'); render(); }
+    else if (pw) showToast('密码错误');
+  }
+});
+
+function exitAdmin() { adminMode = false; document.getElementById('adminBar').classList.add('hidden'); showToast('已退出管理模式'); render(); }
+
+async function approveAll() {
+  const data = await fetchAll();
+  for (const item of data) { if (item.status === 'pending') { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); } catch (e) {} } }
+  showToast('已全部通过'); render();
+}
+
+async function rejectAll() {
+  const data = await fetchAll();
+  for (const item of data) { if (item.status === 'pending') { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); } catch (e) {} } }
+  showToast('已全部拒绝'); render();
+}
+
+async function approveOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); showToast('已通过'); render(); } catch (e) {} }
+async function rejectOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); showToast('已拒绝'); render(); } catch (e) {} }
+
+// ===== Render =====
+function buildCard(item) {
+  const isLiked = liked.includes(item.id);
+  const tagList = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 5) : [];
+  const adminBtns = adminMode && item.status === 'pending' ? `
+    <div class="actions" style="margin-top:4px">
+      <button class="btn btn-copy" onclick="approveOne(${item.id})" style="font-size:0.7rem;padding:4px 12px;">通过</button>
+      <button class="btn btn-like" onclick="rejectOne(${item.id})" style="font-size:0.7rem;padding:4px 12px;">拒绝</button>
+    </div>` : '';
+
+  return `
+    <div class="card${adminMode && item.status === 'pending' ? ' pending' : ''}">
+      <div class="code" onclick="copyCode('${item.code}')" title="点击复制">${item.code}</div>
+      <div class="title">${item.title}</div>
+      ${item.description ? `<div class="desc">${item.description}</div>` : ''}
+      ${tagList.length ? `<div class="tags">${tagList.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+      <div class="meta">
+        <span>👤 ${item.author}</span>
+        <span>👁 ${item.views || 0}</span>
+        <span>❤ ${item.likes || 0}</span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-copy" onclick="copyCode('${item.code}')">📋 复制</button>
+        <button class="btn btn-like${isLiked ? ' liked' : ''}" onclick="doLike(${item.id})">${isLiked ? '❤' : '🤍'} ${item.likes || 0}</button>
+      </div>
+      ${adminBtns}
+    </div>`;
+}
+
+async function render() {
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+
+  if (adminMode) { loadPending(); return; }
+
+  grid.innerHTML = ''; empty.style.display = 'none';
+
+  try {
+    let data;
+    if (tab === 'search') {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) { empty.style.display = 'block'; empty.textContent = '输入关键词搜索'; return; }
+      data = await searchCodes(encodeURIComponent(q));
+    } else { data = await fetchApproved(); }
+
+    if (!data.length) { empty.style.display = 'block'; empty.textContent = tab === 'search' ? '没有找到匹配的分享码' : '暂无分享码，点右下角 + 提交第一个吧！'; return; }
+    data.forEach(item => { const d = document.createElement('div'); d.innerHTML = buildCard(item); grid.appendChild(d.firstElementChild); trackView(item.id); });
+  } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败，请刷新重试'; }
+}
+
+async function loadPending() {
+  const grid = document.getElementById('grid'); const empty = document.getElementById('empty');
+  try {
+    const data = await fetchAll();
+    if (!data.length) { empty.style.display = 'block'; empty.textContent = '无待审核项'; grid.innerHTML = ''; return; }
+    empty.style.display = 'none'; grid.innerHTML = data.map(item => buildCard(item)).join('');
+  } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败'; }
+}
+
+render();
+</script>
+
+</body>
+</html>
