@@ -43,6 +43,10 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .row .sub{font-size:0.75rem;color:var(--text-dim)}
 .row .actions{display:flex;gap:4px}
 .empty{text-align:center;color:var(--text-dim);padding:48px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
+.stat .val{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat .lbl{font-size:0.7rem;color:var(--text-dim);margin-top:2px}
 @media(max-width:600px){.row{flex-wrap:wrap;gap:6px;padding:8px 10px}.header{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
@@ -76,6 +80,8 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <button class="tab" data-filter="approved" id="tabApproved">已通过</button>
     <button class="tab" data-filter="rejected" id="tabRejected">已拒绝</button>
   </div>
+
+  <div class="stats" id="stats"></div>
 
   <div class="list" id="list"></div>
   <div class="empty" id="empty">加载中...</div>
@@ -193,7 +199,7 @@ async function load() {
   document.getElementById('list').innerHTML = '';
   try {
     dataCache = await sbApi('linli_codes?select=*&order=created_at.desc&limit=200');
-    updateCounts(); renderFiltered();
+    updateCounts(); renderStats(); renderFiltered();
   } catch (e) {
     document.getElementById('empty').textContent = '加载失败';
     document.getElementById('empty').style.display = 'block';
@@ -207,6 +213,25 @@ function updateCounts() {
   document.getElementById('tabPending').innerHTML = `待审核 <span class="count">${counts.pending}</span>`;
   document.getElementById('tabApproved').innerHTML = `已通过 <span class="count">${counts.approved}</span>`;
   document.getElementById('tabRejected').innerHTML = `已拒绝 <span class="count">${counts.rejected}</span>`;
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+
+function renderStats() {
+  const approved = dataCache.filter(i => i.status === 'approved');
+  const totalViews = dataCache.reduce((s, i) => s + (i.views || 0), 0);
+  const totalLikes = dataCache.reduce((s, i) => s + (i.likes || 0), 0);
+  const topLiked = approved.slice().sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 3);
+  const recent = dataCache.slice(0, 3);
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="val">${dataCache.length}</div><div class="lbl">总提交</div></div>
+    <div class="stat"><div class="val">${approved.length}</div><div class="lbl">已通过</div></div>
+    <div class="stat"><div class="val">${totalViews}</div><div class="lbl">总浏览</div></div>
+    <div class="stat"><div class="val">${totalLikes}</div><div class="lbl">总点赞</div></div>
+    <div class="stat"><div class="val" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${topLiked.map((t,i) => `${i+1}.${esc(t.title)} ❤${t.likes||0}`).join('<br>')||'—'}</div><div class="lbl">最热三首</div></div>
+    <div class="stat"><div class="val" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${recent.map(r => `${esc(r.title)}`).join('<br>')||'—'}</div><div class="lbl">最新提交</div></div>
+  `;
 }
 
 function renderFiltered() {
@@ -231,8 +256,6 @@ function renderFiltered() {
       </div></div>`;
   }).join('');
 }
-
-function esc(s) { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
 
 // ===== Actions =====
 async function approve(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); load(); } catch (e) {} }
