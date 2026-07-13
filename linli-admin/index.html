@@ -449,21 +449,27 @@ function renderFiltered() {
   let items = filter === 'all' ? dataCache : dataCache.filter(item => item.status === filter);
   const dupes = findDupes();
 
-  // 重复码排最前
+  // 重复码分组放在一起，每组内按时间倒序
   items = [...items].sort((a, b) => {
-    const da = dupes.has(a.code) ? 1 : 0;
-    const db = dupes.has(b.code) ? 1 : 0;
-    return db - da;
+    const da = dupes.has(a.code);
+    const db = dupes.has(b.code);
+    if (da && db) return a.code.localeCompare(b.code) || b.id - a.id;
+    if (da) return -1;
+    if (db) return 1;
+    return 0;
   });
 
   const list = document.getElementById('list'), empty = document.getElementById('empty');
   if (!items.length) { list.innerHTML = ''; empty.style.display = 'block'; empty.textContent = '暂无数据'; return; }
   empty.style.display = 'none';
+  let lastDupe = '';
   list.innerHTML = items.map(item => {
     const tags = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 3) : [];
     const sc = { pending: 'var(--warn)', approved: 'var(--ok)', rejected: 'var(--danger)' };
     const isDupe = dupes.has(item.code);
-    return `<div class="row ${item.status}${isDupe ? ' dupe' : ''}">
+    const sep = isDupe && item.code !== lastDupe ? '<div style="text-align:center;color:#ef4444;font-size:0.7rem;padding:4px 0">——— ' + esc(item.code) + ' 重复 ———</div>' : '';
+    if (isDupe) lastDupe = item.code;
+    return sep + `<div class="row ${item.status}${isDupe ? ' dupe' : ''}">
       <span style="font-size:0.7rem;color:${sc[item.status]||'var(--text-dim)'};min-width:45px">${item.status}</span>
       <div class="code">${esc(item.code)}${isDupe ? ' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px;vertical-align:middle">重复</span>' : ''}</div>
       <div class="info">
