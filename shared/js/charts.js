@@ -49,12 +49,12 @@
       bars.push({ x, y, w: barW, h, label: d.label, value: d.value })
     })
     // Hover tooltip
-    const tip = document.createElement('div'); tip.style.cssText = 'position:absolute;display:none;background:rgba(0,0,0,0.85);color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;pointer-events:none;white-space:nowrap;z-index:10'
+    const tip = document.createElement('div'); tip.style.cssText = 'position:fixed;display:none;background:rgba(0,0,0,0.9);color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;pointer-events:none;white-space:nowrap;z-index:999'
     canvas.parentElement.style.position = 'relative'; canvas.parentElement.appendChild(tip)
     canvas.addEventListener('mousemove', e => {
       const rect = canvas.getBoundingClientRect(); const mx = (e.clientX - rect.left) * (width / rect.width), my = (e.clientY - rect.top) * (height / rect.height)
       const hit = bars.find(b => mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h)
-      if (hit) { tip.style.display = 'block'; tip.style.left = (e.clientX - rect.left + 12) + 'px'; tip.style.top = (e.clientY - rect.top - 28) + 'px'; tip.textContent = hit.label + '  ' + hit.value + '条' }
+      if (hit) { tip.style.display = 'block'; tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY - 28) + 'px'; tip.textContent = hit.label + '  ' + hit.value + '条' }
       else tip.style.display = 'none'
     })
     canvas.addEventListener('mouseleave', () => tip.style.display = 'none')
