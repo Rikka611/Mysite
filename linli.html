@@ -508,6 +508,11 @@ async function deleteRejected() {
 }
 
 // ===== Render =====
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
 function buildRow(item, idx) {
   const isLiked = liked.includes(item.id);
   const tagList = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 3) : [];
@@ -523,14 +528,14 @@ function buildRow(item, idx) {
     <div class="row${adminMode && item.status === 'pending' ? ' pending' : ''}">
       <div class="glare"></div>
       ${rank !== null ? `<div class="rank">#${rank}</div>` : ''}
-      <div class="code" onclick="copyCode('${item.code}')" title="点击复制">${item.code}</div>
+      <div class="code" onclick="copyCode('${esc(item.code)}')" title="点击复制">${esc(item.code)}</div>
       <div class="info">
-        <div class="title">${item.title}</div>
-        <div class="sub">${desc ? `<span>${desc}</span>` : ''}${tagList.length ? tagList.map(t => `<span class="tag">${t}</span>`).join('') : ''}</div>
+        <div class="title">${esc(item.title)}</div>
+        <div class="sub">${desc ? `<span>${esc(desc)}</span>` : ''}${tagList.length ? tagList.map(t => `<span class="tag">${esc(t)}</span>`).join('') : ''}</div>
       </div>
       <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
       <div style="display:flex;gap:6px;position:relative;z-index:3">
-        <button class="btn btn-copy" onclick="copyCode('${item.code}')">📋</button>
+        <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}')">📋</button>
         <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id})">${isLiked?'❤':'🤍'}</button>
         ${adminBtns}
       </div>
