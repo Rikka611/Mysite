@@ -1,53 +1,110 @@
 // ============================================================
-// linli 图表抽象 — drawBarChart / drawLineChart / drawPieChart
-// 基于 Canvas 2D，无外部依赖
+// linli 图表 — drawBarChart / drawLineChart / drawPieChart
+// Canvas 2D，无外部依赖
 // ============================================================
 (function () {
   'use strict'
 
   function canvasCtx(canvas, w, h) {
-    canvas.width = w; canvas.height = h
-    return canvas.getContext('2d')
+    const dpr = window.devicePixelRatio || 1
+    canvas.width = w * dpr; canvas.height = h * dpr
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px'
+    const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr)
+    return ctx
   }
 
   window.drawBarChart = function (canvas, data, opts = {}) {
-    const { width = 400, height = 200, barColor = '#6366f1', labelColor = '#94a3b8' } = opts
+    const { width = 400, height = 260, title = '', barColor = '#38bdf8', labelColor = '#94a3b8' } = opts
     const ctx = canvasCtx(canvas, width, height)
+    if (!data.length) return
+    const pad = { top: title ? 30 : 10, right: 16, bottom: 24, left: 16 }
+    const pw = width - pad.left - pad.right, ph = height - pad.top - pad.bottom
     const max = Math.max(...data.map(d => d.value), 1)
-    const barW = (width - 40) / data.length - 8
+    const barW = Math.min(40, (pw / data.length) - 8)
+    // Title
+    if (title) { ctx.fillStyle = '#ccc'; ctx.font = '12px system-ui'; ctx.textAlign = 'left'; ctx.fillText(title, pad.left, 18) }
+    // Bars
     data.forEach((d, i) => {
-      const x = 20 + i * ((width - 40) / data.length) + 4
-      const h = (d.value / max) * (height - 40)
-      ctx.fillStyle = barColor; ctx.fillRect(x, height - 20 - h, barW, h)
-      ctx.fillStyle = labelColor; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText(d.label, x + barW / 2, height - 4)
+      const x = pad.left + i * (pw / data.length) + (pw / data.length - barW) / 2
+      const h = (d.value / max) * ph
+      const grad = ctx.createLinearGradient(x, height - pad.bottom - h, x, height - pad.bottom)
+      grad.addColorStop(0, barColor); grad.addColorStop(1, barColor + '80')
+      ctx.fillStyle = grad
+      ctx.beginPath(); roundRect(ctx, x, height - pad.bottom - h, barW, h, 4); ctx.fill()
+      ctx.fillStyle = labelColor; ctx.font = '10px system-ui'; ctx.textAlign = 'center'
+      ctx.fillText(d.label, x + barW / 2, height - 6)
+      ctx.fillStyle = '#ddd'; ctx.font = '9px system-ui'
+      ctx.fillText(d.value, x + barW / 2, height - pad.bottom - h - 6)
     })
   }
 
   window.drawLineChart = function (canvas, data, opts = {}) {
-    const { width = 400, height = 200, lineColor = '#6366f1' } = opts
+    const { width = 400, height = 260, title = '', lineColor = '#38bdf8' } = opts
     const ctx = canvasCtx(canvas, width, height)
+    if (data.length < 1) return
+    const pad = { top: title ? 30 : 10, right: 20, bottom: 24, left: 20 }
+    const pw = width - pad.left - pad.right, ph = height - pad.top - pad.bottom
+    if (title) { ctx.fillStyle = '#ccc'; ctx.font = '12px system-ui'; ctx.textAlign = 'left'; ctx.fillText(title, pad.left, 18) }
     const max = Math.max(...data.map(d => d.value), 1)
-    ctx.beginPath(); ctx.strokeStyle = lineColor; ctx.lineWidth = 2
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1
+    for (let i = 0; i <= 3; i++) { const y = pad.top + (ph / 3) * i; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(width - pad.right, y); ctx.stroke() }
+    // Line
+    const stepX = data.length > 1 ? pw / (data.length - 1) : pw / 2
+    ctx.beginPath(); ctx.strokeStyle = lineColor; ctx.lineWidth = 2; ctx.lineJoin = 'round'
     data.forEach((d, i) => {
-      const x = 20 + (i / (data.length - 1)) * (width - 40)
-      const y = height - 20 - (d.value / max) * (height - 40)
+      const x = pad.left + stepX * i, y = pad.top + ph - (d.value / max) * ph
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
     })
     ctx.stroke()
+    // Fill
+    const lastX = pad.left + stepX * (data.length - 1)
+    ctx.lineTo(lastX, pad.top + ph); ctx.lineTo(pad.left, pad.top + ph); ctx.closePath()
+    ctx.fillStyle = lineColor + '15'; ctx.fill()
+    // Dots + labels
+    data.forEach((d, i) => {
+      const x = pad.left + stepX * i, y = pad.top + ph - (d.value / max) * ph
+      ctx.fillStyle = lineColor; ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill()
+      if (i % Math.max(1, Math.floor(data.length / 6)) === 0 || i === data.length - 1) {
+        ctx.fillStyle = '#889'; ctx.font = '9px system-ui'; ctx.textAlign = 'center'; ctx.fillText(d.label, x, pad.top + ph + 16)
+      }
+    })
   }
 
   window.drawPieChart = function (canvas, data, opts = {}) {
-    const { size = 200, colors = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'] } = opts
-    const ctx = canvasCtx(canvas, size, size)
+    const { size = 220, title = '', colors = ['#38bdf8', '#34d399', '#fbbf24', '#ef4444', '#a78bfa'] } = opts
+    const totalH = title ? 280 : 220
+    const ctx = canvasCtx(canvas, size + 120, totalH)
+    if (title) { ctx.fillStyle = '#ccc'; ctx.font = '12px system-ui'; ctx.textAlign = 'left'; ctx.fillText(title, 10, 18) }
+    const cx = 100, cy = title ? 130 : 110, r = 80, ir = 40
     const total = data.reduce((s, d) => s + d.value, 0) || 1
     let angle = -Math.PI / 2
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0a0a1a'
     data.forEach((d, i) => {
       const slice = (d.value / total) * 2 * Math.PI
       ctx.beginPath(); ctx.fillStyle = colors[i % colors.length]
-      ctx.moveTo(size / 2, size / 2)
-      ctx.arc(size / 2, size / 2, size / 2 - 10, angle, angle + slice)
-      ctx.fill(); angle += slice
+      ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, angle, angle + slice); ctx.closePath(); ctx.fill()
+      ctx.strokeStyle = bg; ctx.lineWidth = 2; ctx.stroke()
+      angle += slice
     })
+    ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(cx, cy, ir, 0, Math.PI * 2); ctx.fill()
+    ctx.fillStyle = '#ddd'; ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center'; ctx.fillText(total, cx, cy + 5)
+    // Legend
+    data.forEach((d, i) => {
+      const lx = 200, ly = (title ? 30 : 20) + i * 22
+      ctx.fillStyle = colors[i % colors.length]; ctx.fillRect(lx, ly, 10, 10)
+      ctx.fillStyle = '#ccc'; ctx.font = '11px system-ui'; ctx.textAlign = 'left'
+      ctx.fillText(d.label + ' ' + d.value + ' (' + Math.round(d.value / total * 100) + '%)', lx + 16, ly + 10)
+    })
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y)
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+    ctx.lineTo(x + w, y + h - r)
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+    ctx.lineTo(x + r, y + h)
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y)
   }
 })()

@@ -320,10 +320,10 @@ function renderChart(){
     const uploads=Object.entries(daily).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14).map(([k,v])=>({label:k.slice(5),value:v}))
     const viewDaily={};dataCache.forEach(x=>{const d=x.created_at?x.created_at.slice(0,10):'';if(d)viewDaily[d]=(viewDaily[d]||0)+(x.views||0)})
     const vTrend=Object.entries(viewDaily).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14).map(([k,v])=>({label:k.slice(5),value:v}))
-    try{window.drawBarChart?.(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{width:boxW,height:260})}catch(e){}
-    try{window.drawPieChart?.(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}])}catch(e){}
-    try{window.drawLineChart?.(document.getElementById('chartUploads'),uploads.length?uploads:[{label:'-',value:1}],{width:boxW,height:260})}catch(e){}
-    try{window.drawLineChart?.(document.getElementById('chartViews'),vTrend.length?vTrend:[{label:'-',value:1}],{width:boxW,height:260})}catch(e){}
+    try{window.drawBarChart?.(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{width:boxW,height:260,title:'点赞排行'})}catch(e){}
+    try{window.drawPieChart?.(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布'})}catch(e){}
+    try{window.drawLineChart?.(document.getElementById('chartUploads'),uploads.length?uploads:[{label:'-',value:1}],{width:boxW,height:260,title:'每日上传量'})}catch(e){}
+    try{window.drawLineChart?.(document.getElementById('chartViews'),vTrend.length?vTrend:[{label:'-',value:1}],{width:boxW,height:260,title:'每日浏览量'})}catch(e){}
   },200)
 }
 
