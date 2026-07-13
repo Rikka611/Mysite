@@ -328,7 +328,8 @@ function drawStatusChart() {
     angle += slice;
   });
   // center hole
-  ctx.fillStyle = 'var(--bg)'; ctx.beginPath(); ctx.arc(cx, cy, ir, 0, Math.PI*2); ctx.fill();
+  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0a0a1a';
+  ctx.fillStyle = bgColor; ctx.beginPath(); ctx.arc(cx, cy, ir, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#ddd'; ctx.font = 'bold 16px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(total, cx, cy + 6);
 
@@ -376,13 +377,14 @@ function drawTimelineChart(canvasId, title, field, color) {
   }
 
   const days = Object.keys(daily).sort();
-  if (days.length < 2) {
+  if (!days.length) {
     ctx.fillStyle = '#667'; ctx.font = '14px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText('数据不足', w/2+16, 130); return;
+    ctx.fillText('暂无数据', w/2+16, 130); return;
   }
 
   const maxVal = Math.max(1, ...Object.values(daily));
-  const stepX = pw / Math.max(1, days.length - 1);
+  const stepX = days.length > 1 ? pw / (days.length - 1) : pw / 2;
+  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0a0a1a';
 
   // Grid
   ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
@@ -410,7 +412,7 @@ function drawTimelineChart(canvasId, title, field, color) {
     const x = pad.left + stepX * i;
     const y = pad.top + ph - (daily[d] / maxVal) * ph;
     ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = 'var(--bg)'; ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = bgColor; ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill();
   });
 
   // X labels
