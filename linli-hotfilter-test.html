@@ -333,14 +333,14 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   .tab{padding:6px 14px;font-size:0.75rem}
 }
 </style>
-  <link rel="stylesheet" href="../shared/css/theme.css">
-  <script src="../shared/js/config.js"></script>
-  <script src="../shared/js/sanitize.js"></script>
-  <script src="../shared/js/api.js"></script>
-  <script src="../shared/js/charts.js"></script>
-  <script src="../shared/js/paginate.js"></script>
-  <script src="../shared/js/batch.js"></script>
-  <script src="../shared/js/cache.js"></script>
+  <link rel="stylesheet" href="shared/css/theme.css">
+  <script src="shared/js/config.js"></script>
+  <script src="shared/js/sanitize.js"></script>
+  <script src="shared/js/api.js"></script>
+  <script src="shared/js/charts.js"></script>
+  <script src="shared/js/paginate.js"></script>
+  <script src="shared/js/batch.js"></script>
+  <script src="shared/js/cache.js"></script>
 </head>
 <body>
 
@@ -367,6 +367,11 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   <button class="tab" data-tab="search">🔍 搜索</button>
 </div>
 
+<div class="time-filter" id="timeFilter" style="display:flex;justify-content:center;gap:4px;margin-bottom:20px;position:relative;z-index:1">
+  <button class="tab time-btn active" data-tf="all">有史以来</button>
+  <button class="tab time-btn" data-tf="7d">七天内</button>
+  <button class="tab time-btn" data-tf="1d">今日</button>
+</div>
 <div class="search-bar hidden" id="searchBar">
   <input type="text" id="searchInput" placeholder="搜索曲名、作者、标签..." maxlength="50">
   <button onclick="doSearch()">搜索</button>
@@ -389,8 +394,8 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
     <input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">你的昵称</label>
     <input type="text" id="inputAuthor" placeholder="匿名" maxlength="30" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
-    <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">简介 *（标注出处）</label>
-    <textarea id="inputDesc" placeholder="简单介绍一下曲子来源..." maxlength="200" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:60px"></textarea>
+    <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">简介</label>
+    <textarea id="inputDesc" placeholder="简单介绍一下..." maxlength="200" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:60px"></textarea>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">标签（空格分隔）</label>
     <input type="text" id="inputTags" placeholder="原神 璃月 抒情" maxlength="100" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <div class="error" id="modalError" style="color:#ef4444;font-size:0.8rem;text-align:center;margin-top:8px"></div>
@@ -433,7 +438,7 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 });
 
 // State
-let tab='hot';
+let tab='hot',timeFilter='all';
 const liked=JSON.parse(localStorage.getItem('linli_liked')||'[]');
 const viewed=JSON.parse(localStorage.getItem('linli_viewed')||'[]');
 let autoApprove=localStorage.getItem('linli_auto_approve')!=='false';
@@ -446,14 +451,20 @@ document.getElementById('tabs').addEventListener('click',e=>{
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');tab=btn.dataset.tab;page=1;
   document.getElementById('searchBar').classList.toggle('hidden',tab!=='search');
+  document.getElementById('timeFilter').style.display=tab==='hot'?'flex':'none';
   render();
 });
+document.getElementById('timeFilter').addEventListener('click',e=>{const b=e.target.closest('.time-btn');if(!b)return;document.querySelectorAll('.time-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');timeFilter=b.dataset.tf;page=1;render()});
 document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
 function doSearch(){page=1;render()}
 
 async function fetchApproved(){
   let q='status=eq.approved';
-  q+=tab==='hot'?'&order=likes.desc&limit=200':'&order=created_at.desc&limit=200';
+  if(tab==='hot'){
+    if(timeFilter==='1d'){const d=new Date();d.setDate(d.getDate()-1);q+='&created_at=gte.'+d.toISOString()}
+    else if(timeFilter==='7d'){const d=new Date();d.setDate(d.getDate()-7);q+='&created_at=gte.'+d.toISOString()}
+    q+='&order=likes.desc&limit=200'
+  }else q+='&order=created_at.desc&limit=200';
   return sbApi(`linli_codes?select=*&${q}`);
 }
 async function searchCodes(q){return sbApi(`linli_codes?select=*&status=eq.approved&or=(title.ilike.*${q}*,description.ilike.*${q}*,author.ilike.*${q}*,tags.ilike.*${q}*)&order=likes.desc&limit=200`)}
@@ -502,7 +513,6 @@ async function doSubmit(){
   const errEl=document.getElementById('modalError');
   if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请输入六位分享码（字母或数字）';return}
   if(!title||title.length>50){errEl.textContent='曲名不能为空且不超过50字';return}
-  if(!desc){errEl.textContent='请填写简介并标注出处';return}
   try{
     await sbApi('linli_codes',{method:'POST',body:JSON.stringify({code,title,description:desc,author,tags,status:autoApprove?'approved':'pending'})});
     closeModal();showToast(autoApprove?'提交成功！':'提交成功，审核后显示');render();
