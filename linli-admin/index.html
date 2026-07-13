@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BSide Olivia Lin · 管理</title>
+  <link rel="stylesheet" href="../shared/css/theme.css">
+  <script src="../shared/js/config.js"></script>
+  <script src="../shared/js/sanitize.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/charts.js"></script>
+  <script src="../shared/js/paginate.js"></script>
+  <script src="../shared/js/batch.js"></script>
+  <script src="../shared/js/cache.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0a1a;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e0e0e0;--text-muted:#889;--text-dim:#667;--accent:#38bdf8;--danger:#ef4444;--warn:#fbbf24;--ok:#34d399}
@@ -103,8 +111,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 </div>
 
 <script>
-const SB_URL = 'https://naivizrdefonlelndzqr.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5haXZpenJkZWZvbmxlbG5kenFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTU4MjcsImV4cCI6MjA5NzY5MTgyN30.66G4T_7JDVjsw0RGRC_OwcYBgMwPk33c3sCrlmzrxvI';
+// SB_URL/SB_KEY from shared/js/config.js; sbApi from shared/js/api.js (uses __LINLI_CONFIG__)
 const PW_HASH = '8e76ef51d0841f37d686f4af64ee2bc4c89d3701174c4e0fccf6a08ea825a94e';
 
 let srKey = '';
@@ -115,18 +122,24 @@ async function sha256(str) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-function authHeaders() {
-  const key = srKey || SB_KEY;
-  return { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+// Admin override: use service_role key if available, else shared anon key
+function adminHeaders() {
+  const cfg = window.__LINLI_CONFIG__ || {}
+  const key = srKey || cfg.SB_KEY || ''
+  return { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' }
 }
 
+// Admin sbApi wraps window.sbApi with service_role support
 async function sbApi(path, options = {}) {
-  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
-    headers: { ...authHeaders(), ...options.headers }, ...options
-  });
-  if (!res.ok) throw new Error(await res.text());
-  const t = await res.text();
-  return t ? JSON.parse(t) : [];
+  if (srKey) {
+    const cfg = window.__LINLI_CONFIG__ || {}
+    const url = `${cfg.SB_URL || ''}/rest/v1/${path}`
+    const res = await fetch(url, { headers: { ...adminHeaders(), ...options.headers }, ...options })
+    if (!res.ok) throw new Error(await res.text())
+    const t = await res.text()
+    return t ? JSON.parse(t) : []
+  }
+  return window.sbApi(path, options)
 }
 
 // ===== Auth with brute-force protection =====
