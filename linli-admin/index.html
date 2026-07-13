@@ -299,27 +299,32 @@ async function load(){
 }
 
 async function renderStats(){
-  const all=await sbApi('linli_codes?select=status');const pv=await sbApi('page_views?select=count&page=eq.linli')
+  const all=dataCache;const dupeMap=new Map();all.forEach(x=>{const c=x.code;dupeMap.set(c,(dupeMap.get(c)||0)+1)})
+  const dupeCount=[...dupeMap.values()].filter(v=>v>1).length
+  let pvCount=0;try{const pv=await sbApi('page_views?select=count&page=eq.linli');pvCount=pv[0]?.count||0}catch(e){}
+  const totalViews=all.reduce((s,x)=>s+(x.views||0),0);const totalLikes=all.reduce((s,x)=>s+(x.likes||0),0)
   document.getElementById('stats').innerHTML=[
-    {v:all.length,l:'总数'},{v:all.filter(x=>x.status==='approved').length,l:'已通过'},
-    {v:all.filter(x=>x.status==='pending').length,l:'待审核'},{v:pv[0]?.count||0,l:'浏览量'}
-  ].map(s=>'<div class="stat"><div class="val">'+s.v+'</div><div class="lbl">'+s.l+'</div></div>').join('')
+    {v:all.length,l:'总提交'},{v:all.filter(x=>x.status==='approved').length,l:'已通过'},
+    {v:all.filter(x=>x.status==='pending').length,l:'待审核'},{v:dupeCount,l:'重复码',c:'#ef4444'},
+    {v:totalViews,l:'总浏览'},{v:totalLikes,l:'总点赞'},{v:pvCount,l:'页面访问'}
+  ].map(s=>'<div class="stat"><div class="val"'+(s.c?' style="color:'+s.c+';-webkit-text-fill-color:'+s.c+'"':'')+'>'+s.v+'</div><div class="lbl">'+s.l+'</div></div>').join('')
 }
 
 function renderChart(){
+  const boxW=document.querySelector('.chart-box')?.clientWidth||400
   setTimeout(()=>{
-    const likes=[],status=[],uploads=[],views=[]
-    if(dataCache.length){
-      likes.push({label:'Top1',value:dataCache[0]?.likes||0});likes.push({label:'Avg',value:Math.round(dataCache.reduce((s,x)=>s+x.likes,0)/dataCache.length)})
-      status.push({label:'Approved',value:dataCache.filter(x=>x.status==='approved').length});status.push({label:'Pending',value:dataCache.filter(x=>x.status==='pending').length});status.push({label:'Rejected',value:dataCache.filter(x=>x.status==='rejected').length})
-      uploads.push({label:'Today',value:dataCache.filter(x=>new Date(x.created_at).toDateString()===new Date().toDateString()).length})
-      views.push({label:'Max',value:Math.max(...dataCache.map(x=>x.views||0),0)})
-    }
-    try{window.drawBarChart(document.getElementById('chartLikes'),likes.length?likes:[{label:'N/A',value:1}])}catch(e){}
-    try{window.drawPieChart(document.getElementById('chartStatus'),status.length?status:[{label:'N/A',value:1}])}catch(e){}
-    try{window.drawBarChart(document.getElementById('chartUploads'),uploads.length?uploads:[{label:'N/A',value:1}])}catch(e){}
-    try{window.drawBarChart(document.getElementById('chartViews'),views.length?views:[{label:'N/A',value:1}])}catch(e){}
-  },100)
+    const top10=dataCache.filter(x=>x.status==='approved').sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,8)
+    const likes=top10.map(x=>({label:(x.title||'').slice(0,6),value:x.likes||0}))
+    const status=[{label:'已通过',value:dataCache.filter(x=>x.status==='approved').length},{label:'待审核',value:dataCache.filter(x=>x.status==='pending').length},{label:'已拒绝',value:dataCache.filter(x=>x.status==='rejected').length}]
+    const daily={};dataCache.forEach(x=>{const d=x.created_at?x.created_at.slice(0,10):'';if(d)daily[d]=(daily[d]||0)+1})
+    const uploads=Object.entries(daily).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14).map(([k,v])=>({label:k.slice(5),value:v}))
+    const viewDaily={};dataCache.forEach(x=>{const d=x.created_at?x.created_at.slice(0,10):'';if(d)viewDaily[d]=(viewDaily[d]||0)+(x.views||0)})
+    const vTrend=Object.entries(viewDaily).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14).map(([k,v])=>({label:k.slice(5),value:v}))
+    try{window.drawBarChart?.(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{width:boxW,height:260})}catch(e){}
+    try{window.drawPieChart?.(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}])}catch(e){}
+    try{window.drawLineChart?.(document.getElementById('chartUploads'),uploads.length?uploads:[{label:'-',value:1}],{width:boxW,height:260})}catch(e){}
+    try{window.drawLineChart?.(document.getElementById('chartViews'),vTrend.length?vTrend:[{label:'-',value:1}],{width:boxW,height:260})}catch(e){}
+  },200)
 }
 
 function renderList(){
@@ -330,14 +335,20 @@ function renderList(){
   if(!items.length){em.style.display='block';em.textContent='暂无数据';return}
   em.style.display='none'
   const dupeMap=new Map();items.forEach(x=>{const c=x.code;dupeMap.set(c,(dupeMap.get(c)||0)+1)})
+  const dupeSet=new Set([...dupeMap.entries()].filter(([,v])=>v>1).map(([k])=>k))
+  // sort dupes first, grouped by code
+  items=[...items].sort((a,b)=>{const da=dupeSet.has(a.code),db=dupeSet.has(b.code);if(da&&db)return a.code.localeCompare(b.code)||b.id-a.id;if(da)return -1;if(db)return 1;return 0})
+  let lastDupe=''
   items.forEach((item,i)=>{
+    const isDupe=dupeSet.has(item.code)
+    if(isDupe&&item.code!==lastDupe){const sep=document.createElement('div');sep.style.cssText='text-align:center;color:#ef4444;font-size:0.7rem;padding:4px 0';sep.textContent='——— '+item.code+' 重复 ———';lst.appendChild(sep);lastDupe=item.code}
     const d=document.createElement('div');let cls='row '
     if(item.status==='pending')cls+='pending ';if(item.status==='rejected')cls+='rejected '
-    if(dupeMap.get(item.code)>1)cls+='dupe '
+    if(isDupe)cls+='dupe '
     d.className=cls
     const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'')
     const tags=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[]
-    d.innerHTML='<div class="code">'+escapeHtml(item.code)+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' '+tags.map(t=>'<span style="font-size:0.65rem;color:var(--text-dim)">#'+escapeHtml(t)+'</span>').join(' ')+'</div></div><div class="actions">'+
+    d.innerHTML='<span style="font-size:0.7rem;color:var(--text-dim);min-width:45px">'+item.status+'</span><div class="code">'+escapeHtml(item.code)+(isDupe?' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px">重复</span>':'')+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' '+tags.map(t=>'<span style="font-size:0.65rem;color:var(--text-dim)">#'+escapeHtml(t)+'</span>').join(' ')+'</div></div><span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap">👁'+(item.views||0)+' ❤'+(item.likes||0)+'</span><div class="actions">'+
       (item.status==='pending'?'<button class="btn ok sm" onclick="approve('+item.id+')">通过</button><button class="btn danger sm" onclick="reject('+item.id+')">拒绝</button>':'')+
       '<button class="btn danger sm" onclick="del('+item.id+')">删除</button></div>'
     lst.appendChild(d)
@@ -348,6 +359,9 @@ function renderList(){
 async function approve(id){try{await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'approved'})});load();showToast('已通过','ok')}catch(e){showToast('操作失败','err')}}
 async function reject(id){try{await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'rejected'})});load();showToast('已拒绝','info')}catch(e){showToast('操作失败','err')}}
 async function del(id){if(!confirm('确认删除？'))return;try{await sbApi('linli_codes?id=eq.'+id,{method:'DELETE'});load();showToast('已删除','ok')}catch(e){showToast('操作失败','err')}}
+async function approveAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'approved'})})}catch(e){}}load();showToast('已全部通过','ok')}
+async function rejectAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'rejected'})})}catch(e){}}load();showToast('已全部拒绝','info')}
+async function deleteRejected(){const rejected=dataCache.filter(i=>i.status==='rejected');if(!rejected.length||!confirm('确认删除所有'+rejected.length+'条已拒绝记录？'))return;for(const item of rejected){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'DELETE'})}catch(e){}}load();showToast('已清理','ok')}
 async function approveAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'approved'})})}catch(e){}}load();showToast('批量操作完成','ok')}
 async function rejectAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'rejected'})})}catch(e){}}load();showToast('批量操作完成','info')}
 async function deleteRejected(){const rejected=await sbApi('linli_codes?select=id&status=eq.rejected');for(const item of rejected){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'DELETE'})}catch(e){}}load();showToast('已清理','ok')}
