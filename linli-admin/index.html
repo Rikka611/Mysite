@@ -313,7 +313,7 @@ async function renderStats(){
 
 function renderChart(){
   const boxW=document.querySelector('.chart-box')?.clientWidth||400
-  setTimeout(()=>{
+  setTimeout(async ()=>{
     const top10=dataCache.filter(x=>x.status==='approved').sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,8)
     const likes=top10.map(x=>({label:(x.title||'').slice(0,6),value:x.likes||0}))
     const status=[{label:'已通过',value:dataCache.filter(x=>x.status==='approved').length},{label:'待审核',value:dataCache.filter(x=>x.status==='pending').length},{label:'已拒绝',value:dataCache.filter(x=>x.status==='rejected').length}]
