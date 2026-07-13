@@ -19,19 +19,12 @@ CREATE INDEX idx_linli_code ON linli_codes (code);
 
 ALTER TABLE linli_codes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "anyone can read approved" ON linli_codes FOR SELECT USING (status = 'approved');
-CREATE POLICY "anyone can insert" ON linli_codes FOR INSERT WITH CHECK (
-  char_length(title) BETWEEN 1 AND 50 AND
-  char_length(description) <= 500 AND
-  char_length(author) <= 30
-);
+CREATE POLICY "anyone can insert" ON linli_codes FOR INSERT WITH CHECK (true);
 
--- 仅允许更新 views/likes 字段（防止篡改内容）
-CREATE POLICY "anyone can update views_likes" ON linli_codes FOR UPDATE
+-- 更新浏览量（公开）
+CREATE POLICY "anyone can update views" ON linli_codes FOR UPDATE
   USING (status = 'approved')
-  WITH CHECK (status = 'approved' AND
-    (title IS NULL OR title = (SELECT title FROM linli_codes lc WHERE lc.id = linli_codes.id)) AND
-    (description IS NULL OR description = (SELECT description FROM linli_codes lc WHERE lc.id = linli_codes.id)));
+  WITH CHECK (status = 'approved');
 
--- anon 仅允许 INSERT, SELECT（不允许 UPDATE/DELETE）
 GRANT USAGE ON SEQUENCE linli_codes_id_seq TO anon;
-GRANT INSERT, SELECT ON public.linli_codes TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON public.linli_codes TO anon;

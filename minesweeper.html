@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>扫雷 — Vibecoding</title>
-  <link rel="stylesheet" href="shared/css/theme.css">
-  <script src="shared/js/config.js"></script>
-  <script src="shared/js/sanitize.js"></script>
-  <script src="shared/js/api.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -822,7 +818,33 @@ async function submitScoreOverlay() {
 }
 
 // ===== Supabase 在线排行榜 =====
-// SB_URL/SB_KEY/sbApi provided by shared/js/ (config.js + api.js)
+// 1. 在 supabase.com 创建项目
+// 2. SQL Editor 执行 supabase-setup.sql
+// 3. Settings > API 复制 URL 和 anon key 填到下面
+
+const SB_URL = 'https://naivizrdefonlelndzqr.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5haXZpenJkZWZvbmxlbG5kenFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTU4MjcsImV4cCI6MjA5NzY5MTgyN30.66G4T_7JDVjsw0RGRC_OwcYBgMwPk33c3sCrlmzrxvI';
+
+async function sbApi(path, options = {}) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: {
+      apikey: SB_KEY,
+      Authorization: `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+      ...options.headers
+    },
+    ...options
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('Supabase error:', res.status, err);
+    throw new Error(err);
+  }
+  if (res.status === 204) return [];
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
 
 async function fetchLeaderboard() {
   try {

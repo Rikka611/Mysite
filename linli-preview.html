@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BSide Olivia Lin 分享码</title>
+<title>BSide Olivia Lin 分享码 · 动画增强版</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 :root{
-  --bg-start:#0a0a0f;--bg-mid:#11111a;--bg-end:#0d0d14;
+  --bg-start:#0f0c29;--bg-mid:#302b63;--bg-end:#24243e;
   --text:#e0e0e0;--text-muted:#889;--text-dim:#667;
-  --heading:#ddd;--nav-bg:rgba(10,10,15,0.45);--nav-border:rgba(255,255,255,0.06);
+  --heading:#ddd;--nav-bg:rgba(15,12,41,0.45);--nav-border:rgba(255,255,255,0.06);
   --nav-link:#999;--nav-link-hover:#fff;
   --card-bg:rgba(255,255,255,0.05);--card-border:rgba(255,255,255,0.08);
   --card-hover-border:rgba(56,189,248,0.4);--card-hover-shadow:rgba(0,0,0,0.3);
@@ -44,9 +44,9 @@ html.light{
   --star-color:rgba(0,0,0,0.1);
 }
 html.dark{
-  --bg-start:#0a0a0f;--bg-mid:#11111a;--bg-end:#0d0d14;
+  --bg-start:#0f0c29;--bg-mid:#302b63;--bg-end:#24243e;
   --text:#e0e0e0;--text-muted:#889;--text-dim:#667;
-  --heading:#ddd;--nav-bg:rgba(10,10,15,0.45);--nav-border:rgba(255,255,255,0.06);
+  --heading:#ddd;--nav-bg:rgba(15,12,41,0.45);--nav-border:rgba(255,255,255,0.06);
   --nav-link:#999;--nav-link-hover:#fff;--card-bg:rgba(255,255,255,0.05);
   --card-border:rgba(255,255,255,0.08);--card-hover-border:rgba(56,189,248,0.4);
   --card-hover-shadow:rgba(0,0,0,0.3);--card-hover-ring:rgba(56,189,248,0.15);
@@ -61,9 +61,6 @@ body{
   background-size:400% 400%;color:var(--text);min-height:100vh;line-height:1.6;
   animation:bgShift 12s ease infinite;overflow-x:hidden;
 }
-nav,footer,.search-bar input,.modal,.modal input,.modal textarea{
-  transition:background-color 0.4s ease,border-color 0.4s ease,color 0.4s ease;
-}
 @keyframes bgShift{0%,100%{background-position:0% 50%}50%{background-position:100% 100%}}
 
 body::before{
@@ -73,27 +70,6 @@ body::before{
 html.light body::before{opacity:1}
 html.light .stars{opacity:0;animation:none}
 @media(prefers-color-scheme:light){html:not(.dark):not(.light) body::before{opacity:1}html:not(.dark):not(.light) .stars{opacity:0;animation:none}}
-
-/* ===== Shooting stars ===== */
-.meteor{
-  position:fixed;z-index:1;pointer-events:none;top:0;left:0;
-  width:120px;height:1.5px;
-  background:linear-gradient(to right,rgba(255,255,255,0),rgba(255,255,255,0.15),rgba(255,255,255,0.4));
-  border-radius:1px;
-  animation:meteorFly var(--d,1s) linear forwards;
-}
-.meteor::after{
-  content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);
-  width:2px;height:2px;background:rgba(255,255,255,0.6);border-radius:50%;box-shadow:0 0 3px 1px rgba(255,255,255,0.2);
-}
-@keyframes meteorFly{
-  0%{transform:translate(var(--sx),var(--sy)) rotate(var(--a));opacity:0}
-  8%{opacity:1}
-  70%{opacity:1}
-  100%{transform:translate(var(--ex),var(--ey)) rotate(var(--a));opacity:0}
-}
-html.light .meteor{display:none}
-@media(prefers-color-scheme:light){html:not(.dark):not(.light) .meteor{display:none}}
 
 /* ===== Stars ===== */
 @keyframes twinkle{0%,100%{opacity:0.85}50%{opacity:1}}
@@ -105,8 +81,8 @@ html.light .meteor{display:none}
 }
 
 /* ===== Cursor Glow ===== */
-.cursor-glow{position:fixed;z-index:0;top:0;left:0;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,0.05),transparent 65%);pointer-events:none;transform:translate(-50%,-50%);transition:opacity 0.5s;opacity:0}
-@media(max-width:768px){.cursor-glow{display:none}.meteor{width:80px;height:1px}.meteor::after{width:1.5px;height:1.5px}}
+.cursor-glow{position:fixed;z-index:0;top:0;left:0;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,0.1),transparent 65%);pointer-events:none;transform:translate(-50%,-50%);transition:opacity 0.5s;opacity:0}
+@media(max-width:768px){.cursor-glow{display:none}}
 
 /* ===== Nav ===== */
 nav{
@@ -116,10 +92,9 @@ nav{
   animation:navSlideIn 0.6s ease-out;
 }
 @keyframes navSlideIn{from{transform:translateY(-60px);opacity:0}to{transform:translateY(0);opacity:1}}
-nav .inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;height:56px}
+nav .inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
 .theme-btn{background:none;border:1px solid var(--nav-border);color:var(--nav-link);cursor:pointer;width:36px;height:36px;border-radius:50%;font-size:1.1rem;transition:all 0.3s}
 .theme-btn:hover{background:var(--card-bg);color:var(--nav-link-hover);transform:rotate(30deg)}
-#feedbackBtn:hover{background:var(--card-bg);color:var(--nav-link-hover);transform:translateY(-1px)}
 .theme-btn .icon-sun{display:inline}.theme-btn .icon-moon{display:none}
 html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{display:inline}
 @media(prefers-color-scheme:light){html:not(.dark):not(.light) .theme-btn .icon-sun{display:none}html:not(.dark):not(.light) .theme-btn .icon-moon{display:inline}}
@@ -128,14 +103,13 @@ html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{di
 .hero{text-align:center;padding:80px 24px 50px;position:relative;z-index:1}
 .hero h1{
   font-size:clamp(2rem,5vw,2.8rem);font-weight:800;
-  background:linear-gradient(135deg,#38bdf8,#818cf8,#c084fc);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   animation:heroFadeIn 0.8s cubic-bezier(0.25,0.8,0.25,1.6);
 }
 @keyframes heroFadeIn{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
 .hero h1 a{
   text-decoration:underline;text-underline-offset:6px;color:inherit;
-  -webkit-text-fill-color:transparent;
+  background:linear-gradient(135deg,#38bdf8,#818cf8,#c084fc);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   transition:text-underline-offset 0.3s;
 }
 .hero h1 a:hover{text-underline-offset:10px}
@@ -223,8 +197,7 @@ html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{di
 .row .sub{font-size:0.75rem;color:var(--text-dim);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .row .tag{font-size:0.65rem;padding:2px 8px;border-radius:50px;background:var(--tag-bg);color:var(--tag-text);transition:all 0.3s}
 .row:hover .tag{background:rgba(56,189,248,0.15);color:var(--accent)}
-.row .stats{display:flex;gap:10px;font-size:0.75rem;color:var(--text-dim);white-space:nowrap;position:relative;z-index:3;transition:all 0.3s;width:80px;flex-shrink:0;justify-content:center}
-.row .actions{display:flex;gap:6px;position:relative;z-index:3;width:90px;flex-shrink:0;justify-content:center}
+.row .stats{display:flex;gap:10px;font-size:0.75rem;color:var(--text-dim);white-space:nowrap;position:relative;z-index:3;transition:all 0.3s}
 .row .btn{
   padding:6px 14px;border-radius:50px;font-size:0.75rem;font-weight:500;cursor:pointer;
   border:none;font-family:system-ui,-apple-system,sans-serif;transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1.2);white-space:nowrap;position:relative;overflow:hidden;
@@ -309,28 +282,13 @@ html.light .modal{background:#fff}
 
 footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);color:var(--footer-text);font-size:0.8rem;position:relative;z-index:1}
 .empty{text-align:center;color:var(--text-dim);padding:48px 0;font-size:0.9rem;position:relative;z-index:1}
-.pagination{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:24px;position:relative;z-index:1}
-.pagination button{padding:6px 14px;border-radius:8px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-family:inherit;transition:all 0.2s}
-.pagination button:hover:not(:disabled){color:var(--text);border-color:var(--border-hover)}
-.pagination button:disabled{opacity:0.35;cursor:default}
-.pagination button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.pagination .info{font-size:0.8rem;color:var(--text-dim);padding:0 8px}
 
 @media(max-width:480px){
-  .hero{padding:40px 12px 24px}.hero h1{font-size:1.5rem}
-  .content{padding:0 8px 40px}.list{gap:4px}
-  .row{flex-wrap:nowrap;gap:6px;padding:8px 10px}
-  .row .rank{width:22px;font-size:0.75rem}
-  .row .code{width:62px;font-size:0.8rem;letter-spacing:0;padding:2px 4px}
-  .row .title{font-size:0.8rem}
-  .row .sub{font-size:0.7rem}
-  .row .stats{width:auto;font-size:0.68rem;gap:6px}
-  .row .actions{width:auto;gap:2px}
-  .row .btn{padding:4px 7px;font-size:0.68rem}
-  .fab{bottom:16px;right:16px;width:44px;height:44px;font-size:1.2rem}
-  nav{padding:0 8px}
-  .tabs{gap:4px}
-  .tab{padding:6px 14px;font-size:0.75rem}
+  .hero{padding:50px 16px 30px}.hero h1{font-size:1.6rem}
+  .content{padding:0 12px 40px}.list{gap:6px}
+  .row{flex-wrap:wrap;gap:8px;padding:10px 12px}
+  .fab{bottom:20px;right:20px;width:48px;height:48px;font-size:1.3rem}
+  nav{padding:0 12px}
 }
 </style>
 </head>
@@ -341,10 +299,10 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
 
 <nav>
   <div class="inner">
+    <span></span>
     <button class="theme-btn" id="themeToggle" title="切换日夜模式">
       <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
     </button>
-    <button id="feedbackBtn" style="background:none;border:1px solid var(--nav-border);color:var(--nav-link);cursor:pointer;height:36px;border-radius:50px;padding:0 14px;font-size:0.8rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif;transition:all 0.3s">反馈</button>
   </div>
 </nav>
 
@@ -366,7 +324,6 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
 
 <div class="content">
   <div class="list" id="grid"></div>
-  <div class="pagination" id="pager"></div>
   <div class="empty" id="empty">加载中...</div>
 </div>
 
@@ -376,7 +333,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   <div class="modal">
     <h3 style="text-align:center;font-size:1.1rem;margin-bottom:20px;color:var(--heading)">提交分享码</h3>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">六位分享码 *</label>
-    <input type="text" id="inputCode" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
+    <input type="text" id="inputCode" placeholder="ABC123" maxlength="6" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">曲名 *</label>
     <input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">你的昵称</label>
@@ -393,22 +350,9 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   </div>
 </div>
 
-<div class="modal-overlay" id="feedbackOverlay">
-  <div class="modal">
-    <h3>反馈意见</h3>
-    <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">意见或建议</label>
-    <textarea id="feedbackContent" placeholder="说说你的想法..." maxlength="500" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:80px"></textarea>
-    <div class="error" id="feedbackError"></div>
-    <div class="btn-row">
-      <button onclick="closeFeedback()" style="padding:10px 28px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">取消</button>
-      <button onclick="doFeedback()" style="padding:10px 28px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">提交</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
-<footer>本网站为粉丝自发整理的社区分享平台，与米哈游/HoYoverse及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务。如有侵权内容，请联系QQ:3332984386删除。</footer>
+<footer>本网站为粉丝自发整理的社区分享平台，与米哈游/HoYoverse及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务。如有侵权内容，请联系管理删除。</footer>
 
 <script>
 const SB_URL='https://naivizrdefonlelndzqr.supabase.co';
@@ -436,26 +380,25 @@ let tab='hot';
 const liked=JSON.parse(localStorage.getItem('linli_liked')||'[]');
 const viewed=JSON.parse(localStorage.getItem('linli_viewed')||'[]');
 let autoApprove=localStorage.getItem('linli_auto_approve')!=='false';
-let page=1,pageSize=15,totalPages=1;
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
 
 document.getElementById('tabs').addEventListener('click',e=>{
   const btn=e.target.closest('.tab');if(!btn)return;
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');tab=btn.dataset.tab;page=1;
+  btn.classList.add('active');tab=btn.dataset.tab;
   document.getElementById('searchBar').classList.toggle('hidden',tab!=='search');
   render();
 });
 document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
-function doSearch(){page=1;render()}
+function doSearch(){render()}
 
 async function fetchApproved(){
   let q='status=eq.approved';
-  q+=tab==='hot'?'&order=likes.desc&limit=200':'&order=created_at.desc&limit=200';
+  q+=tab==='hot'?'&order=likes.desc&limit=30':'&order=created_at.desc&limit=30';
   return sbApi(`linli_codes?select=*&${q}`);
 }
-async function searchCodes(q){return sbApi(`linli_codes?select=*&status=eq.approved&or=(title.ilike.*${q}*,description.ilike.*${q}*,author.ilike.*${q}*,tags.ilike.*${q}*)&order=likes.desc&limit=200`)}
+async function searchCodes(q){return sbApi(`linli_codes?select=*&status=eq.approved&or=(title.ilike.*${q}*,description.ilike.*${q}*,author.ilike.*${q}*,tags.ilike.*${q}*)&order=likes.desc&limit=30`)}
 
 async function trackView(id){
   if(viewed.includes(id))return;
@@ -480,20 +423,11 @@ function copyCode(code,e){
 }
 
 document.getElementById('fab').addEventListener('click',()=>{document.getElementById('modalOverlay').classList.add('show');document.getElementById('modalError').textContent=''});
-document.getElementById('feedbackBtn').addEventListener('click',()=>{document.getElementById('feedbackOverlay').classList.add('show');document.getElementById('feedbackError').textContent=''});
-document.getElementById('feedbackOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeFeedback()});
-function closeFeedback(){document.getElementById('feedbackOverlay').classList.remove('show');document.getElementById('feedbackContent').value='';document.getElementById('feedbackContact').value=''}
-async function doFeedback(){
-  const content=document.getElementById('feedbackContent').value.trim();
-  const err=document.getElementById('feedbackError');
-  if(!content){err.textContent='请输入意见内容';return}
-  try{await sbApi('feedbacks',{method:'POST',body:JSON.stringify({content})});closeFeedback();showToast('感谢反馈！')}catch(e){err.textContent='提交失败，请重试'}
-}
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');['inputCode','inputTitle','inputAuthor','inputDesc','inputTags'].forEach(id=>document.getElementById(id).value='')}
 
 async function doSubmit(){
-  const code=document.getElementById('inputCode').value.trim().toUpperCase();
+  const code=document.getElementById('inputCode').value.trim();
   const title=document.getElementById('inputTitle').value.trim();
   const author=document.getElementById('inputAuthor').value.trim()||'匿名';
   const desc=document.getElementById('inputDesc').value.trim();
@@ -523,21 +457,11 @@ function buildRow(item,idx){
       <div class="sub">${desc?`<span>${esc(desc)}</span>`:''}${tagList.length?tagList.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):''}</div>
     </div>
     <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
-    <div class="actions">
+    <div style="display:flex;gap:6px;position:relative;z-index:3">
       <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}',event)">📋</button>
       <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id},event)">${isLiked?'❤':'🤍'}</button>
     </div></div>`;
 }
-
-function renderPager(){
-  const p=document.getElementById('pager');
-  if(totalPages<=1){p.innerHTML='';return}
-  let h=`<button onclick="goPage(${page-1})" ${page<=1?'disabled':''}>‹</button>`;
-  h+=`<span class="info">${page} / ${totalPages}</span>`;
-  h+=`<button onclick="goPage(${page+1})" ${page>=totalPages?'disabled':''}>›</button>`;
-  p.innerHTML=h;
-}
-function goPage(n){if(n<1||n>totalPages)return;page=n;render();window.scrollTo({top:0,behavior:'smooth'})}
 
 async function render(){
   const grid=document.getElementById('grid'),empty=document.getElementById('empty');
@@ -551,12 +475,8 @@ async function render(){
     else data=await fetchApproved();
 
     grid.innerHTML='';
-    if(!data.length){empty.style.display='block';empty.textContent=tab==='search'?'没有找到匹配的分享码':'暂无分享码，点右下角 + 提交第一个吧！';document.getElementById('pager').innerHTML='';return}
-    totalPages=Math.ceil(data.length/pageSize);
-    if(page>totalPages)page=totalPages;
-    const slice=data.slice((page-1)*pageSize,page*pageSize);
-    slice.forEach((item,i)=>{const d=document.createElement('div');d.innerHTML=buildRow(item,(page-1)*pageSize+i);grid.appendChild(d.firstElementChild);trackView(item.id)});
-    renderPager();
+    if(!data.length){empty.style.display='block';empty.textContent=tab==='search'?'没有找到匹配的分享码':'暂无分享码，点右下角 + 提交第一个吧！';return}
+    data.forEach((item,i)=>{const d=document.createElement('div');d.innerHTML=buildRow(item,i);grid.appendChild(d.firstElementChild);trackView(item.id)});
   }catch(e){grid.innerHTML='';empty.style.display='block';empty.textContent='加载失败，请刷新重试'}
 }
 
@@ -571,46 +491,7 @@ if(glow){let pending=false;document.addEventListener('mousemove',e=>{if(pending)
 // Click spark (more particles)
 (function(){const c=document.createElement('div');c.className='spark-container';document.body.appendChild(c);document.addEventListener('click',e=>{for(let i=0;i<10;i++){const s=document.createElement('div');s.className='spark';const a=Math.PI*2*i/10+(Math.random()-0.5)*0.5;s.style.left=e.clientX+'px';s.style.top=e.clientY+'px';s.style.setProperty('--sx',Math.cos(a)*(20+Math.random()*30)+'px');s.style.setProperty('--sy',Math.sin(a)*(20+Math.random()*30)+'px');s.style.background=`hsl(${200+Math.random()*60},90%,${55+Math.random()*20}%)`;c.appendChild(s);s.addEventListener('animationend',()=>s.remove())}})})();
 
-(async function(){
-  if(sessionStorage.getItem('pv_counted'))return;
-  sessionStorage.setItem('pv_counted','1');
-  try{
-    const d=await sbApi('page_views?select=count&page=eq.linli');
-    const n=(d[0]?.count||0)+1;
-    await sbApi('page_views?page=eq.linli',{method:'PATCH',body:JSON.stringify({count:n})});
-  }catch(e){}
-})();
-
 render();
-
-// ===== Random meteors =====
-(function(){
-  if(document.documentElement.classList.contains('light'))return;
-  let timer;
-  function spawn(){
-    const m=document.createElement('div');m.className='meteor';
-    const isMobile=innerWidth<768;
-    const fromRight=Math.random()>0.5;
-    const sx=fromRight?innerWidth+60:-80;
-    const sy=Math.random()*innerHeight*0.4;
-    const ex=fromRight?-80:innerWidth+60;
-    const ey=sy+(isMobile?150:250)+Math.random()*(isMobile?250:400);
-    const dx=ex-sx,dy=ey-sy;
-    const angle=Math.atan2(dy,dx)*180/Math.PI;
-    const dur=0.7+Math.random()*0.5;
-    m.style.setProperty('--sx',sx+'px');m.style.setProperty('--sy',sy+'px');
-    m.style.setProperty('--ex',ex+'px');m.style.setProperty('--ey',ey+'px');
-    m.style.setProperty('--a',angle+'deg');m.style.setProperty('--d',dur+'s');
-    document.body.appendChild(m);
-    m.addEventListener('animationend',()=>m.remove());
-    timer=setTimeout(spawn,15000+Math.random()*105000);
-  }
-  document.addEventListener('visibilitychange',()=>{
-    if(document.hidden)clearTimeout(timer);
-    else timer=setTimeout(spawn,5000+Math.random()*15000);
-  });
-  timer=setTimeout(spawn,8000+Math.random()*30000);
-})();
 </script>
 </body>
 </html>
