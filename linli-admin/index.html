@@ -405,6 +405,8 @@ async function markFeedback(id,status){try{await sbApi('feedbacks?id=eq.'+id,{me
 async function delFeedback(id){if(!confirm('确认删除？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'DELETE'});loadFeedback()}catch(e){}}
 // Auto-restore session
 if(localStorage.getItem('admin_token')===PW_HASH){srKey=localStorage.getItem('admin_sr')||'';showMain()}
+// Auto refresh every 5 minutes
+setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')load()},300000)
 </script>
 </body>
 </html>
