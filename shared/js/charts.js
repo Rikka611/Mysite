@@ -17,25 +17,44 @@
     const { width = 400, height = 260, title = '', barColor = '#38bdf8', labelColor = '#94a3b8' } = opts
     const ctx = canvasCtx(canvas, width, height)
     if (!data.length) return
-    const pad = { top: title ? 30 : 10, right: 16, bottom: 24, left: 16 }
+    const pad = { top: title ? 30 : 10, right: 16, bottom: 28, left: 36 }
     const pw = width - pad.left - pad.right, ph = height - pad.top - pad.bottom
     const max = Math.max(...data.map(d => d.value), 1)
-    const barW = Math.min(40, (pw / data.length) - 8)
+    const barW = Math.min(32, (pw / data.length) - 6)
+    const bars = [] // store for hover detection
+    // Y axis
+    ctx.fillStyle = '#889'; ctx.font = '9px system-ui'; ctx.textAlign = 'right'
+    for (let i = 0; i <= 4; i++) {
+      const v = Math.round(max * i / 4), y = pad.top + ph - (v / max) * ph
+      ctx.fillText(v, pad.left - 4, y + 3)
+      if (i > 0) { ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(width - pad.right, y); ctx.stroke() }
+    }
     // Title
     if (title) { ctx.fillStyle = '#ccc'; ctx.font = '12px system-ui'; ctx.textAlign = 'left'; ctx.fillText(title, pad.left, 18) }
     // Bars
     data.forEach((d, i) => {
       const x = pad.left + i * (pw / data.length) + (pw / data.length - barW) / 2
-      const h = (d.value / max) * ph
-      const grad = ctx.createLinearGradient(x, height - pad.bottom - h, x, height - pad.bottom)
-      grad.addColorStop(0, barColor); grad.addColorStop(1, barColor + '80')
+      const h = d.value > 0 ? Math.max(2, (d.value / max) * ph) : 0
+      const y = height - pad.bottom - h
+      const grad = ctx.createLinearGradient(x, y, x, height - pad.bottom)
+      grad.addColorStop(0, barColor); grad.addColorStop(1, barColor + '60')
       ctx.fillStyle = grad
-      ctx.beginPath(); roundRect(ctx, x, height - pad.bottom - h, barW, h, 4); ctx.fill()
-      ctx.fillStyle = labelColor; ctx.font = '10px system-ui'; ctx.textAlign = 'center'
-      ctx.fillText(d.label, x + barW / 2, height - 6)
-      ctx.fillStyle = '#ddd'; ctx.font = '9px system-ui'
-      ctx.fillText(d.value, x + barW / 2, height - pad.bottom - h - 6)
+      ctx.beginPath(); roundRect(ctx, x, y, barW, h, 3); ctx.fill()
+      ctx.fillStyle = labelColor; ctx.font = '9px system-ui'; ctx.textAlign = 'center'
+      ctx.fillText(d.label, x + barW / 2, height - 4)
+      if (d.value > 0 && barW > 16) { ctx.fillStyle = '#ddd'; ctx.font = '8px system-ui'; ctx.fillText(d.value, x + barW / 2, y - 4) }
+      bars.push({ x, y, w: barW, h, label: d.label, value: d.value })
     })
+    // Hover tooltip
+    const tip = document.createElement('div'); tip.style.cssText = 'position:absolute;display:none;background:rgba(0,0,0,0.85);color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;pointer-events:none;white-space:nowrap;z-index:10'
+    canvas.parentElement.style.position = 'relative'; canvas.parentElement.appendChild(tip)
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect(); const mx = (e.clientX - rect.left) * (width / rect.width), my = (e.clientY - rect.top) * (height / rect.height)
+      const hit = bars.find(b => mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h)
+      if (hit) { tip.style.display = 'block'; tip.style.left = (e.clientX - rect.left + 12) + 'px'; tip.style.top = (e.clientY - rect.top - 28) + 'px'; tip.textContent = hit.label + '  ' + hit.value + '条' }
+      else tip.style.display = 'none'
+    })
+    canvas.addEventListener('mouseleave', () => tip.style.display = 'none')
   }
 
   window.drawLineChart = function (canvas, data, opts = {}) {

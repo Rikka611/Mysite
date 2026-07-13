@@ -197,6 +197,7 @@ body {
   </div>
 
   <div class="stats" id="stats"></div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:4px"><button class="btn sm" id="chartToggle" onclick="window._chartMode=window._chartMode==='24h'?'7d':'24h';load()">切为7天</button></div>
   <div class="charts">
     <div class="chart-box"><canvas id="chartLikes"></canvas></div>
     <div class="chart-box"><canvas id="chartStatus"></canvas></div>
@@ -316,14 +317,28 @@ function renderChart(){
     const top10=dataCache.filter(x=>x.status==='approved').sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,8)
     const likes=top10.map(x=>({label:(x.title||'').slice(0,6),value:x.likes||0}))
     const status=[{label:'已通过',value:dataCache.filter(x=>x.status==='approved').length},{label:'待审核',value:dataCache.filter(x=>x.status==='pending').length},{label:'已拒绝',value:dataCache.filter(x=>x.status==='rejected').length}]
-    const daily={};dataCache.forEach(x=>{const d=x.created_at?x.created_at.slice(0,10):'';if(d)daily[d]=(daily[d]||0)+1})
-    const uploads=Object.entries(daily).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14).map(([k,v])=>({label:k.slice(5),value:v}))
-    const viewDaily={};dataCache.forEach(x=>{const d=x.created_at?x.created_at.slice(0,10):'';if(d)viewDaily[d]=(viewDaily[d]||0)+(x.views||0)})
-    const vTrend=Object.entries(viewDaily).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14).map(([k,v])=>({label:k.slice(5),value:v}))
+    const now=new Date()
+    // 24h hourly
+    const hours=[];for(let i=23;i>=0;i--){const h=new Date(now);h.setHours(h.getHours()-i);hours.push({label:h.getHours()+':00',value:0})}
+    const upHours=[...hours.map(h=>({...h}))];const vwHours=[...hours.map(h=>({...h}))]
+    // 7d daily
+    const days=[];for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push({label:(d.getMonth()+1)+'/'+d.getDate(),value:0})}
+    const upDays=[...days.map(d=>({...d}))];const vwDays=[...days.map(d=>({...d}))]
+    dataCache.forEach(x=>{if(x.created_at){const d=new Date(x.created_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
+      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24){upHours[idx].value++;vwHours[idx].value+=(x.views||0)}}
+      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7){upDays[idx].value++;vwDays[idx].value+=(x.views||0)}}
+    }})
+    const mode=window._chartMode||'24h'
+    const upData=mode==='24h'?upHours:upDays
+    const vwData=mode==='24h'?vwHours:vwDays
+    const modeLabel=mode==='24h'?'24h':'7天'
     try{window.drawBarChart?.(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{width:boxW,height:260,title:'点赞排行'})}catch(e){}
     try{window.drawPieChart?.(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布'})}catch(e){}
-    try{window.drawLineChart?.(document.getElementById('chartUploads'),uploads.length?uploads:[{label:'-',value:1}],{width:boxW,height:260,title:'每日上传量'})}catch(e){}
-    try{window.drawLineChart?.(document.getElementById('chartViews'),vTrend.length?vTrend:[{label:'-',value:1}],{width:boxW,height:260,title:'每日浏览量'})}catch(e){}
+    try{window.drawBarChart?.(document.getElementById('chartUploads'),upData,{width:boxW,height:260,title:modeLabel+'上传量',barColor:'#818cf8'})}catch(e){}
+    try{window.drawBarChart?.(document.getElementById('chartViews'),vwData,{width:boxW,height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){}
+    // Toggle button
+    const toggleBtn=document.getElementById('chartToggle')
+    if(toggleBtn)toggleBtn.textContent=mode==='24h'?'切为7天':'切为24h'
   },200)
 }
 
