@@ -389,7 +389,7 @@ function doSearch() { render(); }
 // ===== Fetch =====
 async function fetchApproved() {
   let q = 'status=eq.approved';
-  q += tab === 'hot' ? '&order=views.desc&limit=30' : '&order=created_at.desc&limit=30';
+  q += tab === 'hot' ? '&order=likes.desc&limit=30' : '&order=created_at.desc&limit=30';
   return sbApi(`linli_codes?select=*&${q}`);
 }
 async function fetchAll() {
@@ -402,16 +402,13 @@ async function searchCodes(q) {
 // ===== View tracking =====
 async function trackView(id) {
   if (viewed.includes(id)) return;
-  viewed.push(id); localStorage.setItem('linli_viewed', JSON.stringify(viewed));
-  try { const d = await sbApi(`linli_codes?select=views&id=eq.${id}`); await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ views: (d[0]?.views || 0) + 1 }) }); } catch (e) {}
+  try { const d = await sbApi(`linli_codes?select=views&id=eq.${id}`); await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ views: (d[0]?.views || 0) + 1 }) }); viewed.push(id); localStorage.setItem('linli_viewed', JSON.stringify(viewed)); } catch (e) {}
 }
 
 // ===== Like =====
 async function doLike(id) {
   if (liked.includes(id)) return;
-  liked.push(id); localStorage.setItem('linli_liked', JSON.stringify(liked));
-  try { const d = await sbApi(`linli_codes?select=likes&id=eq.${id}`); await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ likes: (d[0]?.likes || 0) + 1 }) }); } catch (e) {}
-  render();
+  try { const d = await sbApi(`linli_codes?select=likes&id=eq.${id}`); await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ likes: (d[0]?.likes || 0) + 1 }) }); liked.push(id); localStorage.setItem('linli_liked', JSON.stringify(liked)); render(); } catch (e) {}
 }
 
 // ===== Copy =====
