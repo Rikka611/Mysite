@@ -247,14 +247,6 @@ html.light .modal { background: #fff; }
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 300; background: #333; color: #fff; padding: 10px 24px; border-radius: 50px; font-size: 0.85rem; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
 .toast.show { opacity: 1; }
 
-/* admin */
-.admin-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; position: relative; z-index: 1; }
-.admin-bar.hidden { display: none; }
-.admin-btn { padding: 6px 14px; border-radius: 50px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-muted); cursor: pointer; font-size: 0.8rem; font-family: system-ui, -apple-system, sans-serif; }
-.admin-btn:hover { color: var(--text); }
-.admin-btn.danger { border-color: rgba(239,68,68,0.4); color: #ef4444; }
-.admin-btn.approve { border-color: rgba(52,211,153,0.4); color: #34d399; }
-.admin-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .empty { text-align: center; color: var(--text-dim); padding: 48px 0; font-size: 0.9rem; position: relative; z-index: 1; }
 footer { text-align: center; padding: 24px; border-top: 1px solid var(--footer-border); color: var(--footer-text); font-size: 0.8rem; position: relative; z-index: 1; }
 
@@ -297,15 +289,6 @@ footer { text-align: center; padding: 24px; border-top: 1px solid var(--footer-b
 <div class="search-bar hidden" id="searchBar">
   <input type="text" id="searchInput" placeholder="搜索曲名、作者、标签..." maxlength="50">
   <button onclick="doSearch()">搜索</button>
-</div>
-
-<div class="admin-bar hidden" id="adminBar">
-  <span style="font-size:0.8rem;color:var(--text-dim)">审核 · </span>
-  <button class="admin-btn approve" onclick="approveAll()">全部通过</button>
-  <button class="admin-btn danger" onclick="rejectAll()">全部拒绝</button>
-  <button class="admin-btn danger" onclick="deleteRejected()">清理已拒绝</button>
-  <button class="admin-btn" id="autoApproveBtn" onclick="toggleAutoApprove()">自动通过：关</button>
-  <button class="admin-btn" onclick="exitAdmin()">退出</button>
 </div>
 
 <div class="content">
@@ -383,21 +366,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 let tab = 'hot';
 const liked = JSON.parse(localStorage.getItem('linli_liked') || '[]');
 const viewed = JSON.parse(localStorage.getItem('linli_viewed') || '[]');
-let adminMode = false;
-let autoApprove = localStorage.getItem('linli_auto_approve') !== 'false'; // default true
-
-updateAutoApproveBtn();
-
-function updateAutoApproveBtn() {
-  const btn = document.getElementById('autoApproveBtn');
-  if (btn) { btn.textContent = '自动通过：' + (autoApprove ? '开' : '关'); btn.classList.toggle('active', autoApprove); }
-}
-function toggleAutoApprove() {
-  autoApprove = !autoApprove;
-  localStorage.setItem('linli_auto_approve', autoApprove);
-  updateAutoApproveBtn();
-  showToast(autoApprove ? '新提交将自动通过' : '新提交需手动审核');
-}
+let autoApprove = localStorage.getItem('linli_auto_approve') !== 'false';
 
 // ===== Toast =====
 const toast = document.getElementById('toast');
@@ -477,36 +446,6 @@ async function doSubmit() {
   }
 }
 
-// ===== Admin =====
-document.addEventListener('keydown', e => {
-  if (e.ctrlKey && e.key === 'm') {
-    e.preventDefault();
-    if (adminMode) { exitAdmin(); return; }
-    const pw = prompt('管理密码：');
-    if (pw === 'linli2026') { adminMode = true; document.getElementById('adminBar').classList.remove('hidden'); updateAutoApproveBtn(); showToast('管理模式已开启'); render(); }
-    else if (pw) showToast('密码错误');
-  }
-});
-function exitAdmin() { adminMode = false; document.getElementById('adminBar').classList.add('hidden'); showToast('已退出管理模式'); render(); }
-async function approveAll() {
-  const data = await fetchAll();
-  for (const item of data) { if (item.status === 'pending') { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); } catch (e) {} } }
-  showToast('已全部通过'); render();
-}
-async function rejectAll() {
-  const data = await fetchAll();
-  for (const item of data) { if (item.status === 'pending') { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); } catch (e) {} } }
-  showToast('已全部拒绝'); render();
-}
-async function approveOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); showToast('已通过'); render(); } catch (e) {} }
-async function rejectOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); showToast('已拒绝'); render(); } catch (e) {} }
-async function deleteOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'DELETE' }); showToast('已删除'); render(); } catch (e) { showToast('删除失败'); } }
-async function deleteRejected() {
-  const data = await sbApi('linli_codes?select=id&status=eq.rejected');
-  for (const item of data) { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'DELETE' }); } catch (e) {} }
-  showToast('已清理'); render();
-}
-
 // ===== Render =====
 function esc(s) {
   const d = document.createElement('div');
@@ -517,15 +456,9 @@ function buildRow(item, idx) {
   const isLiked = liked.includes(item.id);
   const tagList = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 3) : [];
   const rank = tab === 'hot' ? (idx + 1) : null;
-  let adminBtns = '';
-  if (adminMode) {
-    adminBtns = `<span style="font-size:0.65rem;color:var(--text-dim)">[${item.status}]</span>`;
-    if (item.status === 'pending') adminBtns += `<button class="btn btn-copy" onclick="approveOne(${item.id})" style="font-size:0.65rem;padding:4px 8px;">通过</button><button class="btn btn-like" onclick="rejectOne(${item.id})" style="font-size:0.65rem;padding:4px 8px;">拒绝</button>`;
-    adminBtns += `<button class="btn btn-like" onclick="deleteOne(${item.id})" style="font-size:0.65rem;padding:4px 8px;color:#ef4444;border-color:rgba(239,68,68,0.4);">删除</button>`;
-  }
   const desc = item.description || (item.author && item.author !== '匿名' ? item.author : '');
   return `
-    <div class="row${adminMode && item.status === 'pending' ? ' pending' : ''}">
+    <div class="row">
       <div class="glare"></div>
       ${rank !== null ? `<div class="rank">#${rank}</div>` : ''}
       <div class="code" onclick="copyCode('${esc(item.code)}')" title="点击复制">${esc(item.code)}</div>
@@ -537,7 +470,6 @@ function buildRow(item, idx) {
       <div style="display:flex;gap:6px;position:relative;z-index:3">
         <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}')">📋</button>
         <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id})">${isLiked?'❤':'🤍'}</button>
-        ${adminBtns}
       </div>
     </div>`;
 }
@@ -545,7 +477,6 @@ function buildRow(item, idx) {
 async function render() {
   const grid = document.getElementById('grid');
   const empty = document.getElementById('empty');
-  if (adminMode) { loadAll(); return; }
   grid.innerHTML = ''; empty.style.display = 'none';
   try {
     let data;
@@ -557,15 +488,6 @@ async function render() {
     if (!data.length) { empty.style.display = 'block'; empty.textContent = tab === 'search' ? '没有找到匹配的分享码' : '暂无分享码，点右下角 + 提交第一个吧！'; return; }
     data.forEach((item, i) => { const d = document.createElement('div'); d.innerHTML = buildRow(item, i); grid.appendChild(d.firstElementChild); trackView(item.id); });
   } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败，请刷新重试'; }
-}
-
-async function loadAll() {
-  const grid = document.getElementById('grid'); const empty = document.getElementById('empty');
-  try {
-    const data = await fetchAll();
-    if (!data.length) { empty.style.display = 'block'; empty.textContent = '暂无数据'; grid.innerHTML = ''; return; }
-    empty.style.display = 'none'; grid.innerHTML = data.map((item, i) => buildRow(item, i)).join('');
-  } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败'; }
 }
 
 render();

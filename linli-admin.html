@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>林离 分享码 · 管理</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a1a;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e0e0e0;--text-muted:#889;--text-dim:#667;--accent:#38bdf8;--danger:#ef4444;--warn:#fbbf24;--ok:#34d399}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:24px}
+.login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
+.login h1{background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:2rem}
+.login input,.login textarea{padding:12px 20px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:1rem;outline:none;text-align:center;width:320px;font-family:system-ui,-apple-system,sans-serif}
+.login textarea{text-align:left;height:60px;resize:none;font-size:0.85rem}
+.login input:focus,.login textarea:focus{border-color:var(--accent)}
+.login button{padding:10px 32px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;font-size:0.95rem;cursor:pointer;font-weight:600;font-family:system-ui,-apple-system,sans-serif}
+.login button:disabled{opacity:0.5;cursor:not-allowed}
+.login .err{color:var(--danger);font-size:0.85rem}
+.login .hint{color:var(--text-dim);font-size:0.75rem;text-align:left;width:320px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.header h1{font-size:1.3rem;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 18px;border-radius:50px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-family:system-ui,-apple-system,sans-serif;font-weight:500}
+.btn:hover{color:var(--text)}
+.btn.primary{background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;border:none}
+.btn.danger{border-color:rgba(239,68,68,0.4);color:var(--danger)}
+.btn.ok{border-color:rgba(52,211,153,0.4);color:var(--ok)}
+.btn.warn{border-color:rgba(251,191,36,0.4);color:var(--warn)}
+.btn.sm{padding:4px 12px;font-size:0.7rem}
+.btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tabs{display:flex;gap:4px;margin-bottom:16px}
+.tab{padding:6px 16px;border-radius:50px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-family:system-ui,-apple-system,sans-serif}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab .count{opacity:0.7;font-size:0.7rem}
+.list{display:flex;flex-direction:column;gap:6px}
+.row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
+.row.pending{border-left:3px solid var(--warn)}
+.row.rejected{opacity:0.5}
+.row .code{font-size:1rem;font-weight:700;letter-spacing:2px;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:75px}
+.row .info{flex:1;min-width:0}
+.row .title{font-size:0.9rem;font-weight:600}
+.row .sub{font-size:0.75rem;color:var(--text-dim)}
+.row .actions{display:flex;gap:4px}
+.empty{text-align:center;color:var(--text-dim);padding:48px 0}
+@media(max-width:600px){.row{flex-wrap:wrap;gap:6px;padding:8px 10px}.header{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="login" id="loginBox">
+  <h1>林离 分享码</h1>
+  <input type="password" id="pwInput" placeholder="管理密码" autofocus>
+  <textarea id="srInput" placeholder="Supabase service_role key（Settings > API > service_role secret）用于写操作鉴权"></textarea>
+  <div class="hint">service_role key 仅保存在本地浏览器，不会上传到服务器</div>
+  <button id="loginBtn" onclick="doLogin()">进入管理</button>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<div id="mainBox" style="display:none">
+  <div class="header">
+    <h1>管理后台</h1>
+    <div class="btns">
+      <button class="btn active" id="autoBtn" onclick="toggleAuto()">自动通过：开</button>
+      <button class="btn ok" onclick="approveAllPending()">全部通过</button>
+      <button class="btn warn" onclick="rejectAllPending()">全部拒绝</button>
+      <button class="btn danger" onclick="deleteRejected()">清理已拒绝</button>
+      <button class="btn" onclick="doLogout()">退出</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-filter="all" id="tabAll">全部</button>
+    <button class="tab" data-filter="pending" id="tabPending">待审核</button>
+    <button class="tab" data-filter="approved" id="tabApproved">已通过</button>
+    <button class="tab" data-filter="rejected" id="tabRejected">已拒绝</button>
+  </div>
+
+  <div class="list" id="list"></div>
+  <div class="empty" id="empty">加载中...</div>
+</div>
+
+</div>
+
+<script>
+const SB_URL = 'https://naivizrdefonlelndzqr.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5haXZpenJkZWZvbmxlbG5kenFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTU4MjcsImV4cCI6MjA5NzY5MTgyN30.66G4T_7JDVjsw0RGRC_OwcYBgMwPk33c3sCrlmzrxvI';
+const PW_HASH = '8e76ef51d0841f37d686f4af64ee2bc4c89d3701174c4e0fccf6a08ea825a94e';
+
+let srKey = '';
+let filter = 'all', autoApprove = true, dataCache = [];
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function authHeaders() {
+  const key = srKey || SB_KEY;
+  return { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+}
+
+async function sbApi(path, options = {}) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: { ...authHeaders(), ...options.headers }, ...options
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const t = await res.text();
+  return t ? JSON.parse(t) : [];
+}
+
+// ===== Auth with brute-force protection =====
+const BF_KEY = 'linli_admin_bf';
+let bf = JSON.parse(sessionStorage.getItem(BF_KEY) || '{"fails":0,"until":0}');
+
+function doLogin() {
+  const now = Date.now();
+  if (now < bf.until) {
+    const wait = Math.ceil((bf.until - now) / 1000);
+    document.getElementById('loginErr').textContent = `尝试过于频繁，请 ${wait} 秒后重试`;
+    return;
+  }
+  doLoginAsync();
+}
+
+async function doLoginAsync() {
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginErr');
+  btn.disabled = true;
+  errEl.textContent = '';
+
+  const pw = document.getElementById('pwInput').value;
+  const hash = await sha256(pw);
+
+  if (hash !== PW_HASH) {
+    bf.fails++;
+    bf.until = Date.now() + Math.min(2000 * Math.pow(2, bf.fails - 1), 60000);
+    sessionStorage.setItem(BF_KEY, JSON.stringify(bf));
+    const wait = Math.ceil((bf.until - Date.now()) / 1000);
+    errEl.textContent = `密码错误，${wait} 秒后可重试`;
+    btn.disabled = false;
+    return;
+  }
+
+  // Login success
+  bf = { fails: 0, until: 0 };
+  sessionStorage.removeItem(BF_KEY);
+  srKey = document.getElementById('srInput').value.trim();
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2,'0')).join('');
+  sessionStorage.setItem('linli_admin_token', token);
+  if (srKey) sessionStorage.setItem('linli_sr_key', srKey);
+  showMain();
+}
+
+function showMain() {
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('mainBox').style.display = 'block';
+  load();
+}
+
+function doLogout() {
+  sessionStorage.removeItem('linli_admin_token');
+  sessionStorage.removeItem('linli_sr_key');
+  location.reload();
+}
+
+// Restore session
+const savedToken = sessionStorage.getItem('linli_admin_token');
+const savedSrKey = sessionStorage.getItem('linli_sr_key');
+if (savedToken && savedToken.length === 32) {
+  if (savedSrKey) srKey = savedSrKey;
+  showMain();
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ===== Auto approve =====
+autoApprove = localStorage.getItem('linli_auto_approve') !== 'false';
+updateAutoBtn();
+function toggleAuto() { autoApprove = !autoApprove; localStorage.setItem('linli_auto_approve', autoApprove); updateAutoBtn(); }
+function updateAutoBtn() { const b = document.getElementById('autoBtn'); b.textContent = '自动通过：' + (autoApprove ? '开' : '关'); b.classList.toggle('active', autoApprove); }
+
+// ===== Tabs =====
+document.querySelector('.tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab'); if (!tab) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active'); filter = tab.dataset.filter; renderFiltered();
+});
+
+// ===== Load =====
+async function load() {
+  document.getElementById('empty').style.display = 'none';
+  document.getElementById('list').innerHTML = '';
+  try {
+    dataCache = await sbApi('linli_codes?select=*&order=created_at.desc&limit=200');
+    updateCounts(); renderFiltered();
+  } catch (e) {
+    document.getElementById('empty').textContent = '加载失败';
+    document.getElementById('empty').style.display = 'block';
+  }
+}
+
+function updateCounts() {
+  const counts = { all: dataCache.length, pending: 0, approved: 0, rejected: 0 };
+  dataCache.forEach(item => { counts[item.status] = (counts[item.status] || 0) + 1; });
+  document.getElementById('tabAll').innerHTML = `全部 <span class="count">${counts.all}</span>`;
+  document.getElementById('tabPending').innerHTML = `待审核 <span class="count">${counts.pending}</span>`;
+  document.getElementById('tabApproved').innerHTML = `已通过 <span class="count">${counts.approved}</span>`;
+  document.getElementById('tabRejected').innerHTML = `已拒绝 <span class="count">${counts.rejected}</span>`;
+}
+
+function renderFiltered() {
+  const items = filter === 'all' ? dataCache : dataCache.filter(item => item.status === filter);
+  const list = document.getElementById('list'), empty = document.getElementById('empty');
+  if (!items.length) { list.innerHTML = ''; empty.style.display = 'block'; empty.textContent = '暂无数据'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = items.map(item => {
+    const tags = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 3) : [];
+    const sc = { pending: 'var(--warn)', approved: 'var(--ok)', rejected: 'var(--danger)' };
+    return `<div class="row ${item.status}">
+      <span style="font-size:0.7rem;color:${sc[item.status]||'var(--text-dim)'};min-width:45px">${item.status}</span>
+      <div class="code">${esc(item.code)}</div>
+      <div class="info">
+        <div class="title">${esc(item.title)}</div>
+        <div class="sub">${[item.author!=='匿名'?esc(item.author):'',item.description?esc(item.description):'',...tags.map(t=>'#'+esc(t))].filter(Boolean).join(' · ')}</div>
+      </div>
+      <span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap">👁${item.views||0} ❤${item.likes||0}</span>
+      <div class="actions">
+        ${item.status==='pending'?`<button class="btn ok sm" onclick="approve(${item.id})">通过</button><button class="btn warn sm" onclick="reject(${item.id})">拒绝</button>`:''}
+        <button class="btn danger sm" onclick="del(${item.id})">删除</button>
+      </div></div>`;
+  }).join('');
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+
+// ===== Actions =====
+async function approve(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); load(); } catch (e) {} }
+async function reject(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); load(); } catch (e) {} }
+async function del(id) { if (!confirm('确认删除？')) return; try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'DELETE' }); load(); } catch (e) {} }
+
+async function approveAllPending() { for (const item of dataCache.filter(i=>i.status==='pending')) { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); } catch (e) {} } load(); }
+async function rejectAllPending() { for (const item of dataCache.filter(i=>i.status==='pending')) { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); } catch (e) {} } load(); }
+async function deleteRejected() {
+  const rejected = dataCache.filter(i=>i.status==='rejected');
+  if (!rejected.length || !confirm(`确认删除所有 ${rejected.length} 条已拒绝记录？`)) return;
+  for (const item of rejected) { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'DELETE' }); } catch (e) {} }
+  load();
+}
+</script>
+</body>
+</html>
