@@ -228,7 +228,7 @@ function updateCounts() {
 
 function esc(s) { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
 
-function renderStats() {
+async function renderStats() {
   const approved = dataCache.filter(i => i.status === 'approved');
   const totalViews = dataCache.reduce((s, i) => s + (i.views || 0), 0);
   const totalLikes = dataCache.reduce((s, i) => s + (i.likes || 0), 0);
@@ -236,11 +236,19 @@ function renderStats() {
   const topLiked = approved.slice().sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 3);
   const recent = dataCache.slice(0, 3);
 
+  // Fetch page visits
+  let pageVisits = '...';
+  try{
+    const pv = await sbApi('page_views?select=count&page=eq.linli');
+    pageVisits = pv[0]?.count || 0;
+  }catch(e){}
+
   document.getElementById('stats').innerHTML = `
     <div class="stat"><div class="val">${dataCache.length}</div><div class="lbl">总提交</div></div>
     <div class="stat"><div class="val">${approved.length}</div><div class="lbl">已通过</div></div>
     <div class="stat"><div class="val" style="color:#ef4444;-webkit-text-fill-color:#ef4444">${dupeCount}</div><div class="lbl">重复码</div></div>
     <div class="stat"><div class="val">${totalViews}</div><div class="lbl">总浏览</div></div>
+    <div class="stat"><div class="val">${pageVisits}</div><div class="lbl">页面访问量</div></div>
     <div class="stat"><div class="val">${totalLikes}</div><div class="lbl">总点赞</div></div>
     <div class="stat"><div class="val" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${topLiked.map((t,i) => `${i+1}.${esc(t.title)} ❤${t.likes||0}`).join('<br>')||'—'}</div><div class="lbl">最热三首</div></div>
     <div class="stat"><div class="val" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${recent.map(r => `${esc(r.title)}`).join('<br>')||'—'}</div><div class="lbl">最新提交</div></div>

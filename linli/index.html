@@ -493,6 +493,14 @@ if(glow){let pending=false;document.addEventListener('mousemove',e=>{if(pending)
 // Click spark (more particles)
 (function(){const c=document.createElement('div');c.className='spark-container';document.body.appendChild(c);document.addEventListener('click',e=>{for(let i=0;i<10;i++){const s=document.createElement('div');s.className='spark';const a=Math.PI*2*i/10+(Math.random()-0.5)*0.5;s.style.left=e.clientX+'px';s.style.top=e.clientY+'px';s.style.setProperty('--sx',Math.cos(a)*(20+Math.random()*30)+'px');s.style.setProperty('--sy',Math.sin(a)*(20+Math.random()*30)+'px');s.style.background=`hsl(${200+Math.random()*60},90%,${55+Math.random()*20}%)`;c.appendChild(s);s.addEventListener('animationend',()=>s.remove())}})})();
 
+(async function(){
+  try{
+    const d=await sbApi('page_views?select=count&page=eq.linli');
+    const n=(d[0]?.count||0)+1;
+    await sbApi('page_views?page=eq.linli',{method:'PATCH',body:JSON.stringify({count:n})});
+  }catch(e){}
+})();
+
 render();
 </script>
 </body>
