@@ -575,11 +575,7 @@ if(glow){let pending=false;document.addEventListener('mousemove',e=>{if(pending)
 (async function(){
   if(sessionStorage.getItem('pv_counted'))return;
   sessionStorage.setItem('pv_counted','1');
-  try{
-    const d=await sbApi('page_views?select=count&page=eq.linli');
-    const n=(d[0]?.count||0)+1;
-    await sbApi('page_views?page=eq.linli',{method:'PATCH',body:JSON.stringify({count:n})});
-  }catch(e){}
+  try{await sbApi('page_visits',{method:'POST',body:JSON.stringify({page:'linli'})})}catch(e){}
 })();
 
 render();

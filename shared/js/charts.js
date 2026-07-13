@@ -40,9 +40,12 @@
       grad.addColorStop(0, barColor); grad.addColorStop(1, barColor + '60')
       ctx.fillStyle = grad
       ctx.beginPath(); roundRect(ctx, x, y, barW, h, 3); ctx.fill()
-      ctx.fillStyle = labelColor; ctx.font = '9px system-ui'; ctx.textAlign = 'center'
-      ctx.fillText(d.label, x + barW / 2, height - 4)
-      if (d.value > 0 && barW > 16) { ctx.fillStyle = '#ddd'; ctx.font = '8px system-ui'; ctx.fillText(d.value, x + barW / 2, y - 4) }
+      const step = data.length > 12 ? Math.ceil(data.length / 8) : 1
+      if (i % step === 0 || i === data.length - 1) {
+        ctx.fillStyle = labelColor; ctx.font = '9px system-ui'; ctx.textAlign = 'center'
+        ctx.fillText(d.label, x + barW / 2, height - 4)
+      }
+      if (d.value > 0 && barW > 20) { ctx.fillStyle = '#ddd'; ctx.font = '8px system-ui'; ctx.fillText(d.value, x + barW / 2, y - 4) }
       bars.push({ x, y, w: barW, h, label: d.label, value: d.value })
     })
     // Hover tooltip
