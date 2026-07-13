@@ -37,6 +37,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
 .row.pending{border-left:3px solid var(--warn)}
 .row.rejected{opacity:0.5}
+.row.dupe{border-left:3px solid #ef4444}
 .row .code{font-size:1rem;font-weight:700;letter-spacing:1px;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:75px}
 .row .info{flex:1;min-width:0}
 .row .title{font-size:0.9rem;font-weight:600}
@@ -229,12 +230,14 @@ function renderStats() {
   const approved = dataCache.filter(i => i.status === 'approved');
   const totalViews = dataCache.reduce((s, i) => s + (i.views || 0), 0);
   const totalLikes = dataCache.reduce((s, i) => s + (i.likes || 0), 0);
+  const dupeCount = findDupes().size;
   const topLiked = approved.slice().sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 3);
   const recent = dataCache.slice(0, 3);
 
   document.getElementById('stats').innerHTML = `
     <div class="stat"><div class="val">${dataCache.length}</div><div class="lbl">总提交</div></div>
     <div class="stat"><div class="val">${approved.length}</div><div class="lbl">已通过</div></div>
+    <div class="stat"><div class="val" style="color:#ef4444;-webkit-text-fill-color:#ef4444">${dupeCount}</div><div class="lbl">重复码</div></div>
     <div class="stat"><div class="val">${totalViews}</div><div class="lbl">总浏览</div></div>
     <div class="stat"><div class="val">${totalLikes}</div><div class="lbl">总点赞</div></div>
     <div class="stat"><div class="val" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${topLiked.map((t,i) => `${i+1}.${esc(t.title)} ❤${t.likes||0}`).join('<br>')||'—'}</div><div class="lbl">最热三首</div></div>
@@ -348,17 +351,33 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.quadraticCurveTo(x, y, x + r, y);
 }
 
+function findDupes() {
+  const count = {};
+  dataCache.forEach(i => { count[i.code] = (count[i.code] || 0) + 1; });
+  return new Set(Object.keys(count).filter(k => count[k] > 1));
+}
+
 function renderFiltered() {
-  const items = filter === 'all' ? dataCache : dataCache.filter(item => item.status === filter);
+  let items = filter === 'all' ? dataCache : dataCache.filter(item => item.status === filter);
+  const dupes = findDupes();
+
+  // 重复码排最前
+  items = [...items].sort((a, b) => {
+    const da = dupes.has(a.code) ? 1 : 0;
+    const db = dupes.has(b.code) ? 1 : 0;
+    return db - da;
+  });
+
   const list = document.getElementById('list'), empty = document.getElementById('empty');
   if (!items.length) { list.innerHTML = ''; empty.style.display = 'block'; empty.textContent = '暂无数据'; return; }
   empty.style.display = 'none';
   list.innerHTML = items.map(item => {
     const tags = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 3) : [];
     const sc = { pending: 'var(--warn)', approved: 'var(--ok)', rejected: 'var(--danger)' };
-    return `<div class="row ${item.status}">
+    const isDupe = dupes.has(item.code);
+    return `<div class="row ${item.status}${isDupe ? ' dupe' : ''}">
       <span style="font-size:0.7rem;color:${sc[item.status]||'var(--text-dim)'};min-width:45px">${item.status}</span>
-      <div class="code">${esc(item.code)}</div>
+      <div class="code">${esc(item.code)}${isDupe ? ' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px;vertical-align:middle">重复</span>' : ''}</div>
       <div class="info">
         <div class="title">${esc(item.title)}</div>
         <div class="sub">${[item.author!=='匿名'?esc(item.author):'',item.description?esc(item.description):'',...tags.map(t=>'#'+esc(t))].filter(Boolean).join(' · ')}</div>
