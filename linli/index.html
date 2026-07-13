@@ -434,6 +434,7 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 
 // State
 let tab='hot';
+const liked=JSON.parse(localStorage.getItem('linli_liked')||'[]');
 let autoApprove=localStorage.getItem('linli_auto_approve')!=='false';
 let page=1,pageSize=15,totalPages=1;
 
@@ -464,6 +465,7 @@ async function trackView(id){
 async function doLike(id,e){
   const f=btoa(navigator.userAgent+screen.width+'x'+screen.height).slice(0,32);
   try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}
+  liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));
   render();
   if(e){const rect=e.target.getBoundingClientRect();for(let i=0;i<8;i++){const h=document.createElement('div');h.className='heart-burst';h.textContent='❤';h.style.left=rect.left+rect.width/2+'px';h.style.top=rect.top+rect.height/2+'px';const a=Math.PI*2*i/8;h.style.setProperty('--hx',Math.cos(a)*40+'px');h.style.setProperty('--hy',Math.sin(a)*40+'px');h.style.color=`hsl(${350+Math.random()*20},90%,${55+Math.random()*20}%)`;document.body.appendChild(h);h.addEventListener('animationend',()=>h.remove())}}
 }
@@ -510,6 +512,7 @@ function esc(s){const d=document.createElement('div');d.textContent=String(s);re
 function buildRow(item,idx){
   const tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[];
   const rank=tab==='hot'?idx+1:null;
+  const isLiked=liked.includes(item.id);
   const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');
   return `<div class="row" style="animation-delay:${idx*0.04}s">
     <div class="glare"></div>
@@ -522,7 +525,7 @@ function buildRow(item,idx){
     <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
     <div class="actions">
       <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}',event)">📋</button>
-      <button class="btn btn-like" onclick="doLike(${item.id},event)">🤍 ${item.likes||0}</button>
+      <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id},event)">${isLiked?'❤':'🤍'}</button>
     </div></div>`;
 }
 
