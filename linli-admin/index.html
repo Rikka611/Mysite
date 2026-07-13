@@ -302,7 +302,7 @@ async function load(){
 async function renderStats(){
   const all=dataCache;const dupeMap=new Map();all.forEach(x=>{const c=x.code;dupeMap.set(c,(dupeMap.get(c)||0)+1)})
   const dupeCount=[...dupeMap.values()].filter(v=>v>1).length
-  let pvCount=0;try{const pv=await sbApi('page_visits?select=id&page=eq.linli');pvCount=pv.length}catch(e){}
+  let pvCount=0;try{const pv=await sbApi('page_visits?select=id&page=eq.linli&limit=100000');pvCount=pv.length}catch(e){}
   const totalViews=all.reduce((s,x)=>s+(x.views||0),0);const totalLikes=all.reduce((s,x)=>s+(x.likes||0),0)
   document.getElementById('stats').innerHTML=[
     {v:all.length,l:'总提交'},{v:all.filter(x=>x.status==='approved').length,l:'已通过'},
@@ -329,7 +329,7 @@ function renderChart(){
       if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)upDays[idx].value++}
     }})
     // Page visits for views chart
-    try{const pv=await sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=2000');pv.forEach(v=>{if(v.visited_at){const d=new Date(v.visited_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
+    try{const pv=await sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=100000');pv.forEach(v=>{if(v.visited_at){const d=new Date(v.visited_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
       if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24)vwHours[idx].value++}
       if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)vwDays[idx].value++}
     }})}catch(e){}
