@@ -181,14 +181,14 @@ html.light .theme-btn .icon-moon { display: inline; }
 .row:hover .glare { opacity: 1; }
 .row.tilting { will-change: transform; }
 .row.tilting .glare { opacity: 1; }
-.row .rank { font-size: 1.2rem; font-weight: 800; color: var(--text-dim); min-width: 28px; text-align: center; position: relative; z-index: 3; }
+.row .rank { font-size: 1.2rem; font-weight: 800; color: var(--text-dim); width: 36px; text-align: center; position: relative; z-index: 3; flex-shrink: 0; }
 .row:nth-child(1) .rank { color: #fbbf24; }
 .row:nth-child(2) .rank { color: #94a3b8; }
 .row:nth-child(3) .rank { color: #d97706; }
 .row .code {
   font-size: 1.1rem; font-weight: 700; letter-spacing: 3px;
   background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  cursor: pointer; user-select: all; font-variant-numeric: tabular-nums; min-width: 80px; text-align: center; position: relative; z-index: 3;
+  cursor: pointer; user-select: all; font-variant-numeric: tabular-nums; width: 88px; flex-shrink: 0; text-align: center; position: relative; z-index: 3;
 }
 .row .info { flex: 1; min-width: 0; position: relative; z-index: 3; }
 .row .title { font-size: 0.95rem; font-weight: 600; color: var(--heading); }
@@ -457,7 +457,7 @@ function buildRow(item, idx) {
   return `
     <div class="row">
       <div class="glare"></div>
-      ${rank !== null ? `<div class="rank">#${rank}</div>` : ''}
+      <div class="rank">${rank !== null ? '#'+rank : ''}</div>
       <div class="code" onclick="copyCode('${esc(item.code)}')" title="点击复制">${esc(item.code)}</div>
       <div class="info">
         <div class="title">${esc(item.title)}</div>
