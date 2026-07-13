@@ -325,9 +325,14 @@ function renderChart(){
     const days=[];for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push({label:(d.getMonth()+1)+'/'+d.getDate(),value:0})}
     const upDays=[...days.map(d=>({...d}))];const vwDays=[...days.map(d=>({...d}))]
     dataCache.forEach(x=>{if(x.created_at){const d=new Date(x.created_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
-      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24){upHours[idx].value++;vwHours[idx].value+=(x.views||0)}}
-      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7){upDays[idx].value++;vwDays[idx].value+=(x.views||0)}}
+      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24)upHours[idx].value++}
+      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)upDays[idx].value++}
     }})
+    // Page visits for views chart
+    try{const pv=await sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=2000');pv.forEach(v=>{if(v.visited_at){const d=new Date(v.visited_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
+      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24)vwHours[idx].value++}
+      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)vwDays[idx].value++}
+    }})}catch(e){}
     const mode=window._chartMode||'24h'
     const upData=mode==='24h'?upHours:upDays
     const vwData=mode==='24h'?vwHours:vwDays
