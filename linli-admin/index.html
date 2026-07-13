@@ -43,6 +43,9 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .row .sub{font-size:0.75rem;color:var(--text-dim)}
 .row .actions{display:flex;gap:4px}
 .empty{text-align:center;color:var(--text-dim);padding:48px 0}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative}
+.chart-box canvas{width:100%;height:260px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
 .stat .val{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -82,6 +85,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
   </div>
 
   <div class="stats" id="stats"></div>
+
+  <div class="charts">
+    <div class="chart-box"><canvas id="chartLikes"></canvas></div>
+    <div class="chart-box"><canvas id="chartStatus"></canvas></div>
+  </div>
 
   <div class="list" id="list"></div>
   <div class="empty" id="empty">加载中...</div>
@@ -199,7 +207,7 @@ async function load() {
   document.getElementById('list').innerHTML = '';
   try {
     dataCache = await sbApi('linli_codes?select=*&order=created_at.desc&limit=200');
-    updateCounts(); renderStats(); renderFiltered();
+    updateCounts(); renderStats(); renderCharts(); renderFiltered();
   } catch (e) {
     document.getElementById('empty').textContent = '加载失败';
     document.getElementById('empty').style.display = 'block';
@@ -232,6 +240,112 @@ function renderStats() {
     <div class="stat"><div class="val" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${topLiked.map((t,i) => `${i+1}.${esc(t.title)} ❤${t.likes||0}`).join('<br>')||'—'}</div><div class="lbl">最热三首</div></div>
     <div class="stat"><div class="val" style="font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${recent.map(r => `${esc(r.title)}`).join('<br>')||'—'}</div><div class="lbl">最新提交</div></div>
   `;
+}
+
+function renderCharts() {
+  drawLikesChart();
+  drawStatusChart();
+}
+
+function drawLikesChart() {
+  const canvas = document.getElementById('chartLikes');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 260 * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = '260px';
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width - 32;
+  const top10 = dataCache.filter(i => i.status === 'approved').sort((a,b) => (b.likes||0) - (a.likes||0)).slice(0, 10);
+  if (!top10.length) { ctx.fillStyle = '#667'; ctx.font = '14px system-ui'; ctx.textAlign = 'center'; ctx.fillText('暂无数据', w/2+16, 130); return; }
+
+  const maxLikes = Math.max(1, top10[0].likes || 0);
+  const barH = 20, gap = 8, left = 90, right = 40, totalH = top10.length * (barH + gap);
+  ctx.fillStyle = '#889'; ctx.font = '11px system-ui'; ctx.textAlign = 'right';
+  top10.forEach((item, i) => {
+    const y = 10 + i * (barH + gap);
+    const label = item.title.length > 8 ? item.title.slice(0,8)+'...' : item.title;
+    ctx.fillStyle = '#889'; ctx.fillText(label, left - 8, y + barH - 5);
+
+    const barW = ((item.likes || 0) / maxLikes) * (w - left - right);
+    const grad = ctx.createLinearGradient(left, 0, left + barW, 0);
+    grad.addColorStop(0, '#38bdf8'); grad.addColorStop(1, '#818cf8');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); roundRect(ctx, left, y, barW, barH, 4); ctx.fill();
+
+    ctx.fillStyle = '#ddd'; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText((item.likes||0) + ' ❤', left + barW + 6, y + barH - 5);
+  });
+}
+
+function drawStatusChart() {
+  const canvas = document.getElementById('chartStatus');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 260 * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = '260px';
+  ctx.scale(dpr, dpr);
+  const w = rect.width - 32;
+
+  const counts = { pending: 0, approved: 0, rejected: 0 };
+  dataCache.forEach(i => counts[i.status] = (counts[i.status]||0) + 1);
+  const total = counts.pending + counts.approved + counts.rejected || 1;
+  const colors = { pending: '#fbbf24', approved: '#34d399', rejected: '#ef4444' };
+  const labels = { pending: '待审核', approved: '已通过', rejected: '已拒绝' };
+
+  const cx = w / 2 + 16, cy = 120, r = 80, ir = 45;
+  let angle = -Math.PI / 2;
+  ['approved', 'pending', 'rejected'].forEach(status => {
+    const slice = (counts[status] / total) * Math.PI * 2;
+    if (slice <= 0) return;
+    ctx.fillStyle = colors[status];
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, angle, angle + slice);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, angle, angle + slice);
+    ctx.closePath();
+    ctx.strokeStyle = 'var(--bg)'; ctx.lineWidth = 2; ctx.stroke();
+    angle += slice;
+  });
+  // center hole
+  ctx.fillStyle = 'var(--bg)'; ctx.beginPath(); ctx.arc(cx, cy, ir, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ddd'; ctx.font = 'bold 16px system-ui'; ctx.textAlign = 'center';
+  ctx.fillText(total, cx, cy + 6);
+
+  // legend
+  let lx = 16, ly = 210;
+  ['approved', 'pending', 'rejected'].forEach(status => {
+    ctx.fillStyle = colors[status];
+    ctx.fillRect(lx, ly, 12, 12);
+    ctx.fillStyle = '#ccc'; ctx.font = '12px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText(`${labels[status]} ${counts[status]} (${Math.round(counts[status]/total*100)}%)`, lx + 18, ly + 11);
+    lx += 120;
+    if (lx > w - 100) { lx = 16; ly += 20; }
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
 }
 
 function renderFiltered() {
