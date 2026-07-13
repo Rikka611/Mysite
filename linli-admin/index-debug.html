@@ -265,25 +265,21 @@ async function doLogin(){
   const hash=await sha256(pw)
   if(hash!==PW_HASH){document.getElementById('loginErr').textContent='密码错误';return}
   if(sr){srKey=sr;showToast('已启用 service_role 写权限','ok')}
-  localStorage.setItem('admin_token',hash);if(sr)localStorage.setItem('admin_sr',sr)
-  showMain()
-}
-function showMain(){
   document.getElementById('loginBox').style.display='none';document.getElementById('mainBox').style.display='block'
-  const nb=document.getElementById('navBar');if(nb)nb.style.display='flex';init()
+  document.getElementById('navBar').style.display='flex';init()
 }
-function doLogout(){srKey='';localStorage.removeItem('admin_token');localStorage.removeItem('admin_sr');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
+function doLogout(){srKey='';document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';document.getElementById('navBar').style.display='none'}
 function toggleAuto(){autoApprove=!autoApprove;document.getElementById('autoBtn').textContent='自动通过：'+(autoApprove?'开':'关');document.getElementById('autoBtn').className='btn '+(autoApprove?'active':'');showToast(autoApprove?'新提交将自动通过':'新提交需手动审核','info')}
 
 // ---- API ----
 function adminHeaders(){const cfg=window.__LINLI_CONFIG__||{};const key=srKey||cfg.SB_KEY||'';return{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',Prefer:'return=minimal'}}
-const sbApi = async function(path, options = {}) {
+async function sbApi(path,options={}){
   if(srKey){const cfg=window.__LINLI_CONFIG__||{};const url=(cfg.SB_URL||'')+'/rest/v1/'+path;const res=await fetch(url,{headers:{...adminHeaders(),...options.headers},...options});if(!res.ok)throw new Error(await res.text());const t=await res.text();return t?JSON.parse(t):[]}
-  return window.sbApi(path, options)
+  return window.sbApi(path,options)
 }
 
 // ---- Init ----
-async function init(){
+async function init(){console.log("init called");
   try{
     const tabs=document.querySelectorAll('.tab');tabs.forEach(t=>{t.onclick=()=>{filter=t.dataset.filter;tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');filter==='feedback'?loadFeedback():load()}})
     load()
@@ -291,7 +287,7 @@ async function init(){
 }
 
 // ---- Load ----
-async function load(){
+async function load(){console.log("load called");return;
   try{
     dataCache=filter==='feedback'?[]:await sbApi('linli_codes?select=*&order=created_at.desc&limit=200')
     renderStats();renderChart();renderList()
@@ -364,13 +360,12 @@ function renderFeedback(){
   feedbackCache.forEach(f=>{
     const d=document.createElement('div');d.className='row'
     d.innerHTML='<div class="info"><div class="title">'+escapeHtml(f.content||'')+'</div><div class="sub" style="font-size:0.65rem">'+new Date(f.created_at).toLocaleString()+'</div></div><div class="actions"><button class="btn ok sm" onclick="markFeedback('+f.id+',\'resolved\')">解决</button><button class="btn danger sm" onclick="delFeedback('+f.id+')">删除</button></div>'
+    d.querySelectorAll('button').forEach(b=>b.onclick=eval(b.onclick))
     fl.appendChild(d)
   })
 }
 async function markFeedback(id,status){try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status})});loadFeedback();showToast('状态已更新','ok')}catch(e){}}
 async function delFeedback(id){if(!confirm('确认删除？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'DELETE'});loadFeedback()}catch(e){}}
-// Auto-restore session
-if(localStorage.getItem('admin_token')===PW_HASH){srKey=localStorage.getItem('admin_sr')||'';showMain()}
 </script>
 </body>
 </html>
