@@ -302,7 +302,7 @@ async function load(){
 async function renderStats(){
   const all=dataCache;const dupeMap=new Map();all.forEach(x=>{const c=x.code;dupeMap.set(c,(dupeMap.get(c)||0)+1)})
   const dupeCount=[...dupeMap.values()].filter(v=>v>1).length
-  let pvCount=0;try{const pv=await sbApi('page_visits?select=id&page=eq.linli&limit=100000');pvCount=pv.length}catch(e){}
+  let pvCount=0;try{const pv=await sbApi('page_visits?select=id&order=id.desc&limit=1');pvCount=pv[0]?.id||0}catch(e){}
   const totalViews=all.reduce((s,x)=>s+(x.views||0),0);const totalLikes=all.reduce((s,x)=>s+(x.likes||0),0)
   document.getElementById('stats').innerHTML=[
     {v:all.length,l:'总提交'},{v:all.filter(x=>x.status==='approved').length,l:'已通过'},
