@@ -83,6 +83,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <button class="tab" data-filter="pending" id="tabPending">待审核</button>
     <button class="tab" data-filter="approved" id="tabApproved">已通过</button>
     <button class="tab" data-filter="rejected" id="tabRejected">已拒绝</button>
+    <button class="tab" data-filter="feedback" id="tabFeedback">💬 反馈</button>
   </div>
 
   <div class="stats" id="stats"></div>
@@ -95,6 +96,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
   </div>
 
   <div class="list" id="list"></div>
+  <div class="list" id="feedbackList" style="display:none"></div>
   <div class="empty" id="empty">加载中...</div>
 </div>
 
@@ -201,7 +203,9 @@ function updateAutoBtn() { const b = document.getElementById('autoBtn'); b.textC
 document.querySelector('.tabs').addEventListener('click', e => {
   const tab = e.target.closest('.tab'); if (!tab) return;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  tab.classList.add('active'); filter = tab.dataset.filter; renderFiltered();
+  tab.classList.add('active'); filter = tab.dataset.filter;
+  if(filter==='feedback'){loadFeedback();document.getElementById('list').style.display='none';document.getElementById('feedbackList').style.display='flex'}
+  else{document.getElementById('list').style.display='flex';document.getElementById('feedbackList').style.display='none';renderFiltered()}
 });
 
 // ===== Load =====
@@ -493,6 +497,39 @@ function renderFiltered() {
       </div></div>`;
   }).join('');
 }
+
+// ===== Feedback =====
+let feedbackCache=[];
+async function loadFeedback(){
+  try{
+    feedbackCache=await sbApi('feedbacks?select=*&order=created_at.desc&limit=50');
+    renderFeedback();
+  }catch(e){}
+}
+function renderFeedback(){
+  const list=document.getElementById('feedbackList'),empty=document.getElementById('empty');
+  if(!feedbackCache.length){list.innerHTML='';empty.style.display='block';empty.textContent='暂无反馈';return}
+  empty.style.display='none';
+  list.innerHTML=feedbackCache.map(f=>{
+    const d=new Date(f.created_at);const ds=d.toLocaleDateString('zh-CN')+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+    const sc={unread:'var(--warn)',read:'var(--ok)',archived:'var(--text-dim)'};
+    return`<div class="row ${f.status}" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;align-items:center;gap:8px;width:100%">
+        <span style="font-size:0.7rem;color:${sc[f.status]||'var(--text-dim)'}">${f.status==='unread'?'🟡':f.status==='read'?'✅':'📁'} ${f.status}</span>
+        <span style="font-size:0.75rem;color:var(--text-dim)">${ds}</span>
+        ${f.contact?`<span style="font-size:0.75rem;color:var(--accent)">📧 ${esc(f.contact)}</span>`:''}
+        <div style="margin-left:auto;display:flex;gap:4px">
+          ${f.status==='unread'?`<button class="btn ok sm" onclick="markFeedback(${f.id},'read')">已读</button>`:''}
+          ${f.status!=='archived'?`<button class="btn warn sm" onclick="markFeedback(${f.id},'archived')">归档</button>`:''}
+          <button class="btn danger sm" onclick="delFeedback(${f.id})">删除</button>
+        </div>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text);line-height:1.5">${esc(f.content)}</div>
+    </div>`;
+  }).join('');
+}
+async function markFeedback(id,status){try{await sbApi(`feedbacks?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({status})});loadFeedback()}catch(e){}}
+async function delFeedback(id){if(!confirm('确认删除？'))return;try{await sbApi(`feedbacks?id=eq.${id}`,{method:'DELETE'});loadFeedback()}catch(e){}}
 
 // ===== Actions =====
 async function approve(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); load(); } catch (e) {} }
