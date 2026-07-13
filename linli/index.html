@@ -466,7 +466,8 @@ async function doLike(id,e){
   const f=btoa(navigator.userAgent+screen.width+'x'+screen.height).slice(0,32);
   try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}
   liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));
-  render();
+  // Update button inline
+  const btn=e.target.closest('.btn-like');if(btn){btn.classList.add('liked');btn.textContent='❤'}
   if(e){const rect=e.target.getBoundingClientRect();for(let i=0;i<8;i++){const h=document.createElement('div');h.className='heart-burst';h.textContent='❤';h.style.left=rect.left+rect.width/2+'px';h.style.top=rect.top+rect.height/2+'px';const a=Math.PI*2*i/8;h.style.setProperty('--hx',Math.cos(a)*40+'px');h.style.setProperty('--hy',Math.sin(a)*40+'px');h.style.color=`hsl(${350+Math.random()*20},90%,${55+Math.random()*20}%)`;document.body.appendChild(h);h.addEventListener('animationend',()=>h.remove())}}
 }
 
