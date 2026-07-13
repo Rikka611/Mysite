@@ -87,11 +87,9 @@ body::before {
 }
 html.light body::before { opacity: 1; }
 html.light .stars { opacity: 0; animation: none; }
-html.light .orb { opacity: 0.35; }
 @media (prefers-color-scheme: light) {
   html:not(.dark):not(.light) body::before { opacity: 1; }
   html:not(.dark):not(.light) .stars { opacity: 0; animation: none; }
-  html:not(.dark):not(.light) .orb { opacity: 0.35; }
 }
 
 /* stars */
@@ -114,19 +112,6 @@ html.light .orb { opacity: 0.35; }
   transition: transform 0.2s ease-out;
 }
 
-/* orbs */
-.orb { position: fixed; z-index: 0; pointer-events: none; border-radius: 50%; filter: blur(80px); opacity: 0.28; animation: float 25s ease-in-out infinite; }
-.orb-1 { width: 500px; height: 500px; background: #38bdf8; top: -15%; left: -10%; }
-.orb-2 { width: 400px; height: 400px; background: #818cf8; bottom: -12%; right: -8%; animation-delay: -9s; }
-.orb-3 { width: 350px; height: 350px; background: #c084fc; top: 55%; left: 60%; animation-delay: -17s; }
-@keyframes float {
-  0% { transform: translate(5vw, 10vh) scale(0.9); }
-  25% { transform: translate(35vw, -15vh) scale(1.08); }
-  50% { transform: translate(15vw, 35vh) scale(0.88); }
-  75% { transform: translate(-10vw, 5vh) scale(1.04); }
-  100% { transform: translate(5vw, 10vh) scale(0.9); }
-}
-
 /* cursor glow */
 .cursor-glow {
   position: fixed; z-index: 0; top: 0; left: 0;
@@ -135,7 +120,7 @@ html.light .orb { opacity: 0.35; }
   pointer-events: none; transform: translate(-50%, -50%);
   transition: opacity 0.5s; opacity: 0;
 }
-@media (max-width: 768px) { .cursor-glow, .orb { display: none; } }
+@media (max-width: 768px) { .cursor-glow { display: none; } }
 
 /* nav */
 nav {
@@ -276,9 +261,6 @@ footer { text-align: center; padding: 24px; border-top: 1px solid var(--footer-b
 <body>
 
 <div class="stars"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <nav>
@@ -635,10 +617,10 @@ if (glow) {
 // ===== Gyroscope =====
 (function() {
   if (typeof DeviceOrientationEvent === 'undefined') return;
-  const stars = document.querySelector('.stars'), orbs = document.querySelectorAll('.orb');
+  const stars = document.querySelector('.stars');
   if (!stars) return; const maxShift = 28;
-  function handle(e) { const g = e.gamma || 0, b = e.beta || 0; const x = Math.max(-1, Math.min(1, g / 45)), y = Math.max(-1, Math.min(1, (b - 45) / 45)); stars.style.transition = 'none'; stars.style.transform = `translate(${x * maxShift}px, ${y * maxShift}px)`; orbs.forEach((o, i) => { o.style.transition = 'none'; o.style.transform = `translate(${x * maxShift * (i + 1) * 0.6}px, ${y * maxShift * (i + 1) * 0.6}px)`; }); }
-  function reset() { stars.style.transition = 'transform 0.8s ease-out'; stars.style.transform = ''; orbs.forEach(o => { o.style.transition = 'transform 0.8s ease-out'; o.style.transform = ''; }); }
+  function handle(e) { const g = e.gamma || 0, b = e.beta || 0; const x = Math.max(-1, Math.min(1, g / 45)), y = Math.max(-1, Math.min(1, (b - 45) / 45)); stars.style.transition = 'none'; stars.style.transform = `translate(${x * maxShift}px, ${y * maxShift}px)`; }
+  function reset() { stars.style.transition = 'transform 0.8s ease-out'; stars.style.transform = ''; }
   if (typeof DeviceOrientationEvent.requestPermission === 'function') {
     const ask = () => { DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') { window.addEventListener('deviceorientation', handle); let t; window.addEventListener('deviceorientation', () => { clearTimeout(t); t = setTimeout(reset, 3000); }); } }).catch(() => {}); };
     document.addEventListener('click', ask, { once: true }); document.addEventListener('touchstart', ask, { once: true });
