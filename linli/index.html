@@ -389,7 +389,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
     <input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">你的昵称</label>
     <input type="text" id="inputAuthor" placeholder="匿名" maxlength="30" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
-    <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">简介 <span style="color:#ef4444">*</span>（标注出处）</label>
+    <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">简介 <span style="color:#ef4444">*</span>（MIDI来源）</label>
     <textarea id="inputDesc" placeholder="简单介绍一下曲子来源..." maxlength="200" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:60px"></textarea>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">标签（空格分隔）</label>
     <input type="text" id="inputTags" placeholder="原神 璃月 抒情" maxlength="100" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
@@ -502,7 +502,7 @@ async function doSubmit(){
   const errEl=document.getElementById('modalError');
   if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请输入六位分享码（字母或数字）';return}
   if(!title||title.length>50){errEl.textContent='曲名不能为空且不超过50字';return}
-  if(!desc){errEl.textContent='请填写简介并标注出处';return}
+  if(!desc){errEl.textContent='请填写简介（MIDI来源）';return}
   try{
     await sbApi('linli_codes',{method:'POST',body:JSON.stringify({code,title,description:desc,author,tags,status:autoApprove?'approved':'pending'})});
     closeModal();showToast(autoApprove?'提交成功！':'提交成功，审核后显示');render();
