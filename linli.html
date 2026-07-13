@@ -160,6 +160,7 @@ footer { text-align: center; padding: 24px; border-top: 1px solid var(--border);
   <span style="font-size:0.8rem;color:var(--text-dim)">审核 · </span>
   <button class="admin-btn approve" onclick="approveAll()">全部通过</button>
   <button class="admin-btn danger" onclick="rejectAll()">全部拒绝</button>
+  <button class="admin-btn danger" onclick="deleteRejected()">清理已拒绝</button>
   <button class="admin-btn" onclick="exitAdmin()">退出</button>
 </div>
 
@@ -173,7 +174,7 @@ footer { text-align: center; padding: 24px; border-top: 1px solid var(--border);
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h3>提交分享码</h3>
-    <label>六位分享码 *</label><input type="text" id="inputCode" placeholder="000000" maxlength="6">
+    <label>六位分享码 *</label><input type="text" id="inputCode" placeholder="ABC123" maxlength="6">
     <label>曲名 *</label><input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50">
     <label>你的昵称</label><input type="text" id="inputAuthor" placeholder="匿名" maxlength="30">
     <label>简介</label><textarea id="inputDesc" placeholder="简单介绍一下..." maxlength="200"></textarea>
@@ -289,12 +290,16 @@ async function doSubmit() {
   const desc = document.getElementById('inputDesc').value.trim();
   const tags = document.getElementById('inputTags').value.trim();
   const errEl = document.getElementById('modalError');
-  if (!/^\d{6}$/.test(code)) { errEl.textContent = '请输入六位数字分享码'; return; }
+  if (!/^[A-Za-z0-9]{6}$/.test(code)) { errEl.textContent = '请输入六位分享码（字母或数字）'; return; }
   if (!title || title.length > 50) { errEl.textContent = '曲名不能为空且不超过50字'; return; }
   try {
     await sbApi('linli_codes', { method: 'POST', body: JSON.stringify({ code, title, description: desc, author, tags, status: 'pending' }) });
     closeModal(); showToast('提交成功，审核后显示'); render();
-  } catch (e) { errEl.textContent = '提交失败，请重试'; }
+  } catch (e) {
+    let msg = e.message;
+    try { msg = JSON.parse(e.message).message || msg; } catch (_) {}
+    errEl.textContent = msg;
+  }
 }
 
 // ===== Admin =====
@@ -324,16 +329,23 @@ async function rejectAll() {
 
 async function approveOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); showToast('已通过'); render(); } catch (e) {} }
 async function rejectOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) }); showToast('已拒绝'); render(); } catch (e) {} }
+async function deleteOne(id) { try { await sbApi(`linli_codes?id=eq.${id}`, { method: 'DELETE' }); showToast('已删除'); render(); } catch (e) { showToast('删除失败'); } }
+async function deleteRejected() {
+  const data = await sbApi('linli_codes?select=id&status=eq.rejected');
+  for (const item of data) { try { await sbApi(`linli_codes?id=eq.${item.id}`, { method: 'DELETE' }); } catch (e) {} }
+  showToast('已清理'); render();
+}
 
 // ===== Render =====
 function buildCard(item) {
   const isLiked = liked.includes(item.id);
   const tagList = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 5) : [];
-  const adminBtns = adminMode && item.status === 'pending' ? `
-    <div class="actions" style="margin-top:4px">
-      <button class="btn btn-copy" onclick="approveOne(${item.id})" style="font-size:0.7rem;padding:4px 12px;">通过</button>
-      <button class="btn btn-like" onclick="rejectOne(${item.id})" style="font-size:0.7rem;padding:4px 12px;">拒绝</button>
-    </div>` : '';
+  let adminBtns = '';
+  if (adminMode) {
+    adminBtns = `<div class="actions" style="margin-top:4px"><span style="font-size:0.7rem;color:var(--text-dim);margin-right:4px">${item.status}</span>`;
+    if (item.status === 'pending') adminBtns += `<button class="btn btn-copy" onclick="approveOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;">通过</button><button class="btn btn-like" onclick="rejectOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;">拒绝</button>`;
+    adminBtns += `<button class="btn btn-like" onclick="deleteOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;color:#ef4444;border-color:rgba(239,68,68,0.4);">删除</button></div>`;
+  }
 
   return `
     <div class="card${adminMode && item.status === 'pending' ? ' pending' : ''}">
@@ -358,7 +370,7 @@ async function render() {
   const grid = document.getElementById('grid');
   const empty = document.getElementById('empty');
 
-  if (adminMode) { loadPending(); return; }
+  if (adminMode) { loadAll(); return; }
 
   grid.innerHTML = ''; empty.style.display = 'none';
 
@@ -375,11 +387,11 @@ async function render() {
   } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败，请刷新重试'; }
 }
 
-async function loadPending() {
+async function loadAll() {
   const grid = document.getElementById('grid'); const empty = document.getElementById('empty');
   try {
     const data = await fetchAll();
-    if (!data.length) { empty.style.display = 'block'; empty.textContent = '无待审核项'; grid.innerHTML = ''; return; }
+    if (!data.length) { empty.style.display = 'block'; empty.textContent = '暂无数据'; grid.innerHTML = ''; return; }
     empty.style.display = 'none'; grid.innerHTML = data.map(item => buildCard(item)).join('');
   } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败'; }
 }

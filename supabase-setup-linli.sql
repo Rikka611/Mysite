@@ -1,7 +1,7 @@
 -- 林离 MIDI 分享码表
 CREATE TABLE linli_codes (
   id SERIAL PRIMARY KEY,
-  code VARCHAR(6) NOT NULL CHECK (code ~ '^[0-9]{6}$'),
+  code VARCHAR(6) NOT NULL CHECK (code ~ '^[A-Za-z0-9]{6}$'),
   title TEXT NOT NULL CHECK (char_length(title) BETWEEN 1 AND 50),
   description TEXT DEFAULT '',
   author TEXT DEFAULT '匿名',
@@ -27,4 +27,4 @@ CREATE POLICY "anyone can update views" ON linli_codes FOR UPDATE
   WITH CHECK (status = 'approved');
 
 GRANT USAGE ON SEQUENCE linli_codes_id_seq TO anon;
-GRANT INSERT, SELECT, UPDATE ON public.linli_codes TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON public.linli_codes TO anon;
