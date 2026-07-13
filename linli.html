@@ -162,39 +162,50 @@ html.light .theme-btn .icon-moon { display: inline; }
 .search-bar button { padding: 10px 20px; border-radius: 50px; border: none; background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 600; font-family: system-ui, -apple-system, sans-serif; }
 
 /* content */
-.content { max-width: 1000px; margin: 0 auto; padding: 0 24px 60px; position: relative; z-index: 1; }
-.grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; perspective: 1200px; }
-.card {
-  flex: 0 1 290px; background: var(--card-bg); border: 1px solid var(--card-border);
-  border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+.content { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; position: relative; z-index: 1; }
+.list { display: flex; flex-direction: column; gap: 8px; }
+.row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 12px 16px; backdrop-filter: blur(6px);
   transition: border-color 0.25s, box-shadow 0.25s;
   transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  backdrop-filter: blur(6px); position: relative; overflow: hidden;
+  position: relative; overflow: hidden;
 }
-.card:hover { border-color: var(--card-hover-border); box-shadow: 0 12px 40px var(--card-hover-shadow), 0 0 0 1px var(--card-hover-ring); }
-.card .glare {
-  position: absolute; inset: 0; pointer-events: none; z-index: 2;
-  border-radius: 16px;
-  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.12) 0%, transparent 60%);
+.row:hover { border-color: var(--card-hover-border); box-shadow: 0 4px 20px var(--card-hover-shadow), 0 0 0 1px var(--card-hover-ring); }
+.row .glare {
+  position: absolute; inset: 0; pointer-events: none; z-index: 2; border-radius: 12px;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.1) 0%, transparent 60%);
   opacity: 0; transition: opacity 0.3s;
 }
-.card:hover .glare { opacity: 1; }
-.card.tilting { will-change: transform; }
-.card.tilting .glare { opacity: 1; }
-.card .code {
-  font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; text-align: center;
+.row:hover .glare { opacity: 1; }
+.row.tilting { will-change: transform; }
+.row.tilting .glare { opacity: 1; }
+.row .rank { font-size: 1.2rem; font-weight: 800; color: var(--text-dim); min-width: 28px; text-align: center; position: relative; z-index: 3; }
+.row:nth-child(1) .rank { color: #fbbf24; }
+.row:nth-child(2) .rank { color: #94a3b8; }
+.row:nth-child(3) .rank { color: #d97706; }
+.row .code {
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 3px;
   background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  cursor: pointer; user-select: all; font-variant-numeric: tabular-nums; position: relative; z-index: 3;
+  cursor: pointer; user-select: all; font-variant-numeric: tabular-nums; min-width: 80px; text-align: center; position: relative; z-index: 3;
 }
-.card .title { font-size: 1.05rem; font-weight: 600; color: var(--heading); text-align: center; position: relative; z-index: 3; }
-.card .desc { color: var(--text-muted); font-size: 0.85rem; text-align: center; flex: 1; position: relative; z-index: 3; }
-.card .meta { display: flex; justify-content: center; gap: 16px; font-size: 0.75rem; color: var(--text-dim); position: relative; z-index: 3; }
-.card .tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; position: relative; z-index: 3; }
-.card .tag { font-size: 0.7rem; padding: 3px 10px; border-radius: 50px; background: var(--tag-bg); color: var(--tag-text); }
-.card .actions { display: flex; gap: 8px; justify-content: center; position: relative; z-index: 3; }
-.card .btn {
-  padding: 6px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 500; cursor: pointer;
-  border: none; font-family: system-ui, -apple-system, sans-serif; transition: opacity 0.2s;
+.row .info { flex: 1; min-width: 0; position: relative; z-index: 3; }
+.row .title { font-size: 0.95rem; font-weight: 600; color: var(--heading); }
+.row .sub { font-size: 0.75rem; color: var(--text-dim); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.row .tag { font-size: 0.65rem; padding: 2px 8px; border-radius: 50px; background: var(--tag-bg); color: var(--tag-text); }
+.row .stats { display: flex; gap: 10px; font-size: 0.75rem; color: var(--text-dim); white-space: nowrap; position: relative; z-index: 3; }
+.row .btn {
+  padding: 6px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 500; cursor: pointer;
+  border: none; font-family: system-ui, -apple-system, sans-serif; transition: opacity 0.2s; white-space: nowrap;
+}
+.row.pending { border-color: rgba(251,191,36,0.3); }
+
+@media (max-width: 600px) {
+  .row { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .row .code { min-width: 70px; font-size: 0.95rem; }
+  .row .stats { width: 100%; justify-content: flex-start; }
+  .row .rank { font-size: 1rem; min-width: 22px; }
 }
 .btn-copy { background: linear-gradient(90deg, #38bdf8, #818cf8); color: #fff; }
 .btn-like { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); }
@@ -298,7 +309,7 @@ footer { text-align: center; padding: 24px; border-top: 1px solid var(--footer-b
 </div>
 
 <div class="content">
-  <div class="grid" id="grid"></div>
+  <div class="list" id="grid"></div>
   <div class="empty" id="empty">加载中...</div>
 </div>
 
@@ -497,28 +508,32 @@ async function deleteRejected() {
 }
 
 // ===== Render =====
-function buildCard(item) {
+function buildRow(item, idx) {
   const isLiked = liked.includes(item.id);
-  const tagList = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 5) : [];
+  const tagList = item.tags ? item.tags.split(/[\s,]+/).filter(Boolean).slice(0, 3) : [];
+  const rank = tab === 'hot' ? (idx + 1) : null;
   let adminBtns = '';
   if (adminMode) {
-    adminBtns = `<div class="actions" style="margin-top:4px"><span style="font-size:0.7rem;color:var(--text-dim);margin-right:4px">${item.status}</span>`;
-    if (item.status === 'pending') adminBtns += `<button class="btn btn-copy" onclick="approveOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;">通过</button><button class="btn btn-like" onclick="rejectOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;">拒绝</button>`;
-    adminBtns += `<button class="btn btn-like" onclick="deleteOne(${item.id})" style="font-size:0.7rem;padding:4px 10px;color:#ef4444;border-color:rgba(239,68,68,0.4);">删除</button></div>`;
+    adminBtns = `<span style="font-size:0.65rem;color:var(--text-dim)">[${item.status}]</span>`;
+    if (item.status === 'pending') adminBtns += `<button class="btn btn-copy" onclick="approveOne(${item.id})" style="font-size:0.65rem;padding:4px 8px;">通过</button><button class="btn btn-like" onclick="rejectOne(${item.id})" style="font-size:0.65rem;padding:4px 8px;">拒绝</button>`;
+    adminBtns += `<button class="btn btn-like" onclick="deleteOne(${item.id})" style="font-size:0.65rem;padding:4px 8px;color:#ef4444;border-color:rgba(239,68,68,0.4);">删除</button>`;
   }
+  const desc = item.description || (item.author && item.author !== '匿名' ? item.author : '');
   return `
-    <div class="card${adminMode && item.status === 'pending' ? ' pending' : ''}">
+    <div class="row${adminMode && item.status === 'pending' ? ' pending' : ''}">
       <div class="glare"></div>
+      ${rank !== null ? `<div class="rank">#${rank}</div>` : ''}
       <div class="code" onclick="copyCode('${item.code}')" title="点击复制">${item.code}</div>
-      <div class="title">${item.title}</div>
-      ${item.description ? `<div class="desc">${item.description}</div>` : ''}
-      ${tagList.length ? `<div class="tags">${tagList.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
-      <div class="meta"><span>👤 ${item.author}</span><span>👁 ${item.views || 0}</span><span>❤ ${item.likes || 0}</span></div>
-      <div class="actions">
-        <button class="btn btn-copy" onclick="copyCode('${item.code}')">📋 复制</button>
-        <button class="btn btn-like${isLiked ? ' liked' : ''}" onclick="doLike(${item.id})">${isLiked ? '❤' : '🤍'} ${item.likes || 0}</button>
+      <div class="info">
+        <div class="title">${item.title}</div>
+        <div class="sub">${desc ? `<span>${desc}</span>` : ''}${tagList.length ? tagList.map(t => `<span class="tag">${t}</span>`).join('') : ''}</div>
       </div>
-      ${adminBtns}
+      <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
+      <div style="display:flex;gap:6px;position:relative;z-index:3">
+        <button class="btn btn-copy" onclick="copyCode('${item.code}')">📋</button>
+        <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id})">${isLiked?'❤':'🤍'}</button>
+        ${adminBtns}
+      </div>
     </div>`;
 }
 
@@ -535,7 +550,7 @@ async function render() {
       data = await searchCodes(encodeURIComponent(q));
     } else { data = await fetchApproved(); }
     if (!data.length) { empty.style.display = 'block'; empty.textContent = tab === 'search' ? '没有找到匹配的分享码' : '暂无分享码，点右下角 + 提交第一个吧！'; return; }
-    data.forEach(item => { const d = document.createElement('div'); d.innerHTML = buildCard(item); grid.appendChild(d.firstElementChild); trackView(item.id); });
+    data.forEach((item, i) => { const d = document.createElement('div'); d.innerHTML = buildRow(item, i); grid.appendChild(d.firstElementChild); trackView(item.id); });
   } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败，请刷新重试'; }
 }
 
@@ -544,7 +559,7 @@ async function loadAll() {
   try {
     const data = await fetchAll();
     if (!data.length) { empty.style.display = 'block'; empty.textContent = '暂无数据'; grid.innerHTML = ''; return; }
-    empty.style.display = 'none'; grid.innerHTML = data.map(item => buildCard(item)).join('');
+    empty.style.display = 'none'; grid.innerHTML = data.map((item, i) => buildRow(item, i)).join('');
   } catch (e) { empty.style.display = 'block'; empty.textContent = '加载失败'; }
 }
 
@@ -590,10 +605,10 @@ if (glow) {
     const done = () => { card.style.transition = 'transform 0.3s ease-out'; card.style.removeProperty('--rx'); card.style.removeProperty('--ry'); card.style.removeProperty('--gx'); card.style.removeProperty('--gy'); card.addEventListener('transitionend', function c(){card.style.transition='';card.removeEventListener('transitionend',c);},{once:true}); };
     if (glare) glare.addEventListener('transitionend', () => { done(); }, { once: true }); else done();
   }
-  document.addEventListener('mouseover', e => { begin(e.target.closest('.card'), e.clientX, e.clientY); });
+  document.addEventListener('mouseover', e => { begin(e.target.closest('.row'), e.clientX, e.clientY); });
   document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
-  document.addEventListener('mouseout', e => { const card = e.target.closest('.card'); if (!card) return; if (e.relatedTarget && card.contains(e.relatedTarget)) return; end(card); });
-  document.addEventListener('touchstart', e => { const t = e.touches[0]; begin(t.target.closest('.card'), t.clientX, t.clientY); }, { passive: true });
+  document.addEventListener('mouseout', e => { const row = e.target.closest('.row'); if (!row) return; if (e.relatedTarget && row.contains(e.relatedTarget)) return; end(row); });
+  document.addEventListener('touchstart', e => { const t = e.touches[0]; begin(t.target.closest('.row'), t.clientX, t.clientY); }, { passive: true });
   document.addEventListener('touchmove', e => { const t = e.touches[0]; move(t.clientX, t.clientY); }, { passive: true });
   document.addEventListener('touchend', () => { if (cur) { reset(cur); cur = null; rect = null; } });
 })();
