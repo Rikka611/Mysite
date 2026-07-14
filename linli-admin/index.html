@@ -221,7 +221,6 @@ body {
 // ================================================================
 
 // SB config from shared/js/
-const PW_HASH = 'f9e00d8f29c089c085367aff29e8e1a78ac42c5c36a5e90a41561e00f9d97eed';
 let filter = 'all', autoApprove = true, dataCache = [], feedbackCache = [];
 
 // ---- 背景特效 ----
@@ -266,8 +265,7 @@ async function doLogin(){
   if(_loginStage===0){
     const pw=document.getElementById('pwInput').value
     if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
-    const hash=await sha256(pw)
-    if(hash!==PW_HASH){document.getElementById('loginErr').textContent='密码错误';return}
+    try{const r=await adminApi('check_pw',{pw});if(!r||r.error){document.getElementById('loginErr').textContent='密码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
     sessionStorage.setItem("admin_pw",pw);
     _loginStage=1;document.getElementById('pwInput').style.display='none'
     document.getElementById('totpInput').style.display='block'
@@ -451,6 +449,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.4</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.5</div>
 </body>
 </html>

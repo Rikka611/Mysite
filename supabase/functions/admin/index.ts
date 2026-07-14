@@ -83,6 +83,10 @@ Deno.serve(async (req: Request) => {
         await db.from('feedbacks').update({ status: payload.status }).eq('id', payload.id)
         break
       }
+      case 'check_pw': {
+        if (payload.pw !== ADMIN_PW) result = { error: 'wrong password' }
+        break
+      }
       case 'check_totp': {
         // Pass through to RPC
         const { data: totpOk } = await db.rpc('check_totp', { code: payload.code })
