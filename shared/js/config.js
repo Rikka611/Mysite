@@ -4,5 +4,5 @@
 // ============================================================
 window.__LINLI_CONFIG__ = {
   SB_URL: 'https://naivizrdefonlelndzqr.supabase.co',
-  SB_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5haXZpenJkZWZvbmxlbG5kenFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTU4MjcsImV4cCI6MjA5NzY5MTgyN30.66G4T_7JDVjsw0RGRC_OwcYBgMwPk33c3sCrlmzrxvI',
+  SB_KEY: 'sb_publishable_-LpxA4RGDCS-NzuHoeMYDg_jD7bdDTq',
 }
