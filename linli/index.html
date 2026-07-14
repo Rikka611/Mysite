@@ -262,6 +262,7 @@ html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{di
   animation:fabPulse 3s ease-in-out infinite;
 }
 @keyframes fabPulse{0%,100%{box-shadow:0 4px 20px rgba(56,189,248,0.4)}50%{box-shadow:0 4px 35px rgba(56,189,248,0.7)}}
+@keyframes replyPulse{0%,100%{box-shadow:0 4px 20px rgba(245,158,11,0.4)}50%{box-shadow:0 4px 35px rgba(245,158,11,0.7)}}
 .fab:hover{transform:scale(1.15) rotate(90deg);box-shadow:0 6px 30px rgba(56,189,248,0.6)}
 .fab:active{transform:scale(0.9)}
 
@@ -383,7 +384,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   <div class="empty" id="empty">修bug中...</div>
 </div>
 
-<button id="replyFab" title="反馈回复" onclick="openReplies()" style="position:fixed;bottom:100px;right:32px;z-index:50;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.4);transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.2);animation:fabPulse 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">📬<span id="replyBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border:2px solid var(--bg-start);border-radius:50%;display:none"></span></button>
+<button id="replyFab" title="反馈回复" onclick="openReplies()" style="position:fixed;bottom:100px;right:32px;z-index:50;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.4);transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.2);animation:replyPulse 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">📬<span id="replyBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border:2px solid var(--bg-start);border-radius:50%;display:none"></span></button>
 <button class="fab" id="fab" title="提交分享码">+</button>
 
 <div class="modal-overlay" id="modalOverlay">
