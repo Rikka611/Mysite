@@ -1,0 +1,7 @@
+BSide Admin TOTP 备用密钥
+=================================
+密钥: 33TXQL6TIXQSPQFN5QJU7GXF37QYWIMT
+保存日期: 2026-07-15
+
+用途: 换手机时重新绑定 Authenticator App
+      手动输入此密钥即可恢复

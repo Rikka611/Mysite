@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>扫描绑定 TOTP</title>
+<style>body{background:#0a0a0f;color:#e0e0e0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui;gap:16px}#qr{width:200px;height:200px;background:#fff;padding:16px;border-radius:16px}.info{color:#889;font-size:0.85rem;text-align:center;max-width:320px}kbd{background:#1a1a2e;padding:4px 8px;border-radius:4px;font-size:0.9rem;word-break:break-all}</style>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script></head>
+<body>
+<h2 style="background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.5rem">BSide Admin TOTP 绑定</h2>
+<div id="qr"></div>
+<div class="info">
+  <p>用 Google Authenticator / Microsoft Authenticator 扫码</p>
+  <p style="margin-top:8px">或手动输入密钥：<br><kbd>33TXQL6TIXQSPQFN5QJU7GXF37QYWIMT</kbd></p>
+  <p style="margin-top:16px;color:#f59e0b">⚠ 请截图保存密钥，换手机时需要</p>
+</div>
+<script>
+new QRCode(document.getElementById('qr'), {
+  text: 'otpauth://totp/BSideAdmin?secret=33TXQL6TIXQSPQFN5QJU7GXF37QYWIMT&issuer=BSide',
+  width:200,height:200,colorDark:'#000',colorLight:'#fff'
+})
+</script>
+</body>
+</html>
