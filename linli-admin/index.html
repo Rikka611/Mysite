@@ -397,12 +397,13 @@ function renderFeedback(){
   em.style.display='none'
   feedbackCache.forEach(f=>{
     const d=document.createElement('div');d.className='row'
-    d.innerHTML='<div class="info"><div class="title">'+escapeHtml(f.content||'')+'</div><div class="sub" style="font-size:0.65rem">'+new Date(f.created_at).toLocaleString()+'</div></div><div class="actions"><button class="btn ok sm" onclick="markFeedback('+f.id+',\'resolved\')">解决</button><button class="btn danger sm" onclick="delFeedback('+f.id+')">删除</button></div>'
+    const replied=f.reply?'<span style="font-size:0.65rem;color:var(--ok);margin-right:4px">已回复</span>':'';d.innerHTML='<div class="info"><div class="title">'+escapeHtml(f.content||'')+'</div><div class="sub" style="font-size:0.65rem">'+new Date(f.created_at).toLocaleString()+'</div>'+(f.reply?'<div style="font-size:0.8rem;color:var(--ok);margin-top:4px">回复: '+escapeHtml(f.reply)+'</div>':'')+'</div><div class="actions">'+replied+'<button class="btn ok sm" onclick="replyFeedback('+f.id+')">回复</button><button class="btn ok sm" onclick="markFeedback('+f.id+',\'resolved\')">解决</button><button class="btn danger sm" onclick="delFeedback('+f.id+')">删除</button></div>'
     fl.appendChild(d)
   })
 }
 async function markFeedback(id,status){try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status})});loadFeedback();showToast('状态已更新','ok')}catch(e){}}
 async function delFeedback(id){if(!confirm('确认删除？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'DELETE'});loadFeedback()}catch(e){}}
+async function replyFeedback(id){const txt=prompt('回复内容：');if(!txt)return;try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reply:txt,reply_read:false})});loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
 // Auto-restore session
 if(localStorage.getItem('admin_token')===PW_HASH){srKey=localStorage.getItem('admin_sr')||'';showMain()}
 // Auto refresh every 5 minutes

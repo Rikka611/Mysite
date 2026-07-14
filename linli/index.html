@@ -488,7 +488,8 @@ async function doFeedback(){
   const content=document.getElementById('feedbackContent').value.trim();
   const err=document.getElementById('feedbackError');
   if(!content){err.textContent='请输入意见内容';return}
-  try{await sbApi('feedbacks',{method:'POST',body:JSON.stringify({content})});closeFeedback();showToast('感谢反馈！')}catch(e){err.textContent='提交失败，请重试'}
+  let f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}
+  try{await sbApi('feedbacks',{method:'POST',body:JSON.stringify({content,fp:f})});closeFeedback();showToast('感谢反馈！')}catch(e){err.textContent='提交失败，请重试'}
 }
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');['inputCode','inputTitle','inputAuthor','inputDesc','inputTags'].forEach(id=>document.getElementById(id).value='')}
@@ -578,6 +579,15 @@ if(glow){let pending=false;document.addEventListener('mousemove',e=>{if(pending)
   if(sessionStorage.getItem('pv_counted'))return;
   sessionStorage.setItem('pv_counted','1');
   try{await sbApi('page_visits',{method:'POST',body:JSON.stringify({page:'linli'})})}catch(e){}
+})();
+
+// Check for feedback replies
+(async function(){
+  let f=sessionStorage.getItem('sid');if(!f)return;
+  try{
+    const fb=await sbApi('feedbacks?select=id,content,reply&fp=eq.'+encodeURIComponent(f)+'&reply_read=eq.false');
+    if(fb.length){const r=fb[0];if(r.reply){alert('📬 你的反馈收到了回复：\n\n"'+r.reply+'"');await sbApi('feedbacks?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({reply_read:true})})}}
+  }catch(e){}
 })();
 
 render();
