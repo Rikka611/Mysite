@@ -403,11 +403,23 @@ function renderFeedback(){
 }
 async function markFeedback(id,status){try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status})});loadFeedback();showToast('状态已更新','ok')}catch(e){}}
 async function delFeedback(id){if(!confirm('确认删除？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'DELETE'});loadFeedback()}catch(e){}}
-async function replyFeedback(id){const txt=prompt('回复内容：');if(!txt)return;try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reply:txt,reply_read:false})});loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
+let _replyId=0;function replyFeedback(id){_replyId=id;document.getElementById('replyOverlay').style.display='flex';document.getElementById('replyText').value='';document.getElementById('replyText').focus()}
+function closeReply(){document.getElementById('replyOverlay').style.display='none';_replyId=0}
+async function doReply(){const txt=document.getElementById('replyText').value.trim();if(!txt||!_replyId)return;try{await sbApi('feedbacks?id=eq.'+_replyId,{method:'PATCH',body:JSON.stringify({reply:txt,reply_read:false})});closeReply();loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
 // Auto-restore session
 if(localStorage.getItem('admin_token')===PW_HASH){srKey=localStorage.getItem('admin_sr')||'';showMain()}
 // Auto refresh every 5 minutes
 setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')load()},300000)
 </script>
+<div class="modal-overlay" id="replyOverlay" style="position:fixed;inset:0;z-index:300;display:none;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)closeReply()">
+  <div class="modal" style="background:var(--elevated,#1c1c1c);border:1px solid var(--border);border-radius:16px;padding:28px;width:400px;max-width:90vw">
+    <h3 style="font-size:1rem;font-weight:600;margin-bottom:16px;text-align:center;color:var(--text)">回复反馈</h3>
+    <textarea id="replyText" placeholder="输入回复内容..." maxlength="500" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:80px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+      <button class="btn" onclick="closeReply()">取消</button>
+      <button class="btn primary" onclick="doReply()">发送回复</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
