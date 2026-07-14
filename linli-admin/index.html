@@ -391,6 +391,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
 
 <div class="glass-nav" id="navBar">
   <h1>BSide Olivia Lin</h1>
+  <button class="theme-btn" id="themeToggle" title="切换日夜模式"><span class="icon-sun">☀️</span><span class="icon-moon">🌙</span></button>
   <div class="btns">
     <button class="btn active" id="autoBtn" onclick="toggleAuto()">自动通过：开</button>
     <button class="btn ok" onclick="approveAllPending()">全部通过</button>
@@ -403,6 +404,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
 <div class="container">
 <div class="login" id="loginBox">
   <h1>BSide Olivia Lin</h1>
+  
   <input type="password" id="pwInput" placeholder="管理密码" autofocus>
   <input type="text" id="totpInput" placeholder="Authenticator 6位码" maxlength="6" style="display:none;padding:12px 20px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:1rem;outline:none;text-align:center;width:320px;font-family:system-ui,-apple-system,sans-serif">
       <button id="loginBtn" onclick="doLogin()">进入管理</button>
@@ -647,6 +649,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.9</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.10</div>
 </body>
 </html>
