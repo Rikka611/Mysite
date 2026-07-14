@@ -297,9 +297,15 @@ function toggleAuto(){autoApprove=!autoApprove;document.getElementById('autoBtn'
 
 // ---- API ----
 function adminHeaders(){const cfg=window.__LINLI_CONFIG__||{};const key=srKey||cfg.SB_KEY||'';return{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',Prefer:'return=minimal'}}
+const SB_URL='https://naivizrdefonlelndzqr.supabase.co';
+const SB_KEY='sb_publishable_-LpxA4RGDCS-NzuHoeMYDg_jD7bdDTq';
 const sbApi = async function(path, options = {}) {
-  if(srKey){const cfg=window.__LINLI_CONFIG__||{};const url=(cfg.SB_URL||'')+'/rest/v1/'+path;const res=await fetch(url,{headers:{...adminHeaders(),...options.headers},...options});if(!res.ok)throw new Error(await res.text());const t=await res.text();return t?JSON.parse(t):[]}
-  return window.sbApi(path, options)
+  const key=srKey||SB_KEY;
+  const url=`${SB_URL}/rest/v1/${path}`;
+  const hdrs={apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',Prefer:'return=minimal',...(options.headers||{})};
+  const res=await fetch(url,{headers:hdrs,method:options.method||'GET',body:options.body});
+  if(!res.ok)throw new Error(await res.text());
+  const t=await res.text();return t?JSON.parse(t):[];
 }
 
 // ---- Init ----
@@ -445,6 +451,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.1.5</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.1.6</div>
 </body>
 </html>
