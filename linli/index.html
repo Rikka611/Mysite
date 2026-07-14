@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://naivizrdefonlelndzqr.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BSide Olivia Lin 分享码</title>
 <style>
@@ -478,12 +479,12 @@ async function fetchApproved(){
 async function searchCodes(q){return sbApi(`linli_codes?select=*&status=eq.approved&or=(title.ilike.*${q}*,description.ilike.*${q}*,author.ilike.*${q}*,tags.ilike.*${q}*)&order=likes.desc&limit=200`)}
 
 async function trackView(id){
-  let f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}
+  let f=window.getVisitorToken();if(!f){f=}
   try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'view'})})}catch(e){}
 }
 
 async function doLike(id,e){
-  let f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}
+  let f=window.getVisitorToken();if(!f){f=}
   try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}
   liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));
   render(true);
@@ -510,7 +511,7 @@ async function doFeedback(){
   const content=document.getElementById('feedbackContent').value.trim();
   const err=document.getElementById('feedbackError');
   if(!content){err.textContent='请输入意见内容';return}
-  let f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}
+  let f=window.getVisitorToken();if(!f){f=}
   try{await sbApi('feedbacks',{method:'POST',body:JSON.stringify({content,fp:f})});closeFeedback();showToast('感谢反馈！')}catch(e){err.textContent='提交失败，请重试'}
 }
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
@@ -610,7 +611,7 @@ document.getElementById('notifyToggle').checked=notifyEnabled;
 function toggleNotify(){notifyEnabled=!notifyEnabled;localStorage.setItem('reply_notify',notifyEnabled);if(!notifyEnabled)document.getElementById('replyBadge').style.display='none'}
 
 async function checkReplies(){
-  let f=sessionStorage.getItem('sid');if(!f||!notifyEnabled)return;
+  let f=window.getVisitorToken();if(!f||!notifyEnabled)return;
   try{replyData=await sbApi('feedbacks?select=id,content,reply,reply_read,created_at,replied_at,fp&or=(fp.eq.'+encodeURIComponent(f)+',fp.eq.)&reply=neq.&order=created_at.desc');const unread=replyData.filter(r=>!r.reply_read);document.getElementById('replyBadge').style.display=unread.length?'block':'none';document.getElementById('replyFab').style.display='flex'}catch(e){}
 }
 async function openReplies(){
