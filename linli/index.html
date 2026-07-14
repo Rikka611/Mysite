@@ -330,6 +330,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   .row .actions{width:auto;gap:2px}
   .row .btn{padding:4px 7px;font-size:0.68rem}
   .fab{bottom:16px;right:16px;width:44px;height:44px;font-size:1.2rem}
+  #replyFab{bottom:78px!important;right:16px!important;width:44px!important;height:44px!important;font-size:1.1rem!important}
   nav{padding:0 8px}
   .tabs{gap:4px}
   .tab{padding:6px 14px;font-size:0.75rem}
@@ -380,6 +381,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   <div class="empty" id="empty">修bug中...</div>
 </div>
 
+<button id="replyFab" title="反馈回复" onclick="openReplies()" style="position:fixed;bottom:100px;right:32px;z-index:50;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.4);transition:transform 0.2s;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">📬<span id="replyBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border:2px solid var(--bg-start);border-radius:50%;display:none"></span></button>
 <button class="fab" id="fab" title="提交分享码">+</button>
 
 <div class="modal-overlay" id="modalOverlay">
@@ -403,6 +405,18 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   </div>
 </div>
 
+<div class="modal-overlay" id="replyListOverlay" style="z-index:200;display:none;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;position:fixed;inset:0" onclick="if(event.target===this)closeReplies()">
+  <style>#replyModal{background:rgba(20,20,30,0.92)}html.light #replyModal{background:rgba(255,255,255,0.92)}@media(prefers-color-scheme:light){html:not(.dark):not(.light) #replyModal{background:rgba(255,255,255,0.92)}}</style>
+<div class="modal" id="replyModal" style="border:1px solid var(--card-border);border-radius:20px;padding:24px;width:440px;max-width:90vw;max-height:70vh;overflow-y:auto;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="font-size:1.1rem;color:var(--heading)">📬 反馈回复</h3>
+      <label style="font-size:0.75rem;color:var(--text-dim);cursor:pointer"><input type="checkbox" id="notifyToggle" onchange="toggleNotify()" checked> 新回复提醒</label>
+    </div>
+    <div id="replyList" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="replyEmpty" style="text-align:center;color:var(--text-dim);padding:24px 0;font-size:0.85rem">暂无回复</div>
+    <div style="text-align:center;margin-top:16px"><button onclick="closeReplies()" style="padding:10px 32px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">关闭</button></div>
+  </div>
+</div>
 <div class="modal-overlay" id="feedbackOverlay">
   <div class="modal">
     <h3>反馈意见</h3>
@@ -510,7 +524,7 @@ async function doSubmit(){
   }catch(e){let msg=e.message;try{msg=JSON.parse(e.message).message||msg}catch(_){}errEl.textContent=msg}
 }
 
-function esc(s){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML.replace(/\n/g,'<br>')}
+function esc(s){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
 
 function buildRow(item,idx){
   const tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[];
@@ -581,14 +595,28 @@ if(glow){let pending=false;document.addEventListener('mousemove',e=>{if(pending)
   try{await sbApi('page_visits',{method:'POST',body:JSON.stringify({page:'linli'})})}catch(e){}
 })();
 
-// Check for feedback replies
-(async function(){
-  let f=sessionStorage.getItem('sid');if(!f)return;
-  try{
-    const fb=await sbApi('feedbacks?select=id,content,reply&fp=eq.'+encodeURIComponent(f)+'&reply_read=eq.false');
-    if(fb.length){const r=fb[0];if(r.reply){alert('📬 你的反馈收到了回复：\n\n"'+r.reply+'"');await sbApi('feedbacks?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({reply_read:true})})}}
-  }catch(e){}
-})();
+// ===== Feedback reply system =====
+let replyData=[],notifyEnabled=localStorage.getItem('reply_notify')!=='false';
+document.getElementById('notifyToggle').checked=notifyEnabled;
+function toggleNotify(){notifyEnabled=!notifyEnabled;localStorage.setItem('reply_notify',notifyEnabled);if(!notifyEnabled)document.getElementById('replyBadge').style.display='none'}
+
+async function checkReplies(){
+  let f=sessionStorage.getItem('sid');if(!f||!notifyEnabled)return;
+  try{replyData=await sbApi('feedbacks?select=id,content,reply,reply_read,created_at,replied_at&fp=eq.'+encodeURIComponent(f)+'&reply=neq.&order=created_at.desc');const unread=replyData.filter(r=>!r.reply_read);document.getElementById('replyBadge').style.display=unread.length?'block':'none';document.getElementById('replyFab').style.display='flex'}catch(e){}
+}
+async function openReplies(){
+  document.getElementById('replyListOverlay').style.display='flex';
+  const list=document.getElementById('replyList'),empty=document.getElementById('replyEmpty');
+  if(!replyData.length){empty.style.display='block';list.innerHTML='';return}
+  empty.style.display='none';
+  list.innerHTML=replyData.map(r=>'<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px"><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;word-break:break-word;white-space:pre-wrap">💬 <span style="font-size:0.65rem;color:var(--text-dim)">'+new Date(r.created_at).toLocaleString('zh-CN')+'</span><br>'+escapeHtml(r.content)+'</div><div style="font-size:0.85rem;color:var(--accent);background:rgba(56,189,248,0.08);padding:8px 12px;border-radius:8px;word-break:break-word;white-space:pre-wrap">回复'+(r.replied_at?' <span style="font-size:0.65rem;opacity:0.7">'+new Date(r.replied_at).toLocaleString('zh-CN')+'</span>':'')+'：'+escapeHtml(r.reply)+'</div></div>').join('');
+  // Mark all as read
+  replyData.forEach(r=>{if(!r.reply_read){sbApi('feedbacks?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({reply_read:true})});r.reply_read=true}});
+  document.getElementById('replyBadge').style.display='none'
+}
+function closeReplies(){document.getElementById('replyListOverlay').style.display='none'}
+function escapeHtml(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML.replace(/\n/g,'<br>')}
+checkReplies();
 
 render();
 
