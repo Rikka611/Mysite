@@ -602,14 +602,14 @@ function toggleNotify(){notifyEnabled=!notifyEnabled;localStorage.setItem('reply
 
 async function checkReplies(){
   let f=sessionStorage.getItem('sid');if(!f||!notifyEnabled)return;
-  try{replyData=await sbApi('feedbacks?select=id,content,reply,reply_read,created_at,replied_at&fp=eq.'+encodeURIComponent(f)+'&reply=neq.&order=created_at.desc');const unread=replyData.filter(r=>!r.reply_read);document.getElementById('replyBadge').style.display=unread.length?'block':'none';document.getElementById('replyFab').style.display='flex'}catch(e){}
+  try{replyData=await sbApi('feedbacks?select=id,content,reply,reply_read,created_at,replied_at,fp&or=(fp.eq.'+encodeURIComponent(f)+',fp.eq.)&reply=neq.&order=created_at.desc');const unread=replyData.filter(r=>!r.reply_read);document.getElementById('replyBadge').style.display=unread.length?'block':'none';document.getElementById('replyFab').style.display='flex'}catch(e){}
 }
 async function openReplies(){
   document.getElementById('replyListOverlay').style.display='flex';
   const list=document.getElementById('replyList'),empty=document.getElementById('replyEmpty');
   if(!replyData.length){empty.style.display='block';list.innerHTML='';return}
   empty.style.display='none';
-  list.innerHTML=replyData.map(r=>'<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px"><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;word-break:break-word;white-space:pre-wrap">💬 <span style="font-size:0.65rem;color:var(--text-dim)">'+new Date(r.created_at).toLocaleString('zh-CN')+'</span><br>'+escapeHtml(r.content)+'</div><div style="font-size:0.85rem;color:var(--accent);background:rgba(56,189,248,0.08);padding:8px 12px;border-radius:8px;word-break:break-word;white-space:pre-wrap">回复'+(r.replied_at?' <span style="font-size:0.65rem;opacity:0.7">'+new Date(r.replied_at).toLocaleString('zh-CN')+'</span>':'')+'：'+escapeHtml(r.reply)+'</div></div>').join('');
+  list.innerHTML=replyData.map(r=>'<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px"><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;word-break:break-word;white-space:pre-wrap">💬 '+(r.fp?'<span style="font-size:0.65rem;color:var(--text-dim)">'+new Date(r.created_at).toLocaleString('zh-CN')+'</span><br>':'')+escapeHtml(r.content)+'</div><div style="font-size:0.85rem;color:var(--accent);background:rgba(56,189,248,0.08);padding:8px 12px;border-radius:8px;word-break:break-word;white-space:pre-wrap">回复'+(r.fp&&r.replied_at?' <span style="font-size:0.65rem;opacity:0.7">'+new Date(r.replied_at).toLocaleString('zh-CN')+'</span>':'')+'：'+escapeHtml(r.reply)+'</div></div>').join('');
   // Mark all as read
   replyData.forEach(r=>{if(!r.reply_read){sbApi('feedbacks?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({reply_read:true})});r.reply_read=true}});
   document.getElementById('replyBadge').style.display='none'
