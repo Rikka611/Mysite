@@ -277,7 +277,7 @@ async function doLogin(){
   }
   const code=document.getElementById('totpInput').value.trim();document.getElementById('loginErr').textContent=''
   if(!code||!/^\d{6}$/.test(code)){document.getElementById('loginErr').textContent='请输入6位验证码';return}
-  try{const r=await sbApi('rpc/check_totp',{method:'POST',body:JSON.stringify({code})});if(r!==true){document.getElementById('loginErr').textContent='验证码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
+  try{const r=await adminApi('check_totp',{code});if(r!==true){document.getElementById('loginErr').textContent='验证码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
   const tok=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('')
   sessionStorage.setItem('admin_session',tok)
   showMain()
@@ -286,11 +286,12 @@ function showMain(){
   document.getElementById('loginBox').style.display='none';document.getElementById('mainBox').style.display='block'
   const nb=document.getElementById('navBar');if(nb)nb.style.display='flex';init()
 }
-function doLogout(){sessionStorage.removeItem('admin_session');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
+function doLogout(){sessionStorage.removeItem('admin_session');sessionStorage.removeItem('admin_pw');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
 function toggleAuto(){autoApprove=!autoApprove;document.getElementById('autoBtn').textContent='自动通过：'+(autoApprove?'开':'关');document.getElementById('autoBtn').className='btn '+(autoApprove?'active':'');showToast(autoApprove?'新提交将自动通过':'新提交需手动审核','info')}
 
 // ---- API ----
-const SB_URL='https://naivizrdefonlelndzqr.supabase.co';
+const SB_URL='https://naivizrdefonlelndzqr.supabase.co';const EDGE_URL="https://naivizrdefonlelndzqr.supabase.co/functions/v1/admin";
+
 const SB_KEY='sb_publishable_-LpxA4RGDCS-NzuHoeMYDg_jD7bdDTq';
 const sbApi = async function(path, options = {}) {
     const url=`${SB_URL}/rest/v1/${path}`;
@@ -397,15 +398,15 @@ function renderList(){
 }
 
 // ---- Actions ----
-async function approve(id){try{await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'approved'})});load();showToast('已通过','ok')}catch(e){showToast('操作失败','err')}}
-async function reject(id){try{await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'rejected'})});load();showToast('已拒绝','info')}catch(e){showToast('操作失败','err')}}
-async function del(id){if(!confirm('确认删除？'))return;try{await sbApi('linli_codes?id=eq.'+id,{method:'DELETE'});load();showToast('已删除','ok')}catch(e){showToast('操作失败','err')}}
-async function approveAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'approved'})})}catch(e){}}load();showToast('已全部通过','ok')}
-async function rejectAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'rejected'})})}catch(e){}}load();showToast('已全部拒绝','info')}
-async function deleteRejected(){const rejected=dataCache.filter(i=>i.status==='rejected');if(!rejected.length||!confirm('确认删除所有'+rejected.length+'条已拒绝记录？'))return;for(const item of rejected){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'DELETE'})}catch(e){}}load();showToast('已清理','ok')}
+async function approve(id){try{await adminApi('approve',{id});load();showToast('已通过','ok')}catch(e){showToast('操作失败','err')}}
+async function reject(id){try{await adminApi('reject',{id});load();showToast('已拒绝','info')}catch(e){showToast('操作失败','err')}}
+async function del(id){if(!confirm('确认删除？'))return;try{await adminApi('delete',{id});load();showToast('已删除','ok')}catch(e){showToast('操作失败','err')}}
+async function approveAllPending(){const ids=dataCache.filter(i=>i.status==='pending').map(i=>i.id);if(ids.length){try{await adminApi('batch_approve',{ids})}catch(e){}}load();showToast('已全部通过','ok')}
+async function rejectAllPending(){const ids2=dataCache.filter(i=>i.status==='pending').map(i=>i.id);if(ids2.length){try{await adminApi('batch_reject',{ids:ids2})}catch(e){}}load();showToast('已全部拒绝','info')}
+async function deleteRejected(){const rejected=dataCache.filter(i=>i.status==='rejected');if(!rejected.length||!confirm('确认删除所有'+rejected.length+'条已拒绝记录？'))return;const rids=rejected.map(i=>i.id);if(rids.length){try{await adminApi('batch_delete',{ids:rids})}catch(e){}}load();showToast('已清理','ok')}
 async function approveAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'approved'})})}catch(e){}}load();showToast('批量操作完成','ok')}
 async function rejectAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'rejected'})})}catch(e){}}load();showToast('批量操作完成','info')}
-async function deleteRejected(){const rejected=await sbApi('linli_codes?select=id&status=eq.rejected');for(const item of rejected){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'DELETE'})}catch(e){}}load();showToast('已清理','ok')}
+async function deleteRejected(){const rejected=await sbApi('linli_codes?select=id&status=eq.rejected');const rids=rejected.map(i=>i.id);if(rids.length){try{await adminApi('batch_delete',{ids:rids})}catch(e){}}load();showToast('已清理','ok')}
 
 // ---- Feedback ----
 async function loadFeedback(){
@@ -422,8 +423,8 @@ function renderFeedback(){
     fl.appendChild(d)
   })
 }
-async function markFeedback(id,status){try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status})});loadFeedback();showToast('状态已更新','ok')}catch(e){}}
-async function delFeedback(id){if(!confirm('确认删除？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'DELETE'});loadFeedback()}catch(e){}}
+async function markFeedback(id,status){try{await adminApi('feedback_mark',{id,status});loadFeedback();showToast('状态已更新','ok')}catch(e){}}
+async function delFeedback(id){if(!confirm('确认删除？'))return;try{await adminApi('feedback_delete',{id});loadFeedback()}catch(e){}}
 async function clearReply(id){if(!confirm('删除这条回复？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reply:'',reply_read:true})});loadFeedback();showToast('已删除回复','ok')}catch(e){showToast('操作失败','err')}}
 let _replyId=0;function replyFeedback(id){_replyId=id;document.getElementById('replyOverlay').style.display='flex';document.getElementById('replyText').value='';document.getElementById('replyText').focus()}
 function closeReply(){document.getElementById('replyOverlay').style.display='none';_replyId=0}
@@ -443,6 +444,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.0</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.1</div>
 </body>
 </html>
