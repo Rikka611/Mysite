@@ -321,7 +321,6 @@ async function clearReply(id){if(!confirm('删除这条回复？'))return;try{aw
 let _replyId=0;function replyFeedback(id){_replyId=id;document.getElementById('replyOverlay').style.display='flex';document.getElementById('replyText').value='';document.getElementById('replyText').focus()}
 function closeReply(){document.getElementById('replyOverlay').style.display='none';_replyId=0}
 async function doReply(){const txt=document.getElementById('replyText').value.trim();if(!txt||!_replyId)return;try{await sbApi('feedbacks?id=eq.'+_replyId,{method:'PATCH',body:JSON.stringify({reply:txt,reply_read:false,replied_at:new Date().toISOString()})});closeReply();loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
-<div id="version" style="position:fixed;bottom:8px;right:12px;font-size:0.65rem;color:var(--text-dim);z-index:99;opacity:0.5">v2.0.0</div>
 // Auto-restore session (sessionStorage only - cleared on tab close)
 if(sessionStorage.getItem('admin_session')){showMain()}
 // Auto refresh every 5 minutes
@@ -337,5 +336,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.65rem;color:var(--text-dim);z-index:99;opacity:0.5">v2.0.1</div>
 </body>
 </html>
