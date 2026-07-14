@@ -424,7 +424,7 @@ let _replyId=0;function replyFeedback(id){_replyId=id;document.getElementById('r
 function closeReply(){document.getElementById('replyOverlay').style.display='none';_replyId=0}
 async function doReply(){const txt=document.getElementById('replyText').value.trim();if(!txt||!_replyId)return;try{await sbApi('feedbacks?id=eq.'+_replyId,{method:'PATCH',body:JSON.stringify({reply:txt,reply_read:false,replied_at:new Date().toISOString()})});closeReply();loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
 // Auto-restore session
-if(sessionStorage.getItem('admin_session')){showMain()}
+if(sessionStorage.getItem('admin_session')){srKey=localStorage.getItem('admin_sr')||'';showMain()}
 // Auto refresh every 5 minutes
 setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')load()},300000)
 </script>
@@ -438,6 +438,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.1.9</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.1.10</div>
 </body>
 </html>
