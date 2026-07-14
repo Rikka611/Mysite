@@ -475,14 +475,14 @@ async function doLogin(){
   if(!code||!/^\d{6}$/.test(code)){document.getElementById('loginErr').textContent='请输入6位验证码';return}
   try{const r=await adminApi('check_totp',{code});if(r!==true){document.getElementById('loginErr').textContent='验证码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
   const tok=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('')
-  sessionStorage.setItem('admin_session',tok)
+  localStorage.setItem('admin_session',tok)
   showMain()
 }
 function showMain(){
   document.getElementById('loginBox').style.display='none';document.getElementById('mainBox').style.display='block'
   const nb=document.getElementById('navBar');if(nb)nb.style.display='flex';init()
 }
-function doLogout(){sessionStorage.removeItem('admin_session');sessionStorage.removeItem('admin_pw');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
+function doLogout(){localStorage.removeItem('admin_session');localStorage.removeItem('admin_pw');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
 function toggleAuto(){autoApprove=!autoApprove;document.getElementById('autoBtn').textContent='自动通过：'+(autoApprove?'开':'关');document.getElementById('autoBtn').className='btn '+(autoApprove?'active':'');showToast(autoApprove?'新提交将自动通过':'新提交需手动审核','info')}
 
 // ---- API ----
@@ -647,6 +647,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.8</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.9</div>
 </body>
 </html>
