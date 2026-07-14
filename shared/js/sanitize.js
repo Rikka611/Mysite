@@ -18,6 +18,6 @@
     if (!str && str !== 0) return ''
     return String(str).replace(/[&<>"'/]/g, function (c) {
       return ENTITY_MAP[c]
-    })
+    }).replace(/\n/g,'<br>')
   }
 })()
