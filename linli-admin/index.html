@@ -268,6 +268,7 @@ async function doLogin(){
     if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
     const hash=await sha256(pw)
     if(hash!==PW_HASH){document.getElementById('loginErr').textContent='密码错误';return}
+    sessionStorage.setItem("admin_pw",pw);
     _loginStage=1;document.getElementById('pwInput').style.display='none'
     document.getElementById('totpInput').style.display='block'
     document.getElementById('loginBtn').textContent='验证 TOTP'
@@ -450,6 +451,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.3</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.4</div>
 </body>
 </html>
