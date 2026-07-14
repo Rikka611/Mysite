@@ -609,7 +609,7 @@ async function openReplies(){
   const list=document.getElementById('replyList'),empty=document.getElementById('replyEmpty');
   if(!replyData.length){empty.style.display='block';list.innerHTML='';return}
   empty.style.display='none';
-  list.innerHTML=replyData.map(r=>'<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px"><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px">💬 '+escapeHtml(r.content)+'</div><div style="font-size:0.85rem;color:var(--accent);background:rgba(56,189,248,0.08);padding:8px 12px;border-radius:8px">回复：'+escapeHtml(r.reply)+'</div></div>').join('');
+  list.innerHTML=replyData.map(r=>'<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px"><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;word-break:break-word;white-space:pre-wrap">💬 '+escapeHtml(r.content)+'</div><div style="font-size:0.85rem;color:var(--accent);background:rgba(56,189,248,0.08);padding:8px 12px;border-radius:8px;word-break:break-word;white-space:pre-wrap">回复：'+escapeHtml(r.reply)+'</div></div>').join('');
   // Mark all as read
   replyData.forEach(r=>{if(!r.reply_read){sbApi('feedbacks?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({reply_read:true})});r.reply_read=true}});
   document.getElementById('replyBadge').style.display='none'
