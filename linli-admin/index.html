@@ -304,10 +304,12 @@ async function renderStats(){
   const dupeCount=[...dupeMap.values()].filter(v=>v>1).length
   let pvCount=0;try{const pv=await sbApi('page_visits?select=id&order=id.desc&limit=1');pvCount=pv[0]?.id||0}catch(e){}
   const totalViews=all.reduce((s,x)=>s+(x.views||0),0);const totalLikes=all.reduce((s,x)=>s+(x.likes||0),0)
+  const totalReports=all.reduce((s,x)=>s+(x.reports||0),0)
   document.getElementById('stats').innerHTML=[
     {v:all.length,l:'总提交'},{v:all.filter(x=>x.status==='approved').length,l:'已通过'},
     {v:all.filter(x=>x.status==='pending').length,l:'待审核'},{v:dupeCount,l:'重复码',c:'#ef4444'},
-    {v:totalViews,l:'总浏览'},{v:totalLikes,l:'总点赞'},{v:pvCount,l:'页面访问'}
+    {v:totalViews,l:'总浏览'},{v:totalLikes,l:'总点赞'},{v:pvCount,l:'页面访问'},
+    {v:totalReports,l:'无效反馈',c:totalReports>0?'#f59e0b':''}
   ].map(s=>'<div class="stat"><div class="val"'+(s.c?' style="color:'+s.c+';-webkit-text-fill-color:'+s.c+'"':'')+'>'+s.v+'</div><div class="lbl">'+s.l+'</div></div>').join('')
 }
 
@@ -368,7 +370,7 @@ function renderList(){
     d.className=cls
     const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'')
     const tags=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[]
-    d.innerHTML='<span style="font-size:0.7rem;color:var(--text-dim);min-width:45px">'+item.status+'</span><div class="code">'+escapeHtml(item.code)+(isDupe?' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px">重复</span>':'')+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' '+tags.map(t=>'<span style="font-size:0.65rem;color:var(--text-dim)">#'+escapeHtml(t)+'</span>').join(' ')+'</div></div><span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap">👁'+(item.views||0)+' ❤'+(item.likes||0)+'</span><div class="actions">'+
+    d.innerHTML='<span style="font-size:0.7rem;color:var(--text-dim);min-width:45px">'+item.status+'</span><div class="code">'+escapeHtml(item.code)+(isDupe?' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px">重复</span>':'')+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' '+tags.map(t=>'<span style="font-size:0.65rem;color:var(--text-dim)">#'+escapeHtml(t)+'</span>').join(' ')+'</div></div><span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap">👁'+(item.views||0)+' ❤'+(item.likes||0)+(item.reports>0?' ⚠'+(item.reports||0):'')+'</span><div class="actions">'+
       (item.status==='pending'?'<button class="btn ok sm" onclick="approve('+item.id+')">通过</button><button class="btn danger sm" onclick="reject('+item.id+')">拒绝</button>':'')+
       '<button class="btn danger sm" onclick="del('+item.id+')">删除</button></div>'
     lst.appendChild(d)
