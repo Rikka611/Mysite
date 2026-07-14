@@ -130,6 +130,7 @@ body {
 .row.pending{border-left:3px solid var(--warn)}
 .row.rejected{opacity:0.5}
 .row.dupe{border-left:3px solid #ef4444}
+.row.reported{border-left:3px solid #f59e0b}
 .row .code{font-size:1rem;font-weight:700;letter-spacing:1px;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:75px}
 .row .info{flex:1;min-width:0}
 .row .title{font-size:0.9rem;font-weight:600}
@@ -193,6 +194,7 @@ body {
     <button class="tab" data-filter="pending" id="tabPending">待审核</button>
     <button class="tab" data-filter="approved" id="tabApproved">已通过</button>
     <button class="tab" data-filter="rejected" id="tabRejected">已拒绝</button>
+    <button class="tab" data-filter="reported" id="tabReported">⚠ 举报</button>
     <button class="tab" data-filter="feedback" id="tabFeedback">💬 反馈</button>
   </div>
 
@@ -353,7 +355,8 @@ function renderList(){
   const lst=document.getElementById('list'),fl=document.getElementById('feedbackList'),em=document.getElementById('empty')
   lst.innerHTML='';fl.innerHTML=''
   let items=dataCache
-  if(filter!=='all'&&filter!=='feedback')items=dataCache.filter(x=>x.status===filter)
+  if(filter==='reported')items=dataCache.filter(x=>(x.reports||0)>0)
+  else if(filter!=='all'&&filter!=='feedback')items=dataCache.filter(x=>x.status===filter)
   if(!items.length){em.style.display='block';em.textContent='暂无数据';return}
   em.style.display='none'
   const dupeMap=new Map();items.forEach(x=>{const c=x.code;dupeMap.set(c,(dupeMap.get(c)||0)+1)})
@@ -367,6 +370,7 @@ function renderList(){
     const d=document.createElement('div');let cls='row '
     if(item.status==='pending')cls+='pending ';if(item.status==='rejected')cls+='rejected '
     if(isDupe)cls+='dupe '
+    if((item.reports||0)>0)cls+='reported '
     d.className=cls
     const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'')
     const tags=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[]
