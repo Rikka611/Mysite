@@ -300,6 +300,12 @@ const sbApi = async function(path, options = {}) {
   if(!res.ok)throw new Error(await res.text());
   const t=await res.text();return t?JSON.parse(t):[];
 }
+async function adminApi(action, payload={}){
+  const pw=sessionStorage.getItem("admin_pw")||"";
+  const res=await fetch(EDGE_URL,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+SB_KEY},body:JSON.stringify({password:pw,action,payload})});
+  if(!res.ok)throw new Error(await res.text());
+  return res.json();
+}
 
 // ---- Init ----
 async function init(){
@@ -444,6 +450,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.1</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.2</div>
 </body>
 </html>
