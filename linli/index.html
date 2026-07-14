@@ -120,7 +120,8 @@ nav .inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justif
 .theme-btn{background:none;border:1px solid var(--nav-border);color:var(--nav-link);cursor:pointer;width:36px;height:36px;border-radius:50%;font-size:1.1rem;transition:all 0.3s}
 .theme-btn:hover{background:var(--card-bg);color:var(--nav-link-hover);transform:rotate(30deg)}
 #feedbackBtn:hover{background:var(--card-bg);color:var(--nav-link-hover);transform:translateY(-1px)}
-#replyFab:hover{transform:scale(1.1)!important}
+#replyFab:hover{transform:scale(1.15)!important;box-shadow:0 6px 30px rgba(245,158,11,0.6)!important}
+#replyFab:active{transform:scale(0.9)!important}
 .theme-btn .icon-sun{display:inline}.theme-btn .icon-moon{display:none}
 html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{display:inline}
 @media(prefers-color-scheme:light){html:not(.dark):not(.light) .theme-btn .icon-sun{display:none}html:not(.dark):not(.light) .theme-btn .icon-moon{display:inline}}
@@ -382,7 +383,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   <div class="empty" id="empty">修bug中...</div>
 </div>
 
-<button id="replyFab" title="反馈回复" onclick="openReplies()" style="position:fixed;bottom:100px;right:32px;z-index:50;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.4);transition:transform 0.2s;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">📬<span id="replyBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border:2px solid var(--bg-start);border-radius:50%;display:none"></span></button>
+<button id="replyFab" title="反馈回复" onclick="openReplies()" style="position:fixed;bottom:100px;right:32px;z-index:50;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.4);transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.2);animation:fabPulse 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">📬<span id="replyBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border:2px solid var(--bg-start);border-radius:50%;display:none"></span></button>
 <button class="fab" id="fab" title="提交分享码">+</button>
 
 <div class="modal-overlay" id="modalOverlay">
