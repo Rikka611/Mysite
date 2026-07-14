@@ -130,6 +130,7 @@ body {
 .row.pending{border-left:3px solid var(--warn)}
 .row.rejected{opacity:0.5}
 .row.dupe{border-left:3px solid #ef4444}
+.row.reported{border-left:3px solid #f59e0b}
 .row .code{font-size:1rem;font-weight:700;letter-spacing:1px;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:75px}
 .row .info{flex:1;min-width:0}
 .row .title{font-size:0.9rem;font-weight:600}
@@ -181,7 +182,6 @@ body {
 <div class="login" id="loginBox">
   <h1>BSide Olivia Lin</h1>
   <input type="password" id="pwInput" placeholder="管理密码" autofocus>
-  <input type="text" id="totpInput" placeholder="Authenticator 6位码" maxlength="6" style="display:none;padding:12px 20px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:1rem;outline:none;text-align:center;width:320px;font-family:system-ui,-apple-system,sans-serif">
   <textarea id="srInput" placeholder="Supabase service_role key（Settings > API > service_role secret）用于写操作鉴权"></textarea>
   <div class="hint">service_role key 仅保存在本地浏览器，不会上传到服务器</div>
   <button id="loginBtn" onclick="doLogin()">进入管理</button>
@@ -194,10 +194,12 @@ body {
     <button class="tab" data-filter="pending" id="tabPending">待审核</button>
     <button class="tab" data-filter="approved" id="tabApproved">已通过</button>
     <button class="tab" data-filter="rejected" id="tabRejected">已拒绝</button>
+    <button class="tab" data-filter="reported" id="tabReported">⚠ 举报</button>
     <button class="tab" data-filter="feedback" id="tabFeedback">💬 反馈</button>
   </div>
 
   <div class="stats" id="stats"></div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:4px"><button class="btn sm" id="chartToggle" onclick="window._chartMode=window._chartMode==='24h'?'7d':'24h';load()">切为7天</button></div>
   <div class="charts">
     <div class="chart-box"><canvas id="chartLikes"></canvas></div>
     <div class="chart-box"><canvas id="chartStatus"></canvas></div>
@@ -219,7 +221,7 @@ body {
 // ================================================================
 
 // SB config from shared/js/
-const PW_HASH = '8e76ef51d0841f37d686f4af64ee2bc4c89d3701174c4e0fccf6a08ea825a94e';
+const PW_HASH = 'f9e00d8f29c089c085367aff29e8e1a78ac42c5c36a5e90a41561e00f9d97eed';
 let srKey = '';
 let filter = 'all', autoApprove = true, dataCache = [], feedbackCache = [];
 
@@ -260,27 +262,13 @@ function showToast(msg,type='info'){
 async function sha256(str){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')}
 
 // ---- Auth ----
-let _loginStage=0;
 async function doLogin(){
-  if(_loginStage===0){
-    const pw=document.getElementById('pwInput').value,sr=document.getElementById('srInput').value.trim()
-    if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
-    const hash=await sha256(pw)
-    if(hash!==PW_HASH){document.getElementById('loginErr').textContent='密码错误';return}
-    if(sr){srKey=sr;showToast('已启用 service_role 写权限','ok')}
-    _loginStage=1;document.getElementById('pwInput').style.display='none'
-    document.getElementById('srInput').style.display='none'
-    document.getElementById('totpInput').style.display='block'
-    document.getElementById('loginBtn').textContent='验证 TOTP'
-    document.getElementById('loginErr').textContent=''
-    document.getElementById('pwInput').value=''
-    return
-  }
-  const code=document.getElementById('totpInput').value.trim();document.getElementById('loginErr').textContent=''
-  if(!code||!/^\d{6}$/.test(code)){document.getElementById('loginErr').textContent='请输入6位验证码';return}
-  try{const r=await sbApi('rpc/check_totp',{method:'POST',body:JSON.stringify({code})});if(r!==true){document.getElementById('loginErr').textContent='验证码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
-  const tok=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('')
-  sessionStorage.setItem('admin_session',tok)
+  const pw=document.getElementById('pwInput').value,sr=document.getElementById('srInput').value.trim()
+  if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
+  const hash=await sha256(pw)
+  if(hash!==PW_HASH){document.getElementById('loginErr').textContent='密码错误';return}
+  if(sr){srKey=sr;showToast('已启用 service_role 写权限','ok')}
+  const tok=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('');sessionStorage.setItem('admin_session',tok)
   showMain()
 }
 function showMain(){
@@ -314,45 +302,79 @@ async function load(){
 }
 
 async function renderStats(){
-  const all=await sbApi('linli_codes?select=status');const pv=await sbApi('page_views?select=count&page=eq.linli')
+  const all=dataCache;const dupeMap=new Map();all.forEach(x=>{const c=x.code;dupeMap.set(c,(dupeMap.get(c)||0)+1)})
+  const dupeCount=[...dupeMap.values()].filter(v=>v>1).length
+  let pvCount=0;try{const pv=await sbApi('page_visits?select=id&order=id.desc&limit=1');pvCount=pv[0]?.id||0}catch(e){}
+  const totalViews=all.reduce((s,x)=>s+(x.views||0),0);const totalLikes=all.reduce((s,x)=>s+(x.likes||0),0)
+  const totalReports=all.reduce((s,x)=>s+(x.reports||0),0)
   document.getElementById('stats').innerHTML=[
-    {v:all.length,l:'总数'},{v:all.filter(x=>x.status==='approved').length,l:'已通过'},
-    {v:all.filter(x=>x.status==='pending').length,l:'待审核'},{v:pv[0]?.count||0,l:'浏览量'}
-  ].map(s=>'<div class="stat"><div class="val">'+s.v+'</div><div class="lbl">'+s.l+'</div></div>').join('')
+    {v:all.length,l:'总提交'},{v:all.filter(x=>x.status==='approved').length,l:'已通过'},
+    {v:all.filter(x=>x.status==='pending').length,l:'待审核'},{v:dupeCount,l:'重复码',c:'#ef4444'},
+    {v:totalViews,l:'总浏览'},{v:totalLikes,l:'总点赞'},{v:pvCount,l:'页面访问'},
+    {v:totalReports,l:'无效反馈',c:totalReports>0?'#f59e0b':''}
+  ].map(s=>'<div class="stat"><div class="val"'+(s.c?' style="color:'+s.c+';-webkit-text-fill-color:'+s.c+'"':'')+'>'+s.v+'</div><div class="lbl">'+s.l+'</div></div>').join('')
 }
 
 function renderChart(){
-  setTimeout(()=>{
-    const likes=[],status=[],uploads=[],views=[]
-    if(dataCache.length){
-      likes.push({label:'Top1',value:dataCache[0]?.likes||0});likes.push({label:'Avg',value:Math.round(dataCache.reduce((s,x)=>s+x.likes,0)/dataCache.length)})
-      status.push({label:'Approved',value:dataCache.filter(x=>x.status==='approved').length});status.push({label:'Pending',value:dataCache.filter(x=>x.status==='pending').length});status.push({label:'Rejected',value:dataCache.filter(x=>x.status==='rejected').length})
-      uploads.push({label:'Today',value:dataCache.filter(x=>new Date(x.created_at).toDateString()===new Date().toDateString()).length})
-      views.push({label:'Max',value:Math.max(...dataCache.map(x=>x.views||0),0)})
-    }
-    try{window.drawBarChart(document.getElementById('chartLikes'),likes.length?likes:[{label:'N/A',value:1}])}catch(e){}
-    try{window.drawPieChart(document.getElementById('chartStatus'),status.length?status:[{label:'N/A',value:1}])}catch(e){}
-    try{window.drawBarChart(document.getElementById('chartUploads'),uploads.length?uploads:[{label:'N/A',value:1}])}catch(e){}
-    try{window.drawBarChart(document.getElementById('chartViews'),views.length?views:[{label:'N/A',value:1}])}catch(e){}
-  },100)
+  const boxW=document.querySelector('.chart-box')?.clientWidth||400
+  setTimeout(async ()=>{
+    const top10=dataCache.filter(x=>x.status==='approved').sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,8)
+    const likes=top10.map(x=>({label:(x.title||'').slice(0,6),value:x.likes||0}))
+    const status=[{label:'已通过',value:dataCache.filter(x=>x.status==='approved').length},{label:'待审核',value:dataCache.filter(x=>x.status==='pending').length},{label:'已拒绝',value:dataCache.filter(x=>x.status==='rejected').length}]
+    const now=new Date()
+    // 24h hourly
+    const hours=[];for(let i=23;i>=0;i--){const h=new Date(now);h.setHours(h.getHours()-i);hours.push({label:h.getHours()+':00',value:0})}
+    const upHours=[...hours.map(h=>({...h}))];const vwHours=[...hours.map(h=>({...h}))]
+    // 7d daily
+    const days=[];for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push({label:(d.getMonth()+1)+'/'+d.getDate(),value:0})}
+    const upDays=[...days.map(d=>({...d}))];const vwDays=[...days.map(d=>({...d}))]
+    dataCache.forEach(x=>{if(x.created_at){const d=new Date(x.created_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
+      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24)upHours[idx].value++}
+      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)upDays[idx].value++}
+    }})
+    // Page visits for views chart
+    try{const pv=await sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=100000');pv.forEach(v=>{if(v.visited_at){const d=new Date(v.visited_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
+      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24)vwHours[idx].value++}
+      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)vwDays[idx].value++}
+    }})}catch(e){}
+    const mode=window._chartMode||'24h'
+    const upData=mode==='24h'?upHours:upDays
+    const vwData=mode==='24h'?vwHours:vwDays
+    const modeLabel=mode==='24h'?'24h':'7天'
+    try{window.drawBarChart?.(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{width:boxW,height:260,title:'点赞排行'})}catch(e){}
+    try{window.drawPieChart?.(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布'})}catch(e){}
+    try{window.drawBarChart?.(document.getElementById('chartUploads'),upData,{width:boxW,height:260,title:modeLabel+'上传量',barColor:'#818cf8'})}catch(e){}
+    try{window.drawBarChart?.(document.getElementById('chartViews'),vwData,{width:boxW,height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){}
+    // Toggle button
+    const toggleBtn=document.getElementById('chartToggle')
+    if(toggleBtn)toggleBtn.textContent=mode==='24h'?'切为7天':'切为24h'
+  },200)
 }
 
 function renderList(){
   const lst=document.getElementById('list'),fl=document.getElementById('feedbackList'),em=document.getElementById('empty')
   lst.innerHTML='';fl.innerHTML=''
   let items=dataCache
-  if(filter!=='all'&&filter!=='feedback')items=dataCache.filter(x=>x.status===filter)
+  if(filter==='reported')items=dataCache.filter(x=>(x.reports||0)>0)
+  else if(filter!=='all'&&filter!=='feedback')items=dataCache.filter(x=>x.status===filter)
   if(!items.length){em.style.display='block';em.textContent='暂无数据';return}
   em.style.display='none'
   const dupeMap=new Map();items.forEach(x=>{const c=x.code;dupeMap.set(c,(dupeMap.get(c)||0)+1)})
+  const dupeSet=new Set([...dupeMap.entries()].filter(([,v])=>v>1).map(([k])=>k))
+  // sort dupes first, grouped by code
+  items=[...items].sort((a,b)=>{const da=dupeSet.has(a.code),db=dupeSet.has(b.code);if(da&&db)return a.code.localeCompare(b.code)||b.id-a.id;if(da)return -1;if(db)return 1;return 0})
+  let lastDupe=''
   items.forEach((item,i)=>{
+    const isDupe=dupeSet.has(item.code)
+    if(isDupe&&item.code!==lastDupe){const sep=document.createElement('div');sep.style.cssText='text-align:center;color:#ef4444;font-size:0.7rem;padding:4px 0';sep.textContent='——— '+item.code+' 重复 ———';lst.appendChild(sep);lastDupe=item.code}
     const d=document.createElement('div');let cls='row '
     if(item.status==='pending')cls+='pending ';if(item.status==='rejected')cls+='rejected '
-    if(dupeMap.get(item.code)>1)cls+='dupe '
+    if(isDupe)cls+='dupe '
+    if((item.reports||0)>0)cls+='reported '
     d.className=cls
     const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'')
     const tags=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[]
-    d.innerHTML='<div class="code">'+escapeHtml(item.code)+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' '+tags.map(t=>'<span style="font-size:0.65rem;color:var(--text-dim)">#'+escapeHtml(t)+'</span>').join(' ')+'</div></div><div class="actions">'+
+    d.innerHTML='<span style="font-size:0.7rem;color:var(--text-dim);min-width:45px">'+item.status+'</span><div class="code">'+escapeHtml(item.code)+(isDupe?' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px">重复</span>':'')+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' '+tags.map(t=>'<span style="font-size:0.65rem;color:var(--text-dim)">#'+escapeHtml(t)+'</span>').join(' ')+'</div></div><span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap">👁'+(item.views||0)+' ❤'+(item.likes||0)+(item.reports>0?' ⚠'+(item.reports||0):'')+'</span><div class="actions">'+
       (item.status==='pending'?'<button class="btn ok sm" onclick="approve('+item.id+')">通过</button><button class="btn danger sm" onclick="reject('+item.id+')">拒绝</button>':'')+
       '<button class="btn danger sm" onclick="del('+item.id+')">删除</button></div>'
     lst.appendChild(d)
@@ -363,6 +385,9 @@ function renderList(){
 async function approve(id){try{await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'approved'})});load();showToast('已通过','ok')}catch(e){showToast('操作失败','err')}}
 async function reject(id){try{await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'rejected'})});load();showToast('已拒绝','info')}catch(e){showToast('操作失败','err')}}
 async function del(id){if(!confirm('确认删除？'))return;try{await sbApi('linli_codes?id=eq.'+id,{method:'DELETE'});load();showToast('已删除','ok')}catch(e){showToast('操作失败','err')}}
+async function approveAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'approved'})})}catch(e){}}load();showToast('已全部通过','ok')}
+async function rejectAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'rejected'})})}catch(e){}}load();showToast('已全部拒绝','info')}
+async function deleteRejected(){const rejected=dataCache.filter(i=>i.status==='rejected');if(!rejected.length||!confirm('确认删除所有'+rejected.length+'条已拒绝记录？'))return;for(const item of rejected){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'DELETE'})}catch(e){}}load();showToast('已清理','ok')}
 async function approveAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'approved'})})}catch(e){}}load();showToast('批量操作完成','ok')}
 async function rejectAllPending(){for(const item of dataCache.filter(i=>i.status==='pending')){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'PATCH',body:JSON.stringify({status:'rejected'})})}catch(e){}}load();showToast('批量操作完成','info')}
 async function deleteRejected(){const rejected=await sbApi('linli_codes?select=id&status=eq.rejected');for(const item of rejected){try{await sbApi('linli_codes?id=eq.'+item.id,{method:'DELETE'})}catch(e){}}load();showToast('已清理','ok')}
@@ -378,15 +403,31 @@ function renderFeedback(){
   em.style.display='none'
   feedbackCache.forEach(f=>{
     const d=document.createElement('div');d.className='row'
-    d.innerHTML='<div class="info"><div class="title">'+escapeHtml(f.content||'')+'</div><div class="sub" style="font-size:0.65rem">'+new Date(f.created_at).toLocaleString()+'</div></div><div class="actions"><button class="btn ok sm" onclick="markFeedback('+f.id+',\'resolved\')">解决</button><button class="btn danger sm" onclick="delFeedback('+f.id+')">删除</button></div>'
+    const replied=f.reply?'<span style="font-size:0.65rem;color:var(--ok);margin-right:4px">已回复</span>':'';d.innerHTML='<div class="info"><div class="title">'+escapeHtml(f.content||'')+'</div><div class="sub" style="font-size:0.65rem">'+new Date(f.created_at).toLocaleString()+'</div>'+(f.reply?'<div style="font-size:0.8rem;color:var(--ok);margin-top:4px">回复: '+escapeHtml(f.reply)+'</div>':'')+'</div><div class="actions">'+replied+'<button class="btn ok sm" onclick="replyFeedback('+f.id+')">回复</button>'+(f.reply?'<button class="btn danger sm" onclick="clearReply('+f.id+')">删回复</button>':'')+'<button class="btn ok sm" onclick="markFeedback('+f.id+',\'resolved\')">解决</button><button class="btn danger sm" onclick="delFeedback('+f.id+')">删除</button></div>'
     fl.appendChild(d)
   })
 }
 async function markFeedback(id,status){try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status})});loadFeedback();showToast('状态已更新','ok')}catch(e){}}
 async function delFeedback(id){if(!confirm('确认删除？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'DELETE'});loadFeedback()}catch(e){}}
+async function clearReply(id){if(!confirm('删除这条回复？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reply:'',reply_read:true})});loadFeedback();showToast('已删除回复','ok')}catch(e){showToast('操作失败','err')}}
+let _replyId=0;function replyFeedback(id){_replyId=id;document.getElementById('replyOverlay').style.display='flex';document.getElementById('replyText').value='';document.getElementById('replyText').focus()}
+function closeReply(){document.getElementById('replyOverlay').style.display='none';_replyId=0}
+async function doReply(){const txt=document.getElementById('replyText').value.trim();if(!txt||!_replyId)return;try{await sbApi('feedbacks?id=eq.'+_replyId,{method:'PATCH',body:JSON.stringify({reply:txt,reply_read:false,replied_at:new Date().toISOString()})});closeReply();loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
 // Auto-restore session
 if(sessionStorage.getItem('admin_session')){showMain()}
+// Auto refresh every 5 minutes
+setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')load()},300000)
 </script>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.0.5</div>
+<div class="modal-overlay" id="replyOverlay" style="position:fixed;inset:0;z-index:300;display:none;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)closeReply()">
+  <div class="modal" style="background:var(--elevated,#1c1c1c);border:1px solid var(--border);border-radius:16px;padding:28px;width:400px;max-width:90vw">
+    <h3 style="font-size:1rem;font-weight:600;margin-bottom:16px;text-align:center;color:var(--text)">回复反馈</h3>
+    <textarea id="replyText" placeholder="输入回复内容..." maxlength="500" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:80px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+      <button class="btn" onclick="closeReply()">取消</button>
+      <button class="btn primary" onclick="doReply()">发送回复</button>
+    </div>
+  </div>
+</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.0.6</div>
 </body>
 </html>
