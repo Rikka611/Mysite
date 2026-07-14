@@ -30,7 +30,6 @@
       Authorization: `Bearer ${SB_KEY}`,
       'Content-Type': 'application/json',
       Prefer: 'return=minimal',
-      'x-visitor-token': window.getVisitorToken(),
       ...(options.headers || {}),
     }
     const res = await fetch(url, { headers, ...options })
