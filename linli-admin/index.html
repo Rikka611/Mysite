@@ -264,9 +264,9 @@ async function sha256(str){const buf=await crypto.subtle.digest('SHA-256',new Te
 // ---- Auth ----
 let _loginStage=0;
 async function doLogin(){
-  const pw=document.getElementById('pwInput').value,sr=document.getElementById('srInput').value.trim()
-  if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
   if(_loginStage===0){
+    const pw=document.getElementById('pwInput').value,sr=document.getElementById('srInput').value.trim()
+    if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
     const hash=await sha256(pw)
     if(hash!==PW_HASH){document.getElementById('loginErr').textContent='密码错误';return}
     if(sr){srKey=sr}
