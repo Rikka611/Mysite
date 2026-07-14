@@ -282,7 +282,7 @@ async function doLogin(){
   // TOTP step
   const code=document.getElementById('totpInput').value.trim();document.getElementById('loginErr').textContent=''
   if(!code||!/^\d{6}$/.test(code)){document.getElementById('loginErr').textContent='请输入6位验证码';return}
-  try{const r=await sbApi('rpc/check_totp',{method:'POST',body:JSON.stringify({code})});if(!r||!r.length||!r[0].check_totp){document.getElementById('loginErr').textContent='验证码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
+  try{const r=await sbApi('rpc/check_totp',{method:'POST',body:JSON.stringify({code})});if(r!==true){document.getElementById('loginErr').textContent='验证码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
   const tok=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,'0')).join('')
   sessionStorage.setItem('admin_session',tok)
   showMain()
