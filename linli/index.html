@@ -455,7 +455,6 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 // State
 let tab='hot';
 const liked=JSON.parse(localStorage.getItem('linli_liked')||'[]');
-let autoApprove=localStorage.getItem('linli_auto_approve')!=='false';
 let page=1,pageSize=15,totalPages=1;
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
@@ -527,7 +526,7 @@ async function doSubmit(){
   if(!title||title.length>50){errEl.textContent='曲名不能为空且不超过50字';return}
   if(!desc){errEl.textContent='请填写简介（MIDI来源）';return}
   try{
-    await sbApi('linli_codes',{method:'POST',body:JSON.stringify({code,title,description:desc,author,tags,status:autoApprove?'approved':'pending'})});
+    await sbApi('linli_codes',{method:'POST',body:JSON.stringify({code,title,description:desc,author,tags,status:'pending',views:0,likes:0,reports:0})});
     closeModal();showToast(autoApprove?'提交成功！':'提交成功，审核后显示');render();
   }catch(e){let msg=e.message;try{msg=JSON.parse(e.message).message||msg}catch(_){}errEl.textContent=msg}
 }
