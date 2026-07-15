@@ -51,6 +51,40 @@
 .row .actions{display:flex;gap:4px}
 .row.pending{border-left:3px solid #fbbf24}.row.rejected{opacity:0.5}
 .row.dupe{border-left:3px solid #ef4444}.row.reported{border-left:3px solid #f59e0b}
+.tag-edit{cursor:pointer;font-size:0.65rem;color:var(--text-dim);transition:all 0.2s;border-radius:4px;padding:1px 4px}
+.tag-edit:hover{background:var(--card-bg);color:var(--accent)}
+.tag-input{font-size:0.7rem!important}
+
+/* Mobile admin */
+@media(max-width:768px){
+  .glass-nav{flex-wrap:wrap;height:auto;padding:8px 12px;gap:4px}
+  .glass-nav h1{font-size:1rem;width:100%;text-align:center}
+  .glass-nav .btns{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;width:100%}
+  .glass-nav .btn{padding:5px 10px;font-size:0.65rem}
+  .glass-nav .theme-btn{position:absolute;top:8px;right:12px}
+  .container{padding:0 8px 40px}
+  .stats{grid-template-columns:repeat(4,1fr);gap:6px}
+  .stat{padding:8px 6px}
+  .stat .val{font-size:1rem}
+  .stat .lbl{font-size:0.6rem}
+  .charts{grid-template-columns:1fr;gap:10px}
+  .range-bar{justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+  .range-btn{padding:3px 8px;font-size:0.65rem}
+  .tabs{gap:3px;flex-wrap:wrap}
+  .tab{padding:6px 10px;font-size:0.7rem}
+  .row{gap:4px;padding:8px 10px;flex-wrap:wrap}
+  .row .code{font-size:0.8rem;min-width:56px}
+  .row .info{min-width:120px}
+  .row .title{font-size:0.8rem}
+  .row .sub{font-size:0.68rem}
+  .row .actions{gap:2px}
+  .row .btn{padding:3px 5px;font-size:0.6rem;min-width:24px}
+  .login input,.login textarea{width:90vw}
+  .modal{width:95vw;padding:20px}
+}
+@media(max-width:400px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 <script src="../shared/js/config.js?v=3.0.4"></script>
 <script src="../shared/js/sanitize.js?v=3.0.4"></script>
@@ -373,12 +407,42 @@ function renderList(){
     if((item.reports||0)>0)cls+='reported '
     d.className=cls
     const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'')
-    const tags=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[]
-    d.innerHTML='<span style="font-size:0.7rem;color:var(--text-dim);min-width:45px">'+item.status+'</span><div class="code">'+escapeHtml(item.code)+(isDupe?' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px">重复</span>':'')+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' '+tags.map(t=>'<span style="font-size:0.65rem;color:var(--text-dim)">#'+escapeHtml(t)+'</span>').join(' ')+'</div></div><span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap">👁'+(item.views||0)+' ❤'+(item.likes||0)+(item.reports>0?' ⚠'+(item.reports||0):'')+'</span><div class="actions">'+
+    const tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean):[]
+    d.setAttribute('data-item-code',item.code)
+    d.setAttribute('data-item-tags',item.tags||'')
+    d.innerHTML='<span style="font-size:0.7rem;color:var(--text-dim);min-width:45px">'+item.status+'</span><div class="code">'+escapeHtml(item.code)+(isDupe?' <span style="background:#ef4444;color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:4px">重复</span>':'')+'</div><div class="info"><div class="title">'+escapeHtml(item.title)+'</div><div class="sub">'+(desc?escapeHtml(desc):'')+' <span class="tag-edit" data-code="'+item.code+'" onclick="editTags(this)" title="点击编辑标签">'+(tagList.length?tagList.map(t=>'#'+escapeHtml(t)).join(' '):'<i style="color:var(--text-dim)">无标签</i>')+'</span></div></div><span style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap">👁'+(item.views||0)+' ❤'+(item.likes||0)+(item.reports>0?' ⚠'+(item.reports||0):'')+'</span><div class="actions">'+
       (item.status==='pending'?'<button class="btn ok sm" onclick="approve('+item.id+')">通过</button><button class="btn danger sm" onclick="reject('+item.id+')">拒绝</button>':'')+
       '<button class="btn danger sm" onclick="del('+item.id+')">删除</button></div>'
     lst.appendChild(d)
   })
+}
+
+// ---- Tag editing ----
+function editTags(el){
+  if(el.querySelector('input'))return
+  var code=el.dataset.code
+  var curTags=el.closest('.row').dataset.itemTags||''
+  el.innerHTML='<input class="tag-input" value="'+curTags.replace(/"/g,'&quot;')+'" data-code="'+code+'" data-old="'+curTags.replace(/"/g,'&quot;')+'" onkeydown="if(event.key===\'Enter\')saveTags(this)" onblur="saveTags(this)" style="width:'+Math.max(80,(curTags.length||4)*10)+'px;padding:2px 6px;border-radius:6px;border:1px solid var(--accent);background:var(--card-bg);color:var(--text);font-size:0.7rem;outline:none;font-family:inherit">'
+  el.querySelector('input').focus()
+  el.querySelector('input').select()
+}
+async function saveTags(input){
+  var newTags=input.value.trim(),code=input.dataset.code,oldTags=input.dataset.old
+  if(newTags===oldTags){cancelTagEdit(input);return}
+  try{
+    await adminApi('update_tags',{code:code,tags:newTags})
+    showToast('标签已更新','ok')
+    var row=document.querySelector('.row[data-item-code="'+code+'"]')
+    if(row)row.setAttribute('data-item-tags',newTags)
+    var tagList=newTags?newTags.split(/[\s,]+/).filter(Boolean):[]
+    var span=input.parentElement
+    span.innerHTML=tagList.length?tagList.map(function(t){return '#'+escapeHtml(t)}).join(' '):'<i style="color:var(--text-dim)">无标签</i>'
+  }catch(e){showToast('更新失败','err');cancelTagEdit(input)}
+}
+function cancelTagEdit(input){
+  var span=input.parentElement,oldTags=input.dataset.old
+  var tagList=oldTags?oldTags.split(/[\s,]+/).filter(Boolean):[]
+  span.innerHTML=tagList.length?tagList.map(function(t){return '#'+escapeHtml(t)}).join(' '):'<i style="color:var(--text-dim)">无标签</i>'
 }
 
 // ---- Actions ----
@@ -427,6 +491,6 @@ if(localStorage.getItem("admin_session")&&localStorage.getItem("admin_pw")){show
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v3.0.5</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v3.0.6</div>
 </body>
 </html>

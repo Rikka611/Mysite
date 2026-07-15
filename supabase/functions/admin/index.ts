@@ -93,6 +93,16 @@ Deno.serve(async (req: Request) => {
         result = totpOk
         break
       }
+      case 'update_tags': {
+        await db.from('linli_codes').update({ tags: payload.tags }).eq('code', payload.code)
+        break
+      }
+      case 'batch_update_tags': {
+        for (const item of payload.items) {
+          await db.from('linli_codes').update({ tags: item.tags }).eq('code', item.code)
+        }
+        break
+      }
       default: {
         result = { error: 'unknown action' }
       }
