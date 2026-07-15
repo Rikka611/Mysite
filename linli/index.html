@@ -101,11 +101,11 @@
   <button onclick="doSearch()">搜索</button>
 </div>
 
-<div class="content">
+<main class="content">
   <div class="list" id="grid"></div>
   <div class="pagination" id="pager"></div>
   <div class="empty" id="empty">修bug中...</div>
-</div>
+</main>
 
 <button id="replyFab" title="反馈回复" onclick="openReplies()" style="position:fixed;bottom:100px;right:32px;z-index:50;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.4);transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.2);animation:replyPulse 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">📬<span id="replyBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border:2px solid var(--bg-start);border-radius:50%;display:none"></span></button>
 <button class="fab" id="fab" title="提交分享码">+</button>
@@ -161,7 +161,7 @@
 <div class="toast" id="toast"></div>
 
 <div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v3.0.7</div>
-<footer>本站为粉丝自发整理的社区索引平台，非商业运营，与米哈游/HoYoverse 及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务，不存储不分发任何曲谱内容。索引曲谱的版权归原始权利人所有，如有侵权请联系删除。用户使用本站服务产生的任何版权问题，本站不承担法律责任。联系：QQ 3332984386</footer>
+<footer>本站为粉丝自发整理的社区索引平台，非商业运营，与米哈游/HoYoverse 及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务，不存储不分发任何曲谱内容。索引曲谱的版权归原始权利人所有，如有侵权请联系删除。用户使用本站服务产生的任何版权问题，本站不承担法律责任。<br><span style="opacity:0.5;font-size:0.65rem">页面更新: <time id="lastUpdate"></time> · 联系：QQ 3332984386</span>，非商业运营，与米哈游/HoYoverse 及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务，不存储不分发任何曲谱内容。索引曲谱的版权归原始权利人所有，如有侵权请联系删除。用户使用本站服务产生的任何版权问题，本站不承担法律责任。联系：QQ 3332984386</footer>
 
 <script>
 // SB_URL/SB_KEY/sbApi provided by shared/js/ (config.js + api.js)
@@ -380,6 +380,7 @@ function escapeHtml(s){const d=document.createElement('div');d.textContent=s||''
 checkReplies();
 
 render();
+document.getElementById('lastUpdate').textContent=new Date().toLocaleDateString('zh-CN');
 
 // ===== Random meteors =====
 (function(){
