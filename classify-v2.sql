@@ -1,0 +1,16 @@
+UPDATE linli_codes SET tags='Roselia V家' WHERE id=180;
+UPDATE linli_codes SET tags='尼尔机械纪元 ACG' WHERE id=161;
+UPDATE linli_codes SET tags='末日时在做什么？有没有空？可以来拯救吗？ ACG' WHERE id=189;
+UPDATE linli_codes SET tags='V家' WHERE id=176;
+UPDATE linli_codes SET tags='动漫 V家' WHERE id=194;
+UPDATE linli_codes SET tags='夏日口袋 动漫' WHERE id=177;
+UPDATE linli_codes SET tags='抒情 ACG' WHERE id=174;
+UPDATE linli_codes SET tags='动漫 V家' WHERE id=13;
+UPDATE linli_codes SET tags='V家' WHERE id=23;
+UPDATE linli_codes SET tags='动漫' WHERE id=183;
+UPDATE linli_codes SET tags='东方 ACG V家' WHERE id=149;
+UPDATE linli_codes SET tags='动漫' WHERE id=70;
+UPDATE linli_codes SET tags='游戏 动漫' WHERE id=69;
+UPDATE linli_codes SET tags='1900 电影 动漫' WHERE id=146;
+UPDATE linli_codes SET tags='游戏 动漫' WHERE id=141;
+UPDATE linli_codes SET tags='动漫' WHERE id=68;
