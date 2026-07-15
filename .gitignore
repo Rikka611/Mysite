@@ -3,3 +3,5 @@ node_modules/
 *.log
 .env
 supabase/.temp/
+# config.js contains real Supabase keys (even though anon key is public, best practice to template it)
+shared/js/config.js
