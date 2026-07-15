@@ -1,87 +1,75 @@
 # 任务计划：Mysite / BSide Olivia Lin 分享码平台
 
+## 当前版本
+v3.0.7 — 卡片模式上线 + 安全加固 + 全面评估修复
+
 ## 目标
-为 BSide Olivia Lin（米哈游 AI 钢琴陪伴应用）构建粉丝分享码社区平台，含用户端浏览/提交/搜索/点赞 + 管理后台审核/统计/图表。
+为 BSide Olivia Lin（米哈游 AI 钢琴陪伴应用）构建粉丝分享码社区平台。
 
-## 技术栈
-- GitHub Pages 静态托管 (rikka611.github.io/Mysite)
-- Supabase (naivizrdefonlelndzqr) PostgreSQL + REST API + RLS
-- 纯 HTML/CSS/JS（无框架），Canvas 2D 图表
-- 公共模块：shared/js/ (config/api/sanitize/charts/paginate/cache/batch)
+## 已完成阶段
 
-## 页面结构
+### 阶段 1：基础框架 ✅
+用户端浏览/搜索/提交/点赞/复制，管理后台登录/审核，Supabase RLS
 
-| 页面 | 路径 | 功能 |
-|------|------|------|
-| 用户端 | /linli/ | 浏览热门/最新/搜索，提交分享码，点赞，复制，分页，流星背景 |
-| 管理后台 | /linli-admin/ | 登录 → 审核(通过/拒绝/删除)，统计面板(提交/浏览/访问/点赞)，图表(柱状/饼图/折线)，反馈管理 |
-| 个人主页 | /index.html | Vibecoding 项目展示，中英双语 FLIP 切换 |
-| 扫雷 | /minesweeper.html | 三种难度，Supabase 在线排行榜 |
-| 游戏合集 | /games.html | 游戏入口页 |
+### 阶段 2：安全加固 ✅
+- P0 全封堵：INSERT status 绕过、PATCH/DELETE 权限、srKey 泄露、PW_HASH 移除
+- RLS 开启：feedbacks + page_visits
+- Edge Function 鉴权：所有写操作走服务端
+- INSERT 限流：每分钟最多 10 条
+- Admin 密码 sessionStorage（关标签即失效）
+- 2FA TOTP 双重验证
 
-## 数据库表（Supabase）
+### 阶段 3：UI 升级 ✅
+- 暗色主题 + 星空流星背景 + 玻璃态卡片
+- Canvas 图表（柱状/饼图/折线）+ 24h/7d/30d/全部 时间维度
+- 标签分布饼图 + 图表联动列表筛选
+- 分类系统 7 大类 + 关键词匹配
 
-| 表 | 用途 |
+### 阶段 4：UX 增强 ✅
+- 卡片/列表双视图滑块切换 + 瀑布流网格
+- 双列列表模式 + 简介展示
+- 搜索防抖 + 分类筛选
+- 页码跳转输入框
+- 分页自适应列数整数倍
+
+### 阶段 5：安全审计修复（2026-07-16）✅
+- prefers-reduced-motion 抑制 JS 动画（流星/火花/光晕/3D倾斜）
+- iOS overscroll-behavior:none
+- Admin 编辑/回复中跳过自动刷新
+- Admin 错误信息去技术细节
+- Admin 反馈仅未回复筛选
+- 卡片不透明度提升（暗 0.05→0.08，亮 0.38→0.45）+ blur 6→10px
+- Escape 关闭弹窗
+- row role="button" + aria-label
+- 弹窗 role="dialog" aria-modal
+- focus-visible 全局样式
+- \<main\> 语义地标
+- Footer 更新时间
+
+## 待完成
+
+### 阶段 6：搜索 + 预览
+| 任务 | 状态 |
 |------|------|
-| linli_codes | 分享码（code/title/desc/author/tags/views/likes/status）|
-| feedbacks | 用户反馈 |
-| page_visits | 页面访问记录（每次访问 INSERT 新行，COUNT 统计）|
-| visitors | 去重表（fp/item_id/action），配合 track() RPC 原子操作 |
-| scores | 扫雷排行榜（仅 hard 模式）|
-| page_views | 旧版页面计数器（已弃用）|
+| 搜索支持 pg_trgm 模糊匹配 | pending |
+| 提交分享码前预览 | pending |
 
-## 当前阶段
-v2.2.11 ✅ — 安全加固完成 + UI统一 + Edge Function上线
-
-## 安全架构（第三轮红队后）
-- **anon 权限**：仅 SELECT + INSERT，UPDATE/DELETE 已 REVOKE
-- **写操作**：所有 PATCH/DELETE 通过 Edge Function (`--no-verify-jwt`) + service_role key
-- **密码验证**：移至 Edge Function 服务端，PW_HASH 已从源码删除
-- **2FA**：TOTP 双重验证（check_totp RPC + Edge Function）
-- **登录持久化**：localStorage（关闭浏览器保持登录）
-- **速率限制**：INSERT 每分钟最多 10 条
-- **反馈 RLS**：已启用，anon 仅 INSERT + SELECT
-- **CSP**：meta 标签限制脚本和数据源
-- **Supabase key**：sb_publishable 已轮换，config.template.js 用占位符
-
-## 阶段历史
-
-### 阶段 1：基础框架（已完成）
-- 用户端浏览/搜索/提交/点赞/复制
-- 管理后台登录/审核
-- Supabase RLS 权限配置
-
-### 阶段 2：统计系统升级（已完成 2026-07-14）
-- track() RPC 函数：服务端去重 + 原子递增 views/likes
-- page_visits 表：每次访问 INSERT 新行，COUNT 统计绕过 1000 行限制
-- visitors 表：浏览器指纹去重
-- hourly_stats 物化视图：预聚合小时级数据
-- 管理后台 5 分钟自动刷新
-
-### 阶段 3：UI 升级（已完成）
-- 深色主题（#0A0A0F 纯黑背景）
-- 流星背景动画
-- 图表：柱状图(渐变色+Y轴+悬浮提示)、饼图(图例+百分比)、折线图(24h/7天切换)
-- 分享码横条布局 + 分页(15条/页)
-- 反馈功能
-- 手机端适配
-
-## 已做决策
-| 决策 | 理由 |
+### 阶段 7：Admin 功能增强
+| 任务 | 状态 |
 |------|------|
-| Supabase anon key 放前端 | 公开设计，RLS 控制权限 |
-| 服务端去重 | localStorage 清缓存就失效 |
-| 页面访问用 MAX(id) | 绕过 Supabase 默认 1000 行限制 |
-| 管理后台 5 分钟自动刷新 | 图表数据随时间更新 |
-| 纯 Canvas 图表无第三方库 | 减少依赖 |
+| Admin 操作日志记录 | pending |
+| Admin CSV 导出 | pending |
+| 移动端适配（顶栏按钮换行、统计卡片、图表单列）| in_progress |
 
-## 遇到的错误
-| 错误 | 尝试次数 | 解决方案 |
-|------|---------|---------|
-| sbApi 函数声明覆盖 window.sbApi 导致递归 | 2 | 改用 const 表达式不覆盖全局 |
-| 204 空响应 JSON 解析失败 | 2 | 检查 res.status === 204 返回 [] |
-| Supabase 默认 1000 行限制 | 3 | MAX(id) 代替 COUNT |
-| GitHub token 嵌入代码被吊销 | 1 | 改 Supabase |
-| setTimeout 缺少 async 导致语法错误 | 1 | 添加 async 关键字 |
-| doLike 函数多余 } 导致脚本崩溃 | 1 | 删除多余括号 |
-| tooltip fixed 定位偏移 | 2 | absolute + 柱子坐标换算 |
+### 阶段 8：视觉打磨
+| 任务 | 状态 |
+|------|------|
+| 日文字体栈（Noto Sans JP）| pending |
+| 渐变文字 WCAG AA 对比度 4.5:1 | pending |
+
+### 阶段 9：架构/合规
+| 任务 | 状态 |
+|------|------|
+| 隐私政策页面 | pending |
+| 自动化测试（vitest）| pending |
+| 用户数据删除权 | pending |

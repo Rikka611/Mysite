@@ -6,5 +6,5 @@ ALTER TABLE discussions ADD COLUMN IF NOT EXISTS reports INT DEFAULT 0;
 
 -- 确保权限
 GRANT ALL ON discussions TO service_role;
-GRANT SELECT, INSERT ON discussions TO anon;
+GRANT SELECT, INSERT, UPDATE ON discussions TO anon;
 GRANT USAGE ON SEQUENCE discussions_id_seq TO anon;

@@ -99,6 +99,7 @@ function esc(s){const d=document.createElement('div');d.textContent=String(s);re
 
 // State
 var threads=[],replyOpen=null;
+var discussLiked=JSON.parse(localStorage.getItem('linli_discuss_liked')||'[]');
 
 async function loadThreads(){
   try{
@@ -120,18 +121,18 @@ function renderThreads(){
   threads.sort(function(a,b){return(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.created_at)-new Date(a.created_at)})
   list.innerHTML=threads.map(function(t){
     var replyCount=t._replies.length;
-    var nameHtml=t.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':(t.name||'匿名用户')
+    var nameHtml=t.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':'<span class="th-name">'+(t.name||'匿名用户')+'</span>'
     var pinBadge=t.pinned?' 📌':''
     return '<div class="thread'+(t.pinned?' pinned':'')+'" id="th-'+t.id+'">'+
       '<div>'+pinBadge+nameHtml+'<span class="th-time">'+fmtTime(t.created_at)+'</span></div>'+
       '<div class="th-content">'+esc(t.content)+'</div>'+
       '<div class="th-actions">'+
-        '<button class="th-btn" onclick="doDiscussLike('+t.id+',event)">👍 '+(t.likes||0)+'</button>'+
+        '<button class="th-btn" onclick="doDiscussLike('+t.id+',event)">'+(discussLiked.indexOf(t.id)>=0?'❤️':'🤍')+' '+(t.likes||0)+'</button>'+
         '<button class="th-btn" onclick="reportDiscuss('+t.id+')">⚠ 举报</button>'+
         '<button class="th-btn" onclick="toggleReplies('+t.id+')">💬 '+(replyCount?replyCount+' 回复':'回复')+'</button>'+
       '</div>'+
       '<div class="replies" id="replies-'+t.id+'">'+
-        (t._replies.length?t._replies.map(function(r){return '<div class="reply-item">'+(r.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':('<span class="th-name">'+(r.name||'匿名用户')+'</span>'))+'<span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
+        (t._replies.length?t._replies.map(function(r){return '<div class="reply-item">'+(r.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':'<span class="th-name">'+(r.name||'匿名用户')+'</span>')+'<span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
         '<div class="reply-form"><input type="text" id="replyName-'+t.id+'" placeholder="昵称" maxlength="30" style="max-width:100px"><input type="text" id="replyContent-'+t.id+'" placeholder="回复 TA..." maxlength="300" onkeydown="if(event.key===\'Enter\')postReply('+t.id+')"><button onclick="postReply('+t.id+')">回复</button></div>'+
       '</div>'+
     '</div>';
@@ -176,9 +177,11 @@ async function postTopic(){
 }
 
 async function doDiscussLike(id,e){
-  try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:sessionStorage.getItem('sid')||'anon',item_id_in:id,action_in:'discuss_like'})})}catch(e){}
-  var t=threads.find(function(x){return x.id===id});var n=(t?t.likes||0:0)+1
-  try{await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({likes:n})})}catch(e){}
+  var idx=discussLiked.indexOf(id),isLiked=idx>=0;
+  if(isLiked){discussLiked.splice(idx,1)}else{discussLiked.push(id)}
+  localStorage.setItem('linli_discuss_liked',JSON.stringify(discussLiked));
+  var t=threads.find(function(x){return x.id===id});var n=(t?t.likes||0:0)+(isLiked?-1:1);
+  try{await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({likes:Math.max(0,n)})})}catch(e){}
   loadThreads()
 }
 async function reportDiscuss(id){
