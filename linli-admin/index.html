@@ -639,6 +639,7 @@ const html=document.documentElement;function applyTheme(mode){html.classList.rem
 
 // Auto refresh every 5 minutes
 setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')load()},300000)
+if(localStorage.getItem("admin_session")&&localStorage.getItem("admin_pw")){showMain()}
 </script>
 <div class="modal-overlay" id="replyOverlay" style="position:fixed;inset:0;z-index:300;display:none;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)closeReply()">
   <div class="modal" style="background:var(--elevated,#1c1c1c);border:1px solid var(--border);border-radius:16px;padding:28px;width:400px;max-width:90vw">
@@ -650,6 +651,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.14</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.15</div>
 </body>
 </html>
