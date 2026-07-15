@@ -284,7 +284,7 @@ document.getElementById('lastUpdate').textContent=new Date().toLocaleDateString(
 if(mainView==='discuss'){switchMainView('discuss')}
 else{
   try{var tabBtn=document.querySelector('#tabs .tab[data-tab="'+tab+'"]');if(tabBtn){tabBtn.classList.add('active');document.querySelectorAll('#tabs .tab').forEach(function(b){if(b.dataset.tab!==tab)b.classList.remove('active')})}}catch(e){}
-  if(tab==='category'){buildCatBar();if(activeCat)pickCat(activeCat)}
+  if(tab==='category'){document.getElementById('catBar').style.display='flex';buildCatBar();if(activeCat)pickCat(activeCat)}
   else if(tab==='search'){document.getElementById('searchBar').classList.remove('hidden');if(typeof render==='function')render()}
   else{if(typeof render==='function')render()}
 }
