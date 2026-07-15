@@ -20,6 +20,7 @@
 .discuss-form .note{font-size:0.7rem;color:var(--text-dim);margin-bottom:8px}
 .thread{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;backdrop-filter:blur(10px);transition:border-color 0.3s}
 .thread:hover{border-color:rgba(56,189,248,0.3)}
+.thread.pinned{border-left:3px solid #f59e0b}
 .thread .th-name{font-size:0.8rem;color:var(--accent);font-weight:600}
 .thread .th-time{font-size:0.65rem;color:var(--text-dim);margin-left:8px}
 .thread .th-content{font-size:0.85rem;color:var(--text);margin:6px 0;white-space:pre-wrap;word-break:break-word}
@@ -115,16 +116,22 @@ function renderThreads(){
   var list=document.getElementById('threadList'),empty=document.getElementById('discussEmpty');
   if(!threads.length){list.innerHTML='';empty.style.display='block';empty.textContent='暂无讨论，来发第一个帖子吧';return}
   empty.style.display='none';
+  // 置顶优先排序
+  threads.sort(function(a,b){return(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.created_at)-new Date(a.created_at)})
   list.innerHTML=threads.map(function(t){
     var replyCount=t._replies.length;
-    return '<div class="thread" id="th-'+t.id+'">'+
-      '<div><span class="th-name">'+(t.name||'匿名用户')+'</span><span class="th-time">'+fmtTime(t.created_at)+'</span></div>'+
+    var nameHtml=t.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':(t.name||'匿名用户')
+    var pinBadge=t.pinned?' 📌':''
+    return '<div class="thread'+(t.pinned?' pinned':'')+'" id="th-'+t.id+'">'+
+      '<div>'+pinBadge+nameHtml+'<span class="th-time">'+fmtTime(t.created_at)+'</span></div>'+
       '<div class="th-content">'+esc(t.content)+'</div>'+
       '<div class="th-actions">'+
+        '<button class="th-btn" onclick="doDiscussLike('+t.id+',event)">👍 '+(t.likes||0)+'</button>'+
+        '<button class="th-btn" onclick="reportDiscuss('+t.id+')">⚠ 举报</button>'+
         '<button class="th-btn" onclick="toggleReplies('+t.id+')">💬 '+(replyCount?replyCount+' 回复':'回复')+'</button>'+
       '</div>'+
       '<div class="replies" id="replies-'+t.id+'">'+
-        (t._replies.length?t._replies.map(function(r){return '<div class="reply-item"><span class="th-name">'+(r.name||'匿名用户')+'</span><span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
+        (t._replies.length?t._replies.map(function(r){return '<div class="reply-item">'+(r.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':('<span class="th-name">'+(r.name||'匿名用户')+'</span>'))+'<span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
         '<div class="reply-form"><input type="text" id="replyName-'+t.id+'" placeholder="昵称" maxlength="30" style="max-width:100px"><input type="text" id="replyContent-'+t.id+'" placeholder="回复 TA..." maxlength="300" onkeydown="if(event.key===\'Enter\')postReply('+t.id+')"><button onclick="postReply('+t.id+')">回复</button></div>'+
       '</div>'+
     '</div>';
@@ -168,6 +175,15 @@ async function postTopic(){
   }catch(e){showToast('发布失败，请确认已运行 discuss.sql 创建表')}
 }
 
+async function doDiscussLike(id,e){
+  try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:sessionStorage.getItem('sid')||'anon',item_id_in:id,action_in:'discuss_like'})})}catch(e){}
+  var t=threads.find(function(x){return x.id===id});var n=(t?t.likes||0:0)+1
+  try{await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({likes:n})})}catch(e){}
+  loadThreads()
+}
+async function reportDiscuss(id){
+  try{var d=await sbApi('discussions?select=reports&id=eq.'+id);var n=(d[0]?.reports||0)+1;await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reports:n})});showToast('已举报')}catch(e){showToast('举报失败')}
+}
 loadThreads();
 </script>
 </body>

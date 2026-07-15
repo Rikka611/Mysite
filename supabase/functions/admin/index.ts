@@ -108,6 +108,20 @@ Deno.serve(async (req: Request) => {
         if (error) throw new Error(error.message)
         break
       }
+      case 'discuss_create': {
+        await db.from('discussions').insert({
+          name: 'Admin',
+          content: payload.content,
+          parent_id: payload.parent_id || null,
+          is_admin: true,
+          pinned: false
+        })
+        break
+      }
+      case 'discuss_pin': {
+        await db.from('discussions').update({ pinned: payload.pinned }).eq('id', parseInt(payload.id))
+        break
+      }
       default: {
         result = { error: 'unknown action' }
       }
