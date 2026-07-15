@@ -65,16 +65,16 @@
       data.forEach(function (d, i) {
         var x = pad.left + i * (pw / data.length) + (pw / data.length - barW) / 2
         var bh = d.value > 0 ? Math.max(2, d.value / max * ph) : 0
-        var by = height - pad.bottom - bh
+        var by = h - pad.bottom - bh
         var color = d.color || barColor
-        var grad = ctx.createLinearGradient(x, by, x, height - pad.bottom)
+        var grad = ctx.createLinearGradient(x, by, x, h - pad.bottom)
         grad.addColorStop(0, color); grad.addColorStop(1, color + '60')
         ctx.fillStyle = grad
         ctx.beginPath(); roundRect(ctx, x, by, barW, bh, 3); ctx.fill()
         var step = data.length > 12 ? Math.ceil(data.length / 8) : 1
         if (i % step === 0 || i === data.length - 1) {
           ctx.fillStyle = labelColor; ctx.font = '9px system-ui'; ctx.textAlign = 'center'
-          ctx.fillText(d.label, x + barW / 2, height - 4)
+          ctx.fillText(d.label, x + barW / 2, h - 4)
         }
         if (d.value > 0 && barW > 20) { ctx.fillStyle = '#ddd'; ctx.font = '8px system-ui'; ctx.textAlign = 'center'; ctx.fillText(d.value, x + barW / 2, by - 4) }
         bars.push({ x: x, y: by, w: barW, h: bh, label: d.label, value: d.value, _raw: d })
