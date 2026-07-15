@@ -437,7 +437,7 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
 
 <div class="toast" id="toast"></div>
 
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v2.2.0</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v2.2.17</div>
 <footer>本网站为粉丝自发整理的社区分享平台，与米哈游/HoYoverse及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务。如有侵权内容，请联系QQ:3332984386删除。</footer>
 
 <script>
@@ -611,7 +611,7 @@ document.getElementById('notifyToggle').checked=notifyEnabled;
 function toggleNotify(){notifyEnabled=!notifyEnabled;localStorage.setItem('reply_notify',notifyEnabled);if(!notifyEnabled)document.getElementById('replyBadge').style.display='none'}
 
 async function checkReplies(){
-  let f=sessionStorage.getItem('sid');if(!f||!notifyEnabled)return;
+  let f=window.getVisitorToken?window.getVisitorToken():sessionStorage.getItem('sid');if(!f||!notifyEnabled)return;
   try{replyData=await sbApi('feedbacks?select=id,content,reply,reply_read,created_at,replied_at,fp&or=(fp.eq.'+encodeURIComponent(f)+',fp.eq.)&reply=neq.&order=created_at.desc');const unread=replyData.filter(r=>!r.reply_read);document.getElementById('replyBadge').style.display=unread.length?'block':'none';document.getElementById('replyFab').style.display='flex'}catch(e){}
 }
 async function openReplies(){
