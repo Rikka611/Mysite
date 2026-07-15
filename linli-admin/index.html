@@ -258,7 +258,7 @@ function doAdminSearch(){
 // ---- Load ----
 async function load(){
   try{
-    dataCache=filter==='feedback'?[]:await sbApi('linli_codes?select=*&order=created_at.desc&limit=200')
+    dataCache=filter==='feedback'?[]:await sbApi('linli_codes?select=*&order=created_at.desc&limit=1000')
     renderStats();renderChart();renderList()
   }catch(e){document.getElementById('empty').textContent='加载失败: '+e.message}
 }
