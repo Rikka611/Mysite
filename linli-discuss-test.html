@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' https://naivizrdefonlelndzqr.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none';">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BSide Olivia Lin 分享码 · 讨论区测试</title>
+<link rel="stylesheet" href="../shared/css/theme.css">
+<style>
+#majorPick .tab, #catBar .tab{padding:4px 10px;font-size:0.72rem}
+.row .tag.major{background:rgba(56,189,248,0.15);color:var(--accent);font-weight:500}
+
+/* 讨论区 */
+.discuss-area{max-width:800px;margin:0 auto;position:relative;z-index:1}
+.discuss-form{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:16px;backdrop-filter:blur(10px)}
+.discuss-form input,.discuss-form textarea{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.85rem;outline:none;font-family:inherit;margin-bottom:8px;resize:vertical}
+.discuss-form textarea{min-height:60px}
+.discuss-form input:focus,.discuss-form textarea:focus{border-color:var(--accent)}
+.discuss-form button{padding:8px 20px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:inherit}
+.discuss-form .note{font-size:0.7rem;color:var(--text-dim);margin-bottom:8px}
+.thread{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;backdrop-filter:blur(10px);transition:border-color 0.3s}
+.thread:hover{border-color:rgba(56,189,248,0.3)}
+.thread .th-name{font-size:0.8rem;color:var(--accent);font-weight:600}
+.thread .th-time{font-size:0.65rem;color:var(--text-dim);margin-left:8px}
+.thread .th-content{font-size:0.85rem;color:var(--text);margin:6px 0;white-space:pre-wrap;word-break:break-word}
+.thread .th-actions{display:flex;gap:8px;margin-top:4px}
+.thread .th-btn{font-size:0.7rem;color:var(--text-dim);cursor:pointer;background:none;border:none;padding:2px 8px;border-radius:50px;font-family:inherit;transition:all 0.2s}
+.thread .th-btn:hover{color:var(--accent);background:rgba(56,189,248,0.08)}
+.replies{margin-top:8px;padding-left:20px;border-left:2px solid rgba(56,189,248,0.15)}
+.reply-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.reply-item:last-child{border-bottom:none}
+.reply-item .th-name{font-size:0.75rem}
+.reply-item .th-content{font-size:0.8rem}
+.reply-form{display:flex;gap:6px;margin-top:8px;align-items:flex-start}
+.reply-form input{flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.8rem;outline:none;font-family:inherit}
+.reply-form input:focus{border-color:var(--accent)}
+.reply-form button{padding:6px 14px;border-radius:50px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:inherit;flex-shrink:0}
+.discuss-empty{text-align:center;color:var(--text-dim);padding:40px 0;font-size:0.9rem}
+
+@media(max-width:500px){
+  .replies{padding-left:12px}
+  .discuss-form{padding:12px}
+}
+</style>
+<script src="../shared/js/config.js?v=3.0.8"></script>
+<script src="../shared/js/sanitize.js?v=3.0.8"></script>
+<script src="../shared/js/api.js?v=3.0.8"></script>
+</head>
+<body>
+<div class="stars"></div>
+
+<nav>
+  <div class="inner">
+    <button class="theme-btn" id="themeToggle" title="切换日夜模式"><span class="icon-sun">☀️</span><span class="icon-moon">🌙</span></button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1><a href="https://store.steampowered.com/app/4532590/BSide_Olivia_Lin/" target="_blank">BSide Olivia Lin</a> 讨论区</h1>
+  <p>分享你的钢琴曲心得 · 匿名交流</p>
+</div>
+
+<div class="discuss-area">
+  <!-- 发帖表单 -->
+  <div style="text-align:center;margin-bottom:12px">
+    <button onclick="togglePostForm()" id="togglePostBtn" style="padding:8px 24px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.85rem;font-family:inherit;transition:all 0.3s">＋ 发起新讨论</button>
+  </div>
+  <div class="discuss-form" id="postForm" style="display:none">
+    <div class="note">💬 发起新讨论</div>
+    <input type="text" id="newName" placeholder="昵称（留空则为「匿名用户」）" maxlength="30">
+    <textarea id="newContent" placeholder="想说点什么..." maxlength="500"></textarea>
+    <button onclick="postTopic()">📨 发布</button>
+  </div>
+
+  <!-- 帖子列表 -->
+  <div id="threadList"></div>
+  <div class="discuss-empty" id="discussEmpty">加载中...</div>
+</div>
+
+<div class="toast" id="toast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:300;background:linear-gradient(90deg,#1e293b,#334155);color:#fff;padding:12px 28px;border-radius:50px;font-size:0.85rem;pointer-events:none;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.3);box-shadow:0 8px 32px rgba(0,0,0,0.4)"></div>
+
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v3.0.8-discuss-test</div>
+
+<script>
+// Theme
+const html=document.documentElement;
+function applyTheme(mode){html.classList.remove('light','dark');if(mode==='light')html.classList.add('light');if(mode==='dark')html.classList.add('dark')}
+const st=localStorage.getItem('theme');if(st)applyTheme(st);
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const cur=html.classList.contains('light')?'light':html.classList.contains('dark')?'dark':'auto';
+  if(cur==='auto'){const sd=matchMedia('(prefers-color-scheme:dark)').matches;localStorage.setItem('theme',sd?'light':'dark');applyTheme(sd?'light':'dark')}
+  else if(cur==='dark'){localStorage.setItem('theme','light');applyTheme('light')}
+  else{localStorage.setItem('theme','dark');applyTheme('dark')}
+});
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+function esc(s){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
+
+// State
+var threads=[],replyOpen=null;
+
+async function loadThreads(){
+  try{
+    var data=await sbApi('discussions?select=*&parent_id=is.null&order=created_at.desc&limit=100');
+    var replies=await sbApi('discussions?select=*&parent_id=not.is.null&order=created_at.asc&limit=500');
+    threads=data.map(function(t){
+      t._replies=replies.filter(function(r){return r.parent_id===t.id});
+      return t;
+    });
+    renderThreads();
+  }catch(e){document.getElementById('discussEmpty').textContent='加载失败，请确认已运行 discuss.sql 创建表'}
+}
+
+function renderThreads(){
+  var list=document.getElementById('threadList'),empty=document.getElementById('discussEmpty');
+  if(!threads.length){list.innerHTML='';empty.style.display='block';empty.textContent='暂无讨论，来发第一个帖子吧';return}
+  empty.style.display='none';
+  list.innerHTML=threads.map(function(t){
+    var replyCount=t._replies.length;
+    return '<div class="thread" id="th-'+t.id+'">'+
+      '<div><span class="th-name">'+(t.name||'匿名用户')+'</span><span class="th-time">'+fmtTime(t.created_at)+'</span></div>'+
+      '<div class="th-content">'+esc(t.content)+'</div>'+
+      '<div class="th-actions">'+
+        '<button class="th-btn" onclick="toggleReplies('+t.id+')">💬 '+(replyCount?replyCount+' 回复':'回复')+'</button>'+
+      '</div>'+
+      '<div class="replies" id="replies-'+t.id+'">'+
+        (t._replies.length?t._replies.map(function(r){return '<div class="reply-item"><span class="th-name">'+(r.name||'匿名用户')+'</span><span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
+        '<div class="reply-form"><input type="text" id="replyName-'+t.id+'" placeholder="昵称" maxlength="30" style="max-width:100px"><input type="text" id="replyContent-'+t.id+'" placeholder="回复 TA..." maxlength="300" onkeydown="if(event.key===\'Enter\')postReply('+t.id+')"><button onclick="postReply('+t.id+')">回复</button></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function fmtTime(ts){if(!ts)return'';var d=new Date(ts),now=new Date();var diff=now-d;var diffM=Math.floor(diff/60000);if(diffM<10)return diffM<=0?'刚刚':diffM+'分钟前';if(d.toDateString()===now.toDateString())return d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});var y=d.getFullYear(),m=d.getMonth()+1,day=d.getDate();return y+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day}
+
+function toggleReplies(id){
+  var div=document.getElementById('replies-'+id);
+  div.style.display=div.style.display==='none'?'block':'none';
+  if(div.style.display==='block'){var inp=document.getElementById('replyContent-'+id);if(inp)inp.focus()}
+}
+
+async function postReply(id){
+  var nameEl=document.getElementById('replyName-'+id),contentEl=document.getElementById('replyContent-'+id);
+  var name=nameEl?nameEl.value.trim():'',content=contentEl?contentEl.value.trim():'';
+  if(!content){showToast('请输入回复内容');return}
+  try{
+    await sbApi('discussions',{method:'POST',body:JSON.stringify({name:name||'匿名用户',content:content,parent_id:id})});
+    showToast('回复成功');
+    await loadThreads();
+  }catch(e){showToast('回复失败，请重试')}
+}
+
+function togglePostForm(){
+  var f=document.getElementById('postForm'),b=document.getElementById('togglePostBtn');
+  if(f.style.display==='none'){f.style.display='block';b.style.display='none'}else{f.style.display='none';b.style.display='inline-block'}
+}
+async function postTopic(){
+  var name=document.getElementById('newName').value.trim();
+  var content=document.getElementById('newContent').value.trim();
+  if(!content){showToast('请输入内容');return}
+  try{
+    await sbApi('discussions',{method:'POST',body:JSON.stringify({name:name||'匿名用户',content:content})});
+    showToast('发布成功');
+    document.getElementById('newName').value='';
+    document.getElementById('newContent').value='';
+    togglePostForm();
+    await loadThreads();
+  }catch(e){showToast('发布失败，请确认已运行 discuss.sql 创建表')}
+}
+
+loadThreads();
+</script>
+</body>
+</html>

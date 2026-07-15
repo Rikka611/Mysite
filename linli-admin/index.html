@@ -133,6 +133,7 @@
     <button class="tab" data-filter="rejected" id="tabRejected">已拒绝</button>
     <button class="tab" data-filter="reported" id="tabReported">⚠ 举报</button>
     <button class="tab" data-filter="feedback" id="tabFeedback">💬 反馈</button>
+    <button class="tab" data-filter="discuss" id="tabDiscuss">💭 讨论</button>
   </div>
 
   <div class="admin-search" id="adminSearch">
@@ -162,6 +163,7 @@
   <div class="list" id="list"></div>
   <div style="display:none;margin-bottom:8px" id="fbFilterBar"><label style="font-size:0.75rem;color:var(--text-dim);cursor:pointer"><input type="checkbox" id="fbUnreplied" onchange="renderFeedback()"> 仅未回复</label></div>
   <div class="list" id="feedbackList" style="display:none"></div>
+  <div class="list" id="discussList" style="display:none"></div>
   <div class="empty" id="empty">加载中...</div>
 </div>
 </div>
@@ -246,7 +248,7 @@ async function init(){
   try{
     var catSel=document.getElementById('catFilter')
     TAG_CATS.forEach(function(c){if(c.id!=='other'){var o=document.createElement('option');o.value=c.id;o.textContent=c.n;catSel.appendChild(o)}})
-    var tabs=document.querySelectorAll('#mainBox .tabs .tab');tabs.forEach(function(t){t.onclick=function(){filter=t.dataset.filter;tabs.forEach(function(x){return x.classList.remove('active')});t.classList.add('active');var fbBar=document.getElementById('fbFilterBar');if(filter==='feedback'){fbBar.style.display='block';loadFeedback()}else{fbBar.style.display='none';load()}}})
+    var tabs=document.querySelectorAll('#mainBox .tabs .tab');tabs.forEach(function(t){t.onclick=function(){filter=t.dataset.filter;tabs.forEach(function(x){return x.classList.remove('active')});t.classList.add('active');var fbBar=document.getElementById('fbFilterBar'),dcList=document.getElementById('discussList'),fbList=document.getElementById('feedbackList');if(filter==='feedback'){fbBar.style.display='block';fbList.style.display='block';dcList.style.display='none';loadFeedback()}else if(filter==='discuss'){fbBar.style.display='none';fbList.style.display='none';dcList.style.display='block';loadDiscuss()}else{fbBar.style.display='none';fbList.style.display='none';dcList.style.display='none';load()}}})
     load()
   }catch(e){console.error(e)}
 }
@@ -407,8 +409,8 @@ function switchTab(target){
 }
 
 function renderList(){
-  const lst=document.getElementById('list'),fl=document.getElementById('feedbackList'),em=document.getElementById('empty')
-  lst.innerHTML='';fl.style.display='none';fl.innerHTML=''
+  const lst=document.getElementById('list'),fl=document.getElementById('feedbackList'),dl=document.getElementById('discussList'),em=document.getElementById('empty')
+  lst.style.display='';lst.innerHTML='';fl.style.display='none';dl.style.display='none'
   var items=dataCache
   if(filter==='reported')items=dataCache.filter(function(x){return(x.reports||0)>0})
   else if(filter!=='all'&&filter!=='feedback')items=dataCache.filter(function(x){return x.status===filter})
@@ -487,8 +489,8 @@ async function loadFeedback(){console.log('loading feedback...');
 }
 function renderFeedback(){
   var unrepliedOnly=document.getElementById('fbUnreplied')&&document.getElementById('fbUnreplied').checked
-  const lst=document.getElementById('list'),fl=document.getElementById('feedbackList'),em=document.getElementById('empty')
-  lst.innerHTML='';fl.style.display='block';fl.innerHTML=''
+  const lst=document.getElementById('list'),fl=document.getElementById('feedbackList'),dl=document.getElementById('discussList'),em=document.getElementById('empty')
+  lst.innerHTML='';fl.style.display='block';fl.innerHTML='';dl.style.display='none'
   var items=unrepliedOnly?feedbackCache.filter(function(f){return!f.reply}):feedbackCache
   if(!items.length){em.style.display='block';em.textContent=unrepliedOnly?'所有反馈均已回复':'暂无反馈';return}
   em.style.display='none'
@@ -508,6 +510,28 @@ async function doReply(){const txt=document.getElementById('replyText').value.tr
 const html=document.documentElement;function applyTheme(mode){html.classList.remove("light","dark");if(mode==="light")html.classList.add("light");if(mode==="dark")html.classList.add("dark")}const st=localStorage.getItem("theme");if(st)applyTheme(st);document.getElementById("themeToggle").addEventListener("click",()=>{const cur=html.classList.contains("light")?"light":html.classList.contains("dark")?"dark":"auto";if(cur==="auto"){const sd=matchMedia("(prefers-color-scheme:dark)").matches;localStorage.setItem("theme",sd?"light":"dark");applyTheme(sd?"light":"dark")}else if(cur==="dark"){localStorage.setItem("theme","light");applyTheme("light")}else{localStorage.setItem("theme","dark");applyTheme("dark")}});
 
 // Auto refresh every 5 minutes
+// ---- Discuss ----
+var discussCache=[]
+async function loadDiscuss(){
+  try{var d=await sbApi('discussions?select=*&order=created_at.desc&limit=200');discussCache=d;renderDiscuss()}catch(e){}
+}
+function renderDiscuss(){
+  var lst=document.getElementById('discussList'),em=document.getElementById('empty'),fbList=document.getElementById('feedbackList')
+  if(lst)lst.innerHTML='';if(fbList)fbList.style.display='none'
+  if(!discussCache.length){em.style.display='block';em.textContent='暂无讨论';return}
+  em.style.display='none'
+  var threads=discussCache.filter(function(x){return!x.parent_id})
+  threads.forEach(function(t){
+    var d=document.createElement('div');d.className='row'
+    var replies=discussCache.filter(function(r){return r.parent_id===t.id})
+    d.innerHTML='<div class="info"><div class="title">'+(t.name||'匿名用户')+' <span style="font-size:0.65rem;color:var(--text-dim)">'+new Date(t.created_at).toLocaleString('zh-CN')+'</span></div><div class="sub">'+escapeHtml(t.content)+'</div>'+
+      (replies.length?'<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;padding-left:12px;border-left:2px solid rgba(56,189,248,0.15)">'+replies.map(function(r){return '<div style="padding:2px 0">'+(r.name||'匿名用户')+' <span style="font-size:0.6rem">'+new Date(r.created_at).toLocaleString('zh-CN')+'</span>: '+escapeHtml(r.content)+' <button class="btn danger sm" onclick="delDiscuss('+r.id+')" style="padding:1px 6px;font-size:0.55rem">删</button></div>'}).join('')+'</div>':'')+
+      '</div><div class="actions"><button class="btn danger sm" onclick="delDiscuss('+t.id+')">删帖</button></div>'
+    lst.appendChild(d)
+  })
+}
+async function delDiscuss(id){if(!confirm('确认删除？子回复也会被删除'))return;try{await adminApi('discuss_delete',{id:id});loadDiscuss();showToast('已删除','ok')}catch(e){showToast('操作失败','err')}}
+
 var _isEditing=false
 setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none'&&!_isEditing&&!_replyId)load()},300000)
 if(localStorage.getItem("admin_session")&&sessionStorage.getItem("admin_pw")){showMain()}
