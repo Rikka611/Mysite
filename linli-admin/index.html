@@ -34,7 +34,10 @@
 .stat{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;text-align:center;backdrop-filter:blur(12px)}
 .stat .val{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .stat .lbl{font-size:0.7rem;color:var(--text-dim);margin-top:2px}
-.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.charts{display:grid;gap:16px;margin-bottom:16px}
+.charts-3col{grid-template-columns:repeat(3,1fr)}
+.charts-2col{grid-template-columns:repeat(2,1fr)}
+@media(max-width:768px){.charts-3col,.charts-2col{grid-template-columns:1fr}}
 .chart-box{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;position:relative;backdrop-filter:blur(12px)}
 .toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast-msg{padding:10px 20px;border-radius:10px;font-size:0.85rem;color:#fff}
@@ -49,13 +52,13 @@
 .row.pending{border-left:3px solid #fbbf24}.row.rejected{opacity:0.5}
 .row.dupe{border-left:3px solid #ef4444}.row.reported{border-left:3px solid #f59e0b}
 </style>
-<script src="../shared/js/config.js?v=3.0.3"></script>
-<script src="../shared/js/sanitize.js?v=3.0.3"></script>
-<script src="../shared/js/api.js?v=3.0.3"></script>
-<script src="../shared/js/charts.js?v=3.0.3"></script>
-<script src="../shared/js/paginate.js?v=3.0.3"></script>
-<script src="../shared/js/batch.js?v=3.0.3"></script>
-<script src="../shared/js/cache.js?v=3.0.3"></script>
+<script src="../shared/js/config.js?v=3.0.4"></script>
+<script src="../shared/js/sanitize.js?v=3.0.4"></script>
+<script src="../shared/js/api.js?v=3.0.4"></script>
+<script src="../shared/js/charts.js?v=3.0.4"></script>
+<script src="../shared/js/paginate.js?v=3.0.4"></script>
+<script src="../shared/js/batch.js?v=3.0.4"></script>
+<script src="../shared/js/cache.js?v=3.0.4"></script>
 </head>
 <body>
 <div class="stars"></div>
@@ -101,12 +104,14 @@
     <button class="range-btn" id="r30d" onclick="setRange('30d')">30天</button>
     <button class="range-btn" id="rall" onclick="setRange('all')">全部</button>
   </div>
-  <div class="charts">
-    <div class="chart-box"><canvas id="chartLikes"></canvas></div>
+  <div class="charts charts-3col">
     <div class="chart-box"><canvas id="chartStatus"></canvas></div>
+    <div class="chart-box"><canvas id="chartLikes"></canvas></div>
+    <div class="chart-box"><canvas id="chartTags"></canvas></div>
+  </div>
+  <div class="charts charts-2col">
     <div class="chart-box"><canvas id="chartUploads"></canvas></div>
     <div class="chart-box"><canvas id="chartViews"></canvas></div>
-    <div class="chart-box"><canvas id="chartTags"></canvas></div>
   </div>
 
   <div class="list" id="list"></div>
@@ -295,8 +300,8 @@ function renderChart(){
   requestAnimationFrame(function(){
     try{window.drawBarChart(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{height:260,title:'点赞排行',barColor:'#38bdf8',onClick:function(d){if(d._id)scrollToItem(d._id)}})}catch(e){console.error('chartLikes',e)}
     try{window.drawPieChart(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布',colors:['#34d399','#fbbf24','#ef4444'],onClick:function(d){switchTabByStatus(d.label)}})}catch(e){console.error('chartStatus',e)}
-    try{window.drawBarChart(document.getElementById('chartUploads'),upSlots,{height:260,title:modeLabel+'上传量',barColor:'#818cf8'})}catch(e){console.error('chartUploads',e)}
-    try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){console.error('chartViews',e)}
+    try{window.drawBarChart(document.getElementById('chartUploads'),upSlots,{height:260,title:modeLabel+'上传量',barColor:'#818cf8',barMaxWidth:52})}catch(e){console.error('chartUploads',e)}
+    try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399',barMaxWidth:52})}catch(e){console.error('chartViews',e)}
     try{window.drawPieChart(document.getElementById('chartTags'),tagData.length?tagData:[{label:'-',value:1}],{title:'标签分布',colors:['#38bdf8','#818cf8','#34d399','#fbbf24','#f472b6','#fb923c','#2dd4bf']})}catch(e){console.error('chartTags',e)}
 
     // Async: update views chart with real PV data, then redraw
@@ -306,7 +311,7 @@ function renderChart(){
         var d=new Date(v.visited_at),idx=slotIndex(vwSlots,d,mode)
         if(idx>=0)vwSlots[idx].value++
       })
-      try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){console.error('chartViews2',e)}
+      try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399',barMaxWidth:52})}catch(e){console.error('chartViews2',e)}
     }).catch(function(e){console.error('pvFetch',e)})
   })
 }
@@ -413,6 +418,6 @@ if(localStorage.getItem("admin_session")&&localStorage.getItem("admin_pw")){show
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v3.0.3</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v3.0.4</div>
 </body>
 </html>

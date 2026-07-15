@@ -41,6 +41,7 @@
     var w = opts.width || 400, h = opts.height || 260
     var title = opts.title || '', barColor = opts.barColor || PALETTE[0]
     var labelColor = opts.labelColor || '#94a3b8', onClick = opts.onClick
+    var barMaxW = opts.barMaxWidth || 32
 
     function draw() {
       var rect = canvas.parentElement ? canvas.parentElement.getBoundingClientRect() : null
@@ -50,7 +51,7 @@
       var pad = { top: title ? 30 : 10, right: 16, bottom: 28, left: 40 }
       var pw = cw - pad.left - pad.right, ph = h - pad.top - pad.bottom
       var max = Math.max.apply(null, data.map(function (d) { return d.value })) || 1
-      var barW = Math.min(32, pw / data.length - 6)
+      var barW = Math.min(barMaxW, pw / data.length - 6)
       var bars = []
 
       // Y axis
