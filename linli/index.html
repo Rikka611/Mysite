@@ -8,8 +8,11 @@
 <link rel="stylesheet" href="../shared/css/theme.css">
 <style>
 #majorPick .tab, #catBar .tab{padding:4px 10px;font-size:0.72rem}
-/* tag major highlight — overrides shared .tag */
 .row .tag.major{background:rgba(56,189,248,0.15);color:var(--accent);font-weight:500}
+.pg-info{font-size:0.8rem;color:var(--text-dim);display:inline-flex;align-items:center;gap:4px}
+.pg-info input{width:38px;padding:3px 4px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--accent);font-size:0.8rem;font-weight:600;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield}
+.pg-info input::-webkit-inner-spin-button,.pg-info input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.pg-info input:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(56,189,248,0.2)}
 </style>
   <script src="../shared/js/config.js?v=3.0.4"></script>
   <script src="../shared/js/sanitize.js?v=3.0.4"></script>
@@ -247,9 +250,8 @@ function renderPager(){
   const p=document.getElementById('pager');
   if(totalPages<=1){p.innerHTML='';return}
   let h=`<button onclick="goPage(${page-1})" ${page<=1?'disabled':''}>‹</button>`;
-  h+=`<span class="info">${page} / ${totalPages}</span>`;
+  h+=`<span class="pg-info"><input id="jumpPage" type="number" min="1" max="${totalPages}" value="${page}" onkeydown="if(event.key==='Enter')goPage(parseInt(this.value))" onfocus="this.select()"> / ${totalPages}</span>`;
   h+=`<button onclick="goPage(${page+1})" ${page>=totalPages?'disabled':''}>›</button>`;
-  h+=`<span style="margin-left:10px;font-size:0.75rem;color:var(--text-dim)">跳至</span><input id="jumpPage" type="number" min="1" max="${totalPages}" value="${page}" onkeydown="if(event.key==='Enter')goPage(parseInt(this.value))" style="width:42px;padding:4px 6px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);font-size:0.75rem;text-align:center;font-family:system-ui;outline:none;-moz-appearance:textfield" onfocus="this.select()">`;
   p.innerHTML=h;
 }
 function goPage(n){if(isNaN(n)||n<1||n>totalPages)return;page=n;render();window.scrollTo({top:0,behavior:'smooth'})}
