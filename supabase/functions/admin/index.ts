@@ -104,7 +104,8 @@ Deno.serve(async (req: Request) => {
         break
       }
       case 'discuss_delete': {
-        await db.from('discussions').delete().eq('id', payload.id)
+        const { error } = await db.from('discussions').delete().eq('id', parseInt(payload.id))
+        if (error) throw new Error(error.message)
         break
       }
       default: {

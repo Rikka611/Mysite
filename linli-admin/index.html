@@ -134,8 +134,10 @@
     <button class="tab" data-filter="reported" id="tabReported">⚠ 举报</button>
     <button class="tab" data-filter="feedback" id="tabFeedback">💬 反馈</button>
     <button class="tab" data-filter="discuss" id="tabDiscuss">💭 讨论</button>
+    <button class="tab" data-filter="data" id="tabData">📊 数据</button>
   </div>
 
+  <div id="dataPanel">
   <div class="admin-search" id="adminSearch">
     <input type="text" id="searchAdmin" placeholder="搜索分享码 / 曲名 / 标签..." oninput="doAdminSearch()">
     <select id="catFilter" onchange="doAdminSearch()">
@@ -159,6 +161,7 @@
     <div class="chart-box"><canvas id="chartUploads"></canvas></div>
     <div class="chart-box"><canvas id="chartViews"></canvas></div>
   </div>
+  </div><!-- /dataPanel -->
 
   <div class="list" id="list"></div>
   <div style="display:none;margin-bottom:8px" id="fbFilterBar"><label style="font-size:0.75rem;color:var(--text-dim);cursor:pointer"><input type="checkbox" id="fbUnreplied" onchange="renderFeedback()"> 仅未回复</label></div>
@@ -248,7 +251,8 @@ async function init(){
   try{
     var catSel=document.getElementById('catFilter')
     TAG_CATS.forEach(function(c){if(c.id!=='other'){var o=document.createElement('option');o.value=c.id;o.textContent=c.n;catSel.appendChild(o)}})
-    var tabs=document.querySelectorAll('#mainBox .tabs .tab');tabs.forEach(function(t){t.onclick=function(){filter=t.dataset.filter;tabs.forEach(function(x){return x.classList.remove('active')});t.classList.add('active');var fbBar=document.getElementById('fbFilterBar'),dcList=document.getElementById('discussList'),fbList=document.getElementById('feedbackList');if(filter==='feedback'){fbBar.style.display='block';fbList.style.display='block';dcList.style.display='none';loadFeedback()}else if(filter==='discuss'){fbBar.style.display='none';fbList.style.display='none';dcList.style.display='block';loadDiscuss()}else{fbBar.style.display='none';fbList.style.display='none';dcList.style.display='none';load()}}})
+    document.getElementById('dataPanel').style.display='none'
+    var tabs=document.querySelectorAll('#mainBox .tabs .tab');tabs.forEach(function(t){t.onclick=function(){filter=t.dataset.filter;tabs.forEach(function(x){return x.classList.remove('active')});t.classList.add('active');var fbBar=document.getElementById('fbFilterBar'),dcList=document.getElementById('discussList'),fbList=document.getElementById('feedbackList'),dp=document.getElementById('dataPanel'),lst=document.getElementById('list');if(filter==='feedback'){fbBar.style.display='block';fbList.style.display='block';dcList.style.display='none';dp.style.display='none';lst.style.display='none';loadFeedback()}else if(filter==='discuss'){fbBar.style.display='none';fbList.style.display='none';dcList.style.display='block';dp.style.display='none';lst.style.display='none';loadDiscuss()}else if(filter==='data'){fbBar.style.display='none';fbList.style.display='none';dcList.style.display='none';dp.style.display='block';lst.style.display='block';load()}else{fbBar.style.display='none';fbList.style.display='none';dcList.style.display='none';dp.style.display='none';lst.style.display='block';load()}}})
     load()
   }catch(e){console.error(e)}
 }
