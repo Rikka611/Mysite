@@ -160,6 +160,7 @@
   </div>
 
   <div class="list" id="list"></div>
+  <div style="display:none;margin-bottom:8px" id="fbFilterBar"><label style="font-size:0.75rem;color:var(--text-dim);cursor:pointer"><input type="checkbox" id="fbUnreplied" onchange="renderFeedback()"> 仅未回复</label></div>
   <div class="list" id="feedbackList" style="display:none"></div>
   <div class="empty" id="empty">加载中...</div>
 </div>
@@ -245,7 +246,7 @@ async function init(){
   try{
     var catSel=document.getElementById('catFilter')
     TAG_CATS.forEach(function(c){if(c.id!=='other'){var o=document.createElement('option');o.value=c.id;o.textContent=c.n;catSel.appendChild(o)}})
-    var tabs=document.querySelectorAll('#mainBox .tabs .tab');tabs.forEach(function(t){t.onclick=function(){filter=t.dataset.filter;tabs.forEach(function(x){return x.classList.remove('active')});t.classList.add('active');filter==='feedback'?loadFeedback():load()}})
+    var tabs=document.querySelectorAll('#mainBox .tabs .tab');tabs.forEach(function(t){t.onclick=function(){filter=t.dataset.filter;tabs.forEach(function(x){return x.classList.remove('active')});t.classList.add('active');var fbBar=document.getElementById('fbFilterBar');if(filter==='feedback'){fbBar.style.display='block';loadFeedback()}else{fbBar.style.display='none';load()}}})
     load()
   }catch(e){console.error(e)}
 }
@@ -485,11 +486,13 @@ async function loadFeedback(){console.log('loading feedback...');
   try{feedbackCache=await sbApi('feedbacks?select=*&order=created_at.desc&limit=50');renderFeedback()}catch(e){}
 }
 function renderFeedback(){
+  var unrepliedOnly=document.getElementById('fbUnreplied')&&document.getElementById('fbUnreplied').checked
   const lst=document.getElementById('list'),fl=document.getElementById('feedbackList'),em=document.getElementById('empty')
   lst.innerHTML='';fl.style.display='block';fl.innerHTML=''
-  if(!feedbackCache.length){em.style.display='block';em.textContent='暂无反馈';return}
+  var items=unrepliedOnly?feedbackCache.filter(function(f){return!f.reply}):feedbackCache
+  if(!items.length){em.style.display='block';em.textContent=unrepliedOnly?'所有反馈均已回复':'暂无反馈';return}
   em.style.display='none'
-  feedbackCache.forEach(f=>{
+  items.forEach(f=>{
     const d=document.createElement('div');d.className='row'
     const replied=f.reply?'<span style="font-size:0.65rem;color:var(--ok);margin-right:4px">已回复</span>':'';d.innerHTML='<div class="info"><div class="title">'+escapeHtml(f.content||'')+'</div><div class="sub" style="font-size:0.65rem">'+new Date(f.created_at).toLocaleString()+'</div>'+(f.reply?'<div style="font-size:0.8rem;color:var(--ok);margin-top:4px">回复: '+escapeHtml(f.reply)+'</div>':'')+'</div><div class="actions">'+replied+'<button class="btn ok sm" onclick="replyFeedback('+f.id+')">回复</button>'+(f.reply?'<button class="btn danger sm" onclick="clearReply('+f.id+')">删回复</button>':'')+'<button class="btn ok sm" onclick="markFeedback('+f.id+',\'resolved\')">解决</button><button class="btn danger sm" onclick="delFeedback('+f.id+')">删除</button></div>'
     fl.appendChild(d)
