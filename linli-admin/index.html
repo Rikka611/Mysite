@@ -539,7 +539,7 @@ function renderDiscuss(){
   })
   // 管理发帖表单
   var formDiv=document.createElement('div');formDiv.className='row';formDiv.style.borderLeft='3px solid #f59e0b'
-  formDiv.innerHTML='<div class="info"><input id="adminPostContent" placeholder="以 Admin 身份发帖..." maxlength="500" style="width:100%;padding:6px 10px;border-radius:8px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);font-size:0.8rem;outline:none;font-family:inherit"></div><div class="actions"><button class="btn warn sm" onclick="adminPost()">发布</button></div>'
+  formDiv.innerHTML='<div class="info"><textarea id="adminPostContent" placeholder="以 Admin 身份发帖..." maxlength="500" rows="2" style="width:100%;padding:6px 10px;border-radius:8px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);font-size:0.8rem;outline:none;font-family:inherit;resize:vertical"></textarea></div><div class="actions"><button class="btn warn sm" onclick="adminPost()">发布</button></div>'
   lst.appendChild(formDiv)
 }
 var _adminReplyId=0
