@@ -522,8 +522,7 @@ async function loadDiscuss(){
 function renderDiscuss(){
   var lst=document.getElementById('discussList'),em=document.getElementById('empty'),fbList=document.getElementById('feedbackList')
   if(lst)lst.innerHTML='';if(fbList)fbList.style.display='none'
-  if(!discussCache.length){em.style.display='block';em.textContent='暂无讨论';return}
-  em.style.display='none'
+  if(!discussCache.length){em.style.display='block';em.textContent='暂无讨论'}else{em.style.display='none'}
   var threads=discussCache.filter(function(x){return!x.parent_id})
   threads.sort(function(a,b){return(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.created_at)-new Date(a.created_at)})
   threads.forEach(function(t){
