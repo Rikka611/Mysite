@@ -49,13 +49,13 @@
 .row.pending{border-left:3px solid #fbbf24}.row.rejected{opacity:0.5}
 .row.dupe{border-left:3px solid #ef4444}.row.reported{border-left:3px solid #f59e0b}
 </style>
-<script src="../shared/js/config.js?v=2.1.4"></script>
-<script src="../shared/js/sanitize.js?v=2.1.4"></script>
-<script src="../shared/js/api.js?v=2.1.4"></script>
-<script src="../shared/js/charts.js?v=2.1.4"></script>
-<script src="../shared/js/paginate.js?v=2.1.4"></script>
-<script src="../shared/js/batch.js?v=2.1.4"></script>
-<script src="../shared/js/cache.js?v=2.1.4"></script>
+<script src="../shared/js/config.js?v=3.0.2"></script>
+<script src="../shared/js/sanitize.js?v=3.0.2"></script>
+<script src="../shared/js/api.js?v=3.0.2"></script>
+<script src="../shared/js/charts.js?v=3.0.2"></script>
+<script src="../shared/js/paginate.js?v=3.0.2"></script>
+<script src="../shared/js/batch.js?v=3.0.2"></script>
+<script src="../shared/js/cache.js?v=3.0.2"></script>
 </head>
 <body>
 <div class="stars"></div>
@@ -291,22 +291,24 @@ function renderChart(){
 
   var modeLabel={ '24h':'24h','7d':'7天','30d':'30天','all':'月度' }[mode]||mode
 
-  // Draw charts
-  try{window.drawBarChart(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{height:260,title:'点赞排行',barColor:'#38bdf8',onClick:function(d){if(d._id)scrollToItem(d._id)}})}catch(e){}
-  try{window.drawPieChart(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布',colors:['#34d399','#fbbf24','#ef4444'],onClick:function(d){switchTabByStatus(d.label)}})}catch(e){}
-  try{window.drawBarChart(document.getElementById('chartUploads'),upSlots,{height:260,title:modeLabel+'上传量',barColor:'#818cf8'})}catch(e){}
-  try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){}
-  try{window.drawPieChart(document.getElementById('chartTags'),tagData.length?tagData:[{label:'-',value:1}],{title:'标签分布',colors:['#38bdf8','#818cf8','#34d399','#fbbf24','#f472b6','#fb923c','#2dd4bf']})}catch(e){}
+  // Draw charts (rAF ensures DOM ready + canvas sized)
+  requestAnimationFrame(function(){
+    try{window.drawBarChart(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{height:260,title:'点赞排行',barColor:'#38bdf8',onClick:function(d){if(d._id)scrollToItem(d._id)}})}catch(e){console.error('chartLikes',e)}
+    try{window.drawPieChart(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布',colors:['#34d399','#fbbf24','#ef4444'],onClick:function(d){switchTabByStatus(d.label)}})}catch(e){console.error('chartStatus',e)}
+    try{window.drawBarChart(document.getElementById('chartUploads'),upSlots,{height:260,title:modeLabel+'上传量',barColor:'#818cf8'})}catch(e){console.error('chartUploads',e)}
+    try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){console.error('chartViews',e)}
+    try{window.drawPieChart(document.getElementById('chartTags'),tagData.length?tagData:[{label:'-',value:1}],{title:'标签分布',colors:['#38bdf8','#818cf8','#34d399','#fbbf24','#f472b6','#fb923c','#2dd4bf']})}catch(e){console.error('chartTags',e)}
 
-  // Async: update views chart with real PV data
-  sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=100000').then(function(pv){
-    pv.forEach(function(v){
-      if(!v.visited_at)return
-      var d=new Date(v.visited_at),idx=slotIndex(vwSlots,d,mode)
-      if(idx>=0)vwSlots[idx].value++
-    })
-    try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){}
-  }).catch(function(){})
+    // Async: update views chart with real PV data, then redraw
+    sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=100000').then(function(pv){
+      pv.forEach(function(v){
+        if(!v.visited_at)return
+        var d=new Date(v.visited_at),idx=slotIndex(vwSlots,d,mode)
+        if(idx>=0)vwSlots[idx].value++
+      })
+      try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){console.error('chartViews2',e)}
+    }).catch(function(e){console.error('pvFetch',e)})
+  })
 }
 
 // Chart → list linkage
