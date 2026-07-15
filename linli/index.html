@@ -145,7 +145,7 @@ body>nav{display:none}
 <div class="view-panel discuss-inactive" id="discussPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div style="display:flex;gap:8px">
-      <button class="tab active" id="discussTabHot" onclick="switchDiscussTab('hot')">🔥 推荐</button>
+      <button class="tab" id="discussTabHot" onclick="switchDiscussTab('hot')">🔥 推荐</button>
       <button class="tab" id="discussTabNew" onclick="switchDiscussTab('new')">🆕 最新</button>
     </div>
     <button onclick="togglePostForm()" id="togglePostBtn" style="padding:6px 18px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-family:inherit;flex-shrink:0">＋ 发起新讨论</button>
@@ -217,7 +217,7 @@ document.getElementById('mainDiscuss').addEventListener('click',function(){switc
 function switchMainView(v){
   mainView=v;sessionStorage.setItem('linli_main',v);document.getElementById('mainShare').classList.toggle('active',v==='share');document.getElementById('mainDiscuss').classList.toggle('active',v==='discuss');
   var sp=document.getElementById('sharePanel'),dp=document.getElementById('discussPanel'),tabs=document.getElementById('tabs'),vs=document.getElementById('viewSwitch'),fab=document.getElementById('fab'),vc=document.getElementById('viewContainer');
-  if(v==='share'){sp.className='view-panel share-active';dp.className='view-panel discuss-inactive';vs.style.display='';fab.style.display='';render()}else{sp.className='view-panel share-inactive';dp.className='view-panel discuss-active';vs.style.display='none';fab.style.display='none';if(!window._discussLoaded){loadThreads();window._discussLoaded=true}}
+  if(v==='share'){sp.className='view-panel share-active';dp.className='view-panel discuss-inactive';vs.style.display='';fab.style.display='';render()}else{sp.className='view-panel share-inactive';dp.className='view-panel discuss-active';vs.style.display='none';fab.style.display='none';if(!window._discussLoaded){document.getElementById('discussTabHot').classList.toggle('active',discussTab==='hot');document.getElementById('discussTabNew').classList.toggle('active',discussTab==='new');loadThreads();window._discussLoaded=true}}
 }
 // 二级Tab（分享码子标签）
 document.getElementById('tabs').addEventListener('click',function(e){var btn=e.target.closest('.tab');if(!btn)return;document.querySelectorAll('#tabs .tab').forEach(function(b){return b.classList.remove('active')});btn.classList.add('active');tab=btn.dataset.tab;sessionStorage.setItem('linli_tab',tab);page=1;var sb=document.getElementById('searchBar'),cb=document.getElementById('catBar');sb.classList.toggle('hidden',tab!=='search');cb.style.display=tab==='category'?'flex':'none';if(tab==='category'){activeCat='';buildCatBar();renderCategories();return}render()});
