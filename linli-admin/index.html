@@ -633,7 +633,7 @@ async function delFeedback(id){if(!confirm('确认删除？'))return;try{await a
 async function clearReply(id){if(!confirm('删除这条回复？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reply:'',reply_read:true})});loadFeedback();showToast('已删除回复','ok')}catch(e){showToast('操作失败','err')}}
 let _replyId=0;function replyFeedback(id){_replyId=id;document.getElementById('replyOverlay').style.display='flex';document.getElementById('replyText').value='';document.getElementById('replyText').focus()}
 function closeReply(){document.getElementById('replyOverlay').style.display='none';_replyId=0}
-async function doReply(){const txt=document.getElementById('replyText').value.trim();if(!txt||!_replyId)return;try{await sbApi('feedbacks?id=eq.'+_replyId,{method:'PATCH',body:JSON.stringify({reply:txt,reply_read:false,replied_at:new Date().toISOString()})});closeReply();loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
+async function doReply(){const txt=document.getElementById('replyText').value.trim();if(!txt||!_replyId)return;try{await adminApi('feedback_reply',{id:_replyId,reply:txt});closeReply();loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
 // Auto-restore session
 const html=document.documentElement;function applyTheme(mode){html.classList.remove("light","dark");if(mode==="light")html.classList.add("light");if(mode==="dark")html.classList.add("dark")}const st=localStorage.getItem("theme");if(st)applyTheme(st);document.getElementById("themeToggle").addEventListener("click",()=>{const cur=html.classList.contains("light")?"light":html.classList.contains("dark")?"dark":"auto";if(cur==="auto"){const sd=matchMedia("(prefers-color-scheme:dark)").matches;localStorage.setItem("theme",sd?"light":"dark");applyTheme(sd?"light":"dark")}else if(cur==="dark"){localStorage.setItem("theme","light");applyTheme("light")}else{localStorage.setItem("theme","dark");applyTheme("dark")}});
 
@@ -651,6 +651,6 @@ if(localStorage.getItem("admin_session")&&localStorage.getItem("admin_pw")){show
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.15</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.16</div>
 </body>
 </html>
