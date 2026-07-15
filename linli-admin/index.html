@@ -630,7 +630,7 @@ function renderFeedback(){
 }
 async function markFeedback(id,status){try{await adminApi('feedback_mark',{id,status});loadFeedback();showToast('状态已更新','ok')}catch(e){}}
 async function delFeedback(id){if(!confirm('确认删除？'))return;try{await adminApi('feedback_delete',{id});loadFeedback()}catch(e){}}
-async function clearReply(id){if(!confirm('删除这条回复？'))return;try{await sbApi('feedbacks?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reply:'',reply_read:true})});loadFeedback();showToast('已删除回复','ok')}catch(e){showToast('操作失败','err')}}
+async function clearReply(id){if(!confirm('删除这条回复？'))return;try{await adminApi('feedback_reply',{id,reply:''});loadFeedback();showToast('已删除回复','ok')}catch(e){showToast('操作失败','err')}}
 let _replyId=0;function replyFeedback(id){_replyId=id;document.getElementById('replyOverlay').style.display='flex';document.getElementById('replyText').value='';document.getElementById('replyText').focus()}
 function closeReply(){document.getElementById('replyOverlay').style.display='none';_replyId=0}
 async function doReply(){const txt=document.getElementById('replyText').value.trim();if(!txt||!_replyId)return;try{await adminApi('feedback_reply',{id:_replyId,reply:txt});closeReply();loadFeedback();showToast('已回复','ok')}catch(e){showToast('操作失败','err')}}
@@ -651,6 +651,6 @@ if(localStorage.getItem("admin_session")&&localStorage.getItem("admin_pw")){show
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.16</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.17</div>
 </body>
 </html>
