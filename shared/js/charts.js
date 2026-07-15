@@ -77,7 +77,7 @@
           ctx.fillStyle = labelColor; ctx.font = '9px system-ui'; ctx.textAlign = 'center'
           ctx.fillText(d.label, x + barW / 2, h - 4)
         }
-        if (d.value > 0 && barW > 20) { ctx.fillStyle = '#ddd'; ctx.font = '8px system-ui'; ctx.textAlign = 'center'; ctx.fillText(d.value, x + barW / 2, by - 4) }
+        if (d.value > 0 && barW > 12) { ctx.fillStyle = '#ddd'; ctx.font = '8px system-ui'; ctx.textAlign = 'center'; ctx.fillText(d.value, x + barW / 2, by - 3) }
         bars.push({ x: x, y: by, w: barW, h: bh, label: d.label, value: d.value, _raw: d })
       })
 

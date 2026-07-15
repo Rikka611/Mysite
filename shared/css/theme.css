@@ -4,7 +4,7 @@
    ============================================================ */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;overflow-y:scroll}
+html{scroll-behavior:smooth;overflow-y:scroll;overscroll-behavior:none}
 :root{
   --bg-start:#0a0a0f;--bg-mid:#11111a;--bg-end:#0d0d14;
   --text:#e0e0e0;--text-muted:#889;--text-dim:#667;
