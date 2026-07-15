@@ -34,8 +34,10 @@
 .stat{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;text-align:center;backdrop-filter:blur(12px)}
 .stat .val{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .stat .lbl{font-size:0.7rem;color:var(--text-dim);margin-top:2px}
-.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:16px}
-@media(max-width:768px){.charts{grid-template-columns:1fr}}
+.charts{display:grid;gap:16px;margin-bottom:16px}
+.charts-top{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.charts-bottom{grid-template-columns:repeat(2,1fr)}
+@media(max-width:768px){.charts-top,.charts-bottom{grid-template-columns:1fr}}
 .chart-box{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;position:relative;backdrop-filter:blur(12px)}
 .toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast-msg{padding:10px 20px;border-radius:10px;font-size:0.85rem;color:#fff}
@@ -102,10 +104,12 @@
     <button class="range-btn" id="r30d" onclick="setRange('30d')">30天</button>
     <button class="range-btn" id="rall" onclick="setRange('all')">全部</button>
   </div>
-  <div class="charts">
+  <div class="charts charts-top">
     <div class="chart-box"><canvas id="chartStatus"></canvas></div>
     <div class="chart-box"><canvas id="chartLikes"></canvas></div>
     <div class="chart-box"><canvas id="chartTags"></canvas></div>
+  </div>
+  <div class="charts charts-bottom">
     <div class="chart-box"><canvas id="chartUploads"></canvas></div>
     <div class="chart-box"><canvas id="chartViews"></canvas></div>
   </div>
