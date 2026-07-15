@@ -109,18 +109,23 @@ Deno.serve(async (req: Request) => {
         break
       }
       case 'discuss_create': {
-        await db.from('discussions').insert({
+        const { error } = await db.from('discussions').insert({
           name: 'Admin',
           content: payload.content,
           parent_id: payload.parent_id || null,
           is_admin: true,
           pinned: false
         })
-        result = { ok: true }
+        if (error) { result = { error: error.message } }
+        else { result = { ok: true } }
         break
       }
       case 'discuss_pin': {
         await db.from('discussions').update({ pinned: payload.pinned }).eq('id', parseInt(payload.id))
+        break
+      }
+      case 'discuss_clear_reports': {
+        await db.from('discussions').update({ reports: 0 }).eq('id', parseInt(payload.id))
         break
       }
       default: {
