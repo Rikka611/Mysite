@@ -254,9 +254,10 @@ function timeSlots(mode){
 function slotIndex(slots,targetDate,mode){
   var diffMs=targetDate.getTime()
   for(var i=slots.length-1;i>=0;i--){
-    var slotDate=slots[i].ts
-    if(mode==='all'){if(diffMs>=slotDate.getTime())return i}
-    else{if(targetDate.toDateString()===slotDate.toDateString())return i}
+    var slotMs=slots[i].ts.getTime()
+    if(mode==='all'){if(diffMs>=slotMs)return i}
+    else if(mode==='24h'){if(diffMs>=slotMs&&diffMs<slotMs+3600000)return i}
+    else{if(targetDate.toDateString()===slots[i].ts.toDateString())return i}
   }
   return -1
 }
@@ -410,6 +411,6 @@ if(localStorage.getItem("admin_session")&&localStorage.getItem("admin_pw")){show
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v3.0.1</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v3.0.2</div>
 </body>
 </html>
