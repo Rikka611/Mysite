@@ -13,6 +13,47 @@
 .pg-info input{width:38px;padding:3px 4px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--accent);font-size:0.8rem;font-weight:600;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield}
 .pg-info input::-webkit-inner-spin-button,.pg-info input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .pg-info input:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(56,189,248,0.2)}
+
+/* === 卡片模式 === */
+.tab-group{display:flex;gap:inherit;margin:0 auto}
+.tabs{position:relative;max-width:min(96vw,1400px);margin-left:auto;margin-right:auto;padding:0 clamp(8px,1.5vw,24px)}
+.view-switch{position:absolute;right:clamp(8px,1.5vw,24px);top:50%;transform:translateY(-50%)}
+.view-switch{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex-shrink:0}
+.view-switch .sw-label{font-size:0.7rem;color:var(--text-dim);transition:color 0.3s}
+.view-switch.card .sw-label:last-child{color:var(--accent);font-weight:600}
+.view-switch:not(.card) .sw-label:first-child{color:var(--accent);font-weight:600}
+.view-switch .sw-track{width:38px;height:22px;border-radius:11px;background:var(--card-border);position:relative;transition:background 0.3s}
+.view-switch.card .sw-track{background:rgba(56,189,248,0.4)}
+.view-switch .sw-thumb{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:transform 0.3s cubic-bezier(0.25,0.8,0.25,1.3)}
+.view-switch.card .sw-thumb{transform:translateX(16px)}
+.desc-text{font-size:0.7rem;color:var(--text-muted);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px}
+.list:not(.card-mode) .desc-text:empty{display:none}
+.meta-row{display:flex;align-items:center;gap:8px}
+.meta-row .code{flex:1;text-align:center}
+.meta-row .stats{flex-shrink:0;text-align:right}
+.content{max-width:min(96vw,1400px)}
+@media(min-width:700px){.list:not(.card-mode){display:grid;grid-template-columns:1fr 1fr;gap:clamp(6px,0.8vw,10px)}}
+.list.card-mode{display:grid;grid-template-columns:repeat(auto-fit,180px);gap:clamp(8px,1vw,14px);place-content:center;width:100%}
+.list.card-mode .row{flex-direction:column;align-items:center;padding:clamp(12px,1.4vw,18px) clamp(10px,1vw,16px) clamp(8px,1vw,14px);gap:0;border-radius:clamp(10px,1.2vw,16px);animation:cardIn 0.35s cubic-bezier(0.25,0.8,0.25,1.2) both;background:linear-gradient(180deg,var(--card-bg) 0%,rgba(56,189,248,0.02) 100%)}
+.list.card-mode .row:hover{transform:translateY(-3px)!important;border-color:rgba(56,189,248,0.45);box-shadow:0 8px 30px rgba(0,0,0,0.35),0 0 0 1px rgba(56,189,248,0.2)}
+.list.card-mode .row .rank{font-size:0.6rem;width:auto;text-align:center;margin-bottom:2px;opacity:0.5}
+.list.card-mode .row:nth-child(1) .rank{color:#fbbf24;opacity:1}
+.list.card-mode .row:nth-child(2) .rank{color:#94a3b8;opacity:0.9}
+.list.card-mode .row:nth-child(3) .rank{color:#d97706;opacity:0.85}
+.list.card-mode .row .rank:empty{display:none}
+.list.card-mode .row .info{text-align:center;flex:0;margin-bottom:4px}
+.list.card-mode .row .title{font-size:clamp(0.78rem,0.95vw,1rem);font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em;color:var(--heading)}
+.list.card-mode .desc-text{display:block;min-height:1.2em;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;max-width:none}
+.list.card-mode .meta-row{display:flex;flex-direction:column;align-items:center;width:100%;margin-top:auto;margin-bottom:6px}
+.list.card-mode .meta-row .code{font-size:0.85rem;letter-spacing:3px;font-weight:700;text-align:center;-webkit-text-fill-color:var(--accent);background:none;border:none;padding:0;width:100%;line-height:1.4}
+.list.card-mode .meta-row .stats{font-size:0.6rem;text-align:center;width:auto;margin-top:1px;line-height:1.2}
+.list.card-mode .row .actions{flex-wrap:wrap;justify-content:center;gap:4px;width:100%;margin-top:0!important}
+.list.card-mode .row .btn-copy{flex:0 0 100%;padding:5px 0;font-size:0.7rem;font-weight:600;border-radius:8px;max-width:140px;margin:0 auto 2px}
+.list.card-mode .row .btn-like{padding:2px 10px;font-size:0.55rem;border-radius:50px;min-width:auto;background:transparent;border:1px solid var(--card-border);flex:0 0 auto}
+.list.card-mode .skeleton{height:120px}
+@media(max-width:400px){.list.card-mode{grid-template-columns:repeat(2,1fr)}.list.card-mode .row .stats{display:flex}}
+@media(max-width:500px){.view-switch .sw-label{font-size:0.6rem}.view-switch .sw-track{width:30px;height:18px}.view-switch .sw-thumb{width:14px;height:14px}.view-switch.card .sw-thumb{transform:translateX(12px)}}
+@keyframes cardIn{from{opacity:0;transform:scale(0.85) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
 </style>
   <script src="../shared/js/config.js?v=3.0.6"></script>
   <script src="../shared/js/sanitize.js?v=3.0.6"></script>
@@ -42,10 +83,15 @@
 </div>
 
 <div class="tabs" id="tabs">
-  <button class="tab active" data-tab="hot">🔥 热门</button>
-  <button class="tab" data-tab="category">📂 分类</button>
-  <button class="tab" data-tab="new">🆕 最新</button>
-  <button class="tab" data-tab="search">🔍 搜索</button>
+  <span class="tab-group">
+    <button class="tab active" data-tab="hot">🔥 热门</button>
+    <button class="tab" data-tab="category">📂 分类</button>
+    <button class="tab" data-tab="new">🆕 最新</button>
+    <button class="tab" data-tab="search">🔍 搜索</button>
+  </span>
+  <label class="view-switch" id="viewSwitch">
+    <span class="sw-label">列表</span><span class="sw-track"><span class="sw-thumb"></span></span><span class="sw-label">卡片</span>
+  </label>
 </div>
 <div id="catBar" style="display:none;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:24px;position:relative;z-index:1"></div>
 <div class="search-bar hidden" id="searchBar">
@@ -112,7 +158,7 @@
 
 <div class="toast" id="toast"></div>
 
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v3.0.6</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v3.0.7</div>
 <footer>本站为粉丝自发整理的社区索引平台，非商业运营，与米哈游/HoYoverse 及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务，不存储不分发任何曲谱内容。索引曲谱的版权归原始权利人所有，如有侵权请联系删除。用户使用本站服务产生的任何版权问题，本站不承担法律责任。联系：QQ 3332984386</footer>
 
 <script>
@@ -133,6 +179,12 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 let tab='hot';
 const liked=JSON.parse(localStorage.getItem('linli_liked')||'[]');
 let page=1,pageSize=15,totalPages=1,activeCat="";
+// View mode toggle
+let viewMode=localStorage.getItem('linli_view')||'list';
+function getCardCols(){var g=document.getElementById('grid');if(!g)return 4;var w=g.clientWidth,gap=12,cardW=180;return Math.max(1,Math.floor((w+gap)/(cardW+gap)))}
+function applyView(){const g=document.getElementById('grid');const sw=document.getElementById('viewSwitch');if(viewMode==='card'){g.classList.add('card-mode');sw.classList.add('card');var cols=getCardCols();pageSize=cols*Math.round(20/cols)}else{g.classList.remove('card-mode');sw.classList.remove('card');var lc=window.innerWidth>=700?2:1;pageSize=lc*Math.round(16/lc)}}
+function toggleView(){viewMode=viewMode==='card'?'list':'card';localStorage.setItem('linli_view',viewMode);applyView();page=1;render()}
+applyView();
 const CATS=[{id:"vocaloid",n:"术力口",k:["v家","术力口","vocaloid","初音未来","miku"]},{id:"anime",n:"番剧OP/ED",k:["动漫","番剧","oped","anime","animenz","air","clannad","cl","eva","fate","86","吉卜力","鸟之诗","缘之空","你的名字","夏日口袋","紫罗兰永恒花园","我推的孩子","凉宫春日","魔法少女小圆","咒术回战","进击的巨人","寄生兽","末日","天之少女","罪恶王冠","re:zero","yoasobi"]},{id:"genshin",n:"原神",k:["原神","genshin","蒙德","璃月","渊下宫","纳塔","挪德卡莱","可莉","芙宁娜","茜特菈莉","哥伦比亚","少偶","莉奈娅"]},{id:"honkai",n:"崩坏系列",k:["崩坏","崩铁","崩坏3","honkai","崩坏三","崩坏星穹铁道","知更鸟","昔涟","翁法洛斯","希儿","耀嘉音"]},{id:"zzz",n:"绝区零",k:["绝区零","zzz"]},{id:"acg",n:"其他ACG音乐",k:["游戏","acg","舞萌","东方","ff14","ff14","轨迹系列","blacksouls","战地风云","去月球","尼尔机械纪元","我的世界","roselia"]},{id:"other",n:"其他",k:[]}];
 function classify(tags){var t=(tags||"").toLowerCase();var words=t.split(/[\s,]+/);for(var i=0;i<CATS.length;i++){var c=CATS[i];if(!c.k.length)continue;for(var j=0;j<c.k.length;j++){var kw=c.k[j].toLowerCase();for(var w=0;w<words.length;w++){if(words[w]===kw)return c.id}if(t.indexOf(kw)>=0&&kw.length>4)return c.id}}return"other"}
 function buildCatBar(){var h="";CATS.forEach(function(c){h+="<button class=\"tab cat-btn\" data-cat=\""+c.id+"\">"+c.n+"</button>"});document.getElementById("catBar").innerHTML=h;updateCatCounts()}
@@ -157,6 +209,8 @@ document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==
 let _searchTimer=null;
 document.getElementById('searchInput').addEventListener('input',function(){clearTimeout(_searchTimer);_searchTimer=setTimeout(doSearch,400)});
 function doSearch(){page=1;render()}
+document.getElementById('viewSwitch').addEventListener('click',toggleView);
+var _resizeDebounce;window.addEventListener('resize',function(){clearTimeout(_resizeDebounce);_resizeDebounce=setTimeout(function(){var old=pageSize;applyView();if(pageSize!==old&&page>1&&totalPages>0){page=Math.min(page,Math.ceil(totalPages*old/pageSize));render()}},300)});
 
 async function fetchApproved(){
   let q='status=eq.approved';
@@ -233,14 +287,17 @@ function buildRow(item,idx){
   return `<div class="row" style="animation-delay:${idx*0.04}s">
     <div class="glare"></div>
     <div class="rank">${rank!==null?'#'+rank:''}</div>
-    <div class="code" onclick="copyCode('${esc(item.code)}',event)" title="点击复制">${esc(item.code)}</div>
     <div class="info">
       <div class="title">${esc(item.title)}</div>
-      <div class="sub">${desc?`<span>${esc(desc)}</span>`:''}${tagList.length?tagList.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):''}</div>
+      <div class="desc-text">${desc?esc(desc):''}</div>
+      <div class="sub">${tagList.length?tagList.map(t=>`<span class="tag">${esc(t)}</span>`).join(''):''}</div>
     </div>
-    <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
+    <div class="meta-row">
+      <div class="code" onclick="copyCode('${esc(item.code)}',event)" title="点击复制">${esc(item.code)}</div>
+      <div class="stats">👁 ${item.views||0} ❤ ${item.likes||0}</div>
+    </div>
     <div class="actions">
-      <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}',event)">📋</button>
+      <button class="btn btn-copy" onclick="copyCode('${esc(item.code)}',event)">📋 复制</button>
       <button class="btn btn-like${isLiked?' liked':''}" onclick="doLike(${item.id},event)">${isLiked?'❤':'🤍'}</button>
       <button class="btn btn-like" onclick="reportCode(${item.id},event)" title="分享码无效">⚠</button>
     </div></div>`;
