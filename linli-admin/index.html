@@ -25,6 +25,11 @@
 .btn.warn{border-color:rgba(251,191,36,0.4);color:#fbbf24}
 .btn.sm{padding:4px 12px;font-size:0.7rem}
 .btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.range-bar{display:flex;justify-content:flex-end;align-items:center;gap:4px;margin-bottom:16px}
+.range-bar span.label{font-size:0.7rem;color:var(--text-dim);margin-right:6px}
+.range-btn{padding:4px 12px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.7rem;font-family:system-ui,-apple-system,sans-serif;transition:all 0.2s}
+.range-btn:hover{color:var(--text)}
+.range-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
 .stat{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;text-align:center;backdrop-filter:blur(12px)}
 .stat .val{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -89,12 +94,19 @@
   </div>
 
   <div class="stats" id="stats"></div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:4px"><button class="btn sm" id="chartToggle" onclick="window._chartMode=window._chartMode==='24h'?'7d':'24h';load()">切为7天</button></div>
+  <div class="range-bar">
+    <span class="label">时间范围</span>
+    <button class="range-btn active" id="r24h" onclick="setRange('24h')">24h</button>
+    <button class="range-btn" id="r7d" onclick="setRange('7d')">7天</button>
+    <button class="range-btn" id="r30d" onclick="setRange('30d')">30天</button>
+    <button class="range-btn" id="rall" onclick="setRange('all')">全部</button>
+  </div>
   <div class="charts">
     <div class="chart-box"><canvas id="chartLikes"></canvas></div>
     <div class="chart-box"><canvas id="chartStatus"></canvas></div>
     <div class="chart-box"><canvas id="chartUploads"></canvas></div>
     <div class="chart-box"><canvas id="chartViews"></canvas></div>
+    <div class="chart-box"><canvas id="chartTags"></canvas></div>
   </div>
 
   <div class="list" id="list"></div>
@@ -203,40 +215,123 @@ async function renderStats(){
   ].map(s=>'<div class="stat"><div class="val"'+(s.c?' style="color:'+s.c+';-webkit-text-fill-color:'+s.c+'"':'')+'>'+s.v+'</div><div class="lbl">'+s.l+'</div></div>').join('')
 }
 
+// ---- Tag categories (mirrors linli CATS) ----
+const TAG_CATS=[
+  {id:'vocaloid',n:'术力口',k:['v家','术力口','vocaloid']},
+  {id:'anime',n:'番剧OP/ED',k:['动漫','番剧','oped','anime','命运石之门','寄生兽','进击的巨人','紫罗兰永恒花园','我推的孩子','凉宫春日','EVA','eva','AIR','Clannad','CLANNAD','CL','魔法少女小圆','fate','Fate','86','莉可丽丝','咒术回战','末日','斩服少女','Angel Beats','86不存在的战区','鸟之诗','缘之空','你的名字','吉卜力','夏日口袋','去月球','天之少女','Saki酱','凡人修仙传']},
+  {id:'genshin',n:'原神',k:['原神','genshin','蒙德','璃月','渊下宫','纳塔','挪德卡莱','可莉','芙宁娜','茜特菈莉','哥伦比亚','少偶','莉奈娅']},
+  {id:'honkai',n:'崩坏系列',k:['崩坏','崩铁','崩坏3','honkai','崩坏星穹铁道','崩坏三','知更鸟','昔涟','翁法洛斯','希儿','耀嘉音','绝区零']},
+  {id:'acg',n:'其他ACG',k:['游戏','acg','东方','ff14','FF14','舞萌','轨迹系列','BLACKSOULS','战地风云','去月球','尼尔机械纪元','我的世界']},
+  {id:'other',n:'其他',k:[]}
+]
+function tagCat(tags){
+  var t=(tags||'').toLowerCase()
+  for(var i=0;i<TAG_CATS.length;i++){
+    var c=TAG_CATS[i];if(!c.k.length)continue
+    for(var j=0;j<c.k.length;j++){if(t.indexOf(c.k[j])>=0)return c.id}
+  }
+  return 'other'
+}
+function tagCatName(id){var c=TAG_CATS.find(function(x){return x.id===id});return c?c.n:id}
+
+// ---- Time range selector ----
+window._chartMode='24h'
+function setRange(mode){
+  window._chartMode=mode
+  document.querySelectorAll('.range-btn').forEach(function(b){b.classList.remove('active')})
+  var btn=document.getElementById(mode==='all'?'rall':'r'+mode);if(btn)btn.classList.add('active')
+  renderChart()
+}
+
+function timeSlots(mode){
+  var now=new Date(),slots=[],i
+  if(mode==='24h'){for(i=23;i>=0;i--){var h=new Date(now);h.setHours(h.getHours()-i);slots.push({label:h.getHours()+':00',value:0,ts:h})}}
+  else if(mode==='7d'){for(i=6;i>=0;i--){var d=new Date(now);d.setDate(d.getDate()-i);slots.push({label:(d.getMonth()+1)+'/'+d.getDate(),value:0,ts:d})}}
+  else if(mode==='30d'){for(i=29;i>=0;i--){var d2=new Date(now);d2.setDate(d2.getDate()-i);slots.push({label:(d2.getMonth()+1)+'/'+d2.getDate(),value:0,ts:d2})}}
+  else{for(i=11;i>=0;i--){var m=new Date(now.getFullYear(),now.getMonth()-i,1);slots.push({label:(m.getMonth()+1)+'月',value:0,ts:m})}}
+  return slots
+}
+function slotIndex(slots,targetDate,mode){
+  var diffMs=targetDate.getTime()
+  for(var i=slots.length-1;i>=0;i--){
+    var slotDate=slots[i].ts
+    if(mode==='all'){if(diffMs>=slotDate.getTime())return i}
+    else{if(targetDate.toDateString()===slotDate.toDateString())return i}
+  }
+  return -1
+}
+
 function renderChart(){
-  const boxW=document.querySelector('.chart-box')?.clientWidth||400
-  setTimeout(async ()=>{
-    const top10=dataCache.filter(x=>x.status==='approved').sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,8)
-    const likes=top10.map(x=>({label:(x.title||'').slice(0,6),value:x.likes||0}))
-    const status=[{label:'已通过',value:dataCache.filter(x=>x.status==='approved').length},{label:'待审核',value:dataCache.filter(x=>x.status==='pending').length},{label:'已拒绝',value:dataCache.filter(x=>x.status==='rejected').length}]
-    const now=new Date()
-    // 24h hourly
-    const hours=[];for(let i=23;i>=0;i--){const h=new Date(now);h.setHours(h.getHours()-i);hours.push({label:h.getHours()+':00',value:0})}
-    const upHours=[...hours.map(h=>({...h}))];const vwHours=[...hours.map(h=>({...h}))]
-    // 7d daily
-    const days=[];for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push({label:(d.getMonth()+1)+'/'+d.getDate(),value:0})}
-    const upDays=[...days.map(d=>({...d}))];const vwDays=[...days.map(d=>({...d}))]
-    dataCache.forEach(x=>{if(x.created_at){const d=new Date(x.created_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
-      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24)upHours[idx].value++}
-      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)upDays[idx].value++}
-    }})
-    // Page visits for views chart
-    try{const pv=await sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=100000');pv.forEach(v=>{if(v.visited_at){const d=new Date(v.visited_at);const diffH=(now-d)/3600000;const diffD=(now-d)/86400000;
-      if(diffH>=0&&diffH<24){const idx=23-Math.floor(diffH);if(idx>=0&&idx<24)vwHours[idx].value++}
-      if(diffD>=0&&diffD<7){const idx=6-Math.floor(diffD);if(idx>=0&&idx<7)vwDays[idx].value++}
-    }})}catch(e){}
-    const mode=window._chartMode||'24h'
-    const upData=mode==='24h'?upHours:upDays
-    const vwData=mode==='24h'?vwHours:vwDays
-    const modeLabel=mode==='24h'?'24h':'7天'
-    try{window.drawBarChart?.(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{width:boxW,height:260,title:'点赞排行'})}catch(e){}
-    try{window.drawPieChart?.(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布'})}catch(e){}
-    try{window.drawBarChart?.(document.getElementById('chartUploads'),upData,{width:boxW,height:260,title:modeLabel+'上传量',barColor:'#818cf8'})}catch(e){}
-    try{window.drawBarChart?.(document.getElementById('chartViews'),vwData,{width:boxW,height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){}
-    // Toggle button
-    const toggleBtn=document.getElementById('chartToggle')
-    if(toggleBtn)toggleBtn.textContent=mode==='24h'?'切为7天':'切为24h'
-  },200)
+  var now=new Date(),mode=window._chartMode||'24h'
+  var top10=dataCache.filter(function(x){return x.status==='approved'}).sort(function(a,b){return(b.likes||0)-(a.likes||0)}).slice(0,8)
+  var likes=top10.map(function(x){return{label:(x.title||'').slice(0,6),value:x.likes||0,_id:x.id}})
+  var status=[
+    {label:'已通过',value:dataCache.filter(function(x){return x.status==='approved'}).length,color:'#34d399'},
+    {label:'待审核',value:dataCache.filter(function(x){return x.status==='pending'}).length,color:'#fbbf24'},
+    {label:'已拒绝',value:dataCache.filter(function(x){return x.status==='rejected'}).length,color:'#ef4444'}
+  ]
+
+  // Time-series data
+  var upSlots=timeSlots(mode),vwSlots=timeSlots(mode)
+  dataCache.forEach(function(x){
+    if(!x.created_at)return
+    var d=new Date(x.created_at),idx=slotIndex(upSlots,d,mode)
+    if(idx>=0)upSlots[idx].value++
+  })
+
+  // Tag distribution
+  var tagCounts={}
+  dataCache.forEach(function(x){
+    var cat=tagCat(x.tags),name=tagCatName(cat)
+    tagCounts[name]=(tagCounts[name]||0)+1
+  })
+  var tagData=Object.keys(tagCounts).map(function(k){return{label:k,value:tagCounts[k]}})
+    .sort(function(a,b){return b.value-a.value})
+
+  var modeLabel={ '24h':'24h','7d':'7天','30d':'30天','all':'月度' }[mode]||mode
+
+  // Draw charts
+  try{window.drawBarChart(document.getElementById('chartLikes'),likes.length?likes:[{label:'-',value:1}],{height:260,title:'点赞排行',barColor:'#38bdf8',onClick:function(d){if(d._id)scrollToItem(d._id)}})}catch(e){}
+  try{window.drawPieChart(document.getElementById('chartStatus'),status.length?status:[{label:'-',value:1}],{title:'审核状态分布',colors:['#34d399','#fbbf24','#ef4444'],onClick:function(d){switchTabByStatus(d.label)}})}catch(e){}
+  try{window.drawBarChart(document.getElementById('chartUploads'),upSlots,{height:260,title:modeLabel+'上传量',barColor:'#818cf8'})}catch(e){}
+  try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){}
+  try{window.drawPieChart(document.getElementById('chartTags'),tagData.length?tagData:[{label:'-',value:1}],{title:'标签分布',colors:['#38bdf8','#818cf8','#34d399','#fbbf24','#f472b6','#fb923c','#2dd4bf']})}catch(e){}
+
+  // Async: update views chart with real PV data
+  sbApi('page_visits?select=visited_at&page=eq.linli&order=visited_at.desc&limit=100000').then(function(pv){
+    pv.forEach(function(v){
+      if(!v.visited_at)return
+      var d=new Date(v.visited_at),idx=slotIndex(vwSlots,d,mode)
+      if(idx>=0)vwSlots[idx].value++
+    })
+    try{window.drawBarChart(document.getElementById('chartViews'),vwSlots,{height:260,title:modeLabel+'浏览量',barColor:'#34d399'})}catch(e){}
+  }).catch(function(){})
+}
+
+// Chart → list linkage
+function scrollToItem(id){
+  var rows=document.querySelectorAll('#list .row')
+  for(var i=0;i<rows.length;i++){
+    var row=rows[i]
+    if(row.innerHTML.indexOf('onclick="approve('+id+')"')>0||row.innerHTML.indexOf('onclick="del('+id+')"')>0){
+      row.scrollIntoView({behavior:'smooth',block:'center'})
+      row.style.boxShadow='0 0 24px rgba(56,189,248,0.6)'
+      setTimeout(function(){row.style.boxShadow=''},2000)
+      return
+    }
+  }
+  // Item not in current view — switch to approved tab
+  switchTab('approved');setTimeout(function(){scrollToItem(id)},300)
+}
+function switchTabByStatus(label){
+  if(label==='已通过')switchTab('approved')
+  else if(label==='待审核')switchTab('pending')
+  else if(label==='已拒绝')switchTab('rejected')
+}
+function switchTab(target){
+  filter=target
+  document.querySelectorAll('#mainBox .tabs .tab').forEach(function(t){t.classList.toggle('active',t.dataset.filter===target)})
+  load()
 }
 
 function renderList(){
