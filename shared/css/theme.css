@@ -10,7 +10,7 @@ html{scroll-behavior:smooth;overflow-y:scroll;overscroll-behavior:none}
   --text:#e0e0e0;--text-muted:#889;--text-dim:#667;
   --heading:#ddd;--nav-bg:rgba(10,10,15,0.45);--nav-border:rgba(255,255,255,0.06);
   --nav-link:#999;--nav-link-hover:#fff;
-  --card-bg:rgba(255,255,255,0.05);--card-border:rgba(255,255,255,0.08);
+  --card-bg:rgba(255,255,255,0.08);--card-border:rgba(255,255,255,0.1);
   --card-hover-border:rgba(56,189,248,0.4);--card-hover-shadow:rgba(0,0,0,0.3);
   --card-hover-ring:rgba(56,189,248,0.15);
   --tag-bg:rgba(255,255,255,0.08);--tag-text:#aab;
@@ -22,7 +22,7 @@ html{scroll-behavior:smooth;overflow-y:scroll;overscroll-behavior:none}
     --bg-start:#f0f9ff;--bg-mid:#f5f3ff;--bg-end:#fce4ec;
     --text:#3a3a4a;--text-muted:#6b6b7b;--text-dim:#8a8a9a;
     --heading:#2a2a3a;--nav-bg:rgba(255,255,255,0.35);--nav-border:rgba(0,0,0,0.06);
-    --nav-link:#777;--nav-link-hover:#333;--card-bg:rgba(255,255,255,0.38);
+    --nav-link:#777;--nav-link-hover:#333;--card-bg:rgba(255,255,255,0.45);
     --card-border:rgba(0,0,0,0.06);--card-hover-border:rgba(56,189,248,0.5);
     --card-hover-shadow:rgba(0,0,0,0.08);--card-hover-ring:rgba(56,189,248,0.12);
     --tag-bg:rgba(0,0,0,0.05);--tag-text:#6b6b7b;
@@ -34,7 +34,7 @@ html.light{
   --bg-start:#f0f9ff;--bg-mid:#f5f3ff;--bg-end:#fce4ec;
   --text:#3a3a4a;--text-muted:#6b6b7b;--text-dim:#8a8a9a;
   --heading:#2a2a3a;--nav-bg:rgba(255,255,255,0.35);--nav-border:rgba(0,0,0,0.06);
-  --nav-link:#777;--nav-link-hover:#333;--card-bg:rgba(255,255,255,0.38);
+  --nav-link:#777;--nav-link-hover:#333;--card-bg:rgba(255,255,255,0.45);
   --card-border:rgba(0,0,0,0.06);--card-hover-border:rgba(56,189,248,0.5);
   --card-hover-shadow:rgba(0,0,0,0.08);--card-hover-ring:rgba(56,189,248,0.12);
   --tag-bg:rgba(0,0,0,0.05);--tag-text:#6b6b7b;
@@ -184,7 +184,7 @@ html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{di
 .row{
   display:flex;align-items:center;gap:12px;
   background:var(--card-bg);border:1px solid var(--card-border);
-  border-radius:12px;padding:12px 16px;backdrop-filter:blur(6px);
+  border-radius:12px;padding:12px 16px;backdrop-filter:blur(10px);
   transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.2);
   transform:perspective(1200px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
   position:relative;overflow:hidden;

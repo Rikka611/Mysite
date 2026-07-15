@@ -110,7 +110,7 @@
 <button id="replyFab" title="反馈回复" onclick="openReplies()" style="position:fixed;bottom:100px;right:32px;z-index:50;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.4);transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.2);animation:replyPulse 3s ease-in-out infinite;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif">📬<span id="replyBadge" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border:2px solid var(--bg-start);border-radius:50%;display:none"></span></button>
 <button class="fab" id="fab" title="提交分享码">+</button>
 
-<div class="modal-overlay" id="modalOverlay">
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="提交分享码">
   <div class="modal">
     <h3 style="text-align:center;font-size:1.1rem;margin-bottom:20px;color:var(--heading)">提交分享码</h3>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">六位分享码 <span style="color:#ef4444">*</span></label>
@@ -260,6 +260,7 @@ async function doFeedback(){
 document.getElementById('majorPick').addEventListener('click',function(e){var s=e.target.closest('.tab');if(!s)return;_pickedMajor=s.dataset.cat;document.querySelectorAll('#majorPick .tab').forEach(function(b){b.classList.toggle('active',b.dataset.cat===_pickedMajor)})});
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');['inputCode','inputTitle','inputAuthor','inputDesc','inputTags'].forEach(id=>document.getElementById(id).value='')}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeFeedback();closeReplies()}})
 
 async function doSubmit(){
   const code=document.getElementById('inputCode').value.trim().toUpperCase();
@@ -286,7 +287,7 @@ function buildRow(item,idx){
   const rank=tab==='hot'?idx+1:null;
   const isLiked=liked.includes(item.id);
   const desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');
-  return `<div class="row" style="animation-delay:${idx*0.04}s">
+  return `<div class="row" style="animation-delay:${idx*0.04}s" role="button" tabindex="0" aria-label="歌曲 ${esc(item.title)}，分享码 ${esc(item.code)}">
     <div class="glare"></div>
     <div class="rank">${rank!==null?'#'+rank:''}</div>
     <div class="info">
