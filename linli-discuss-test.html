@@ -12,7 +12,8 @@
 
 /* 讨论区 */
 .discuss-area{max-width:800px;margin:0 auto;position:relative;z-index:1}
-.discuss-form{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:16px;backdrop-filter:blur(10px)}
+.discuss-form{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:16px;backdrop-filter:blur(10px);max-height:300px;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.25,0.8,0.25,1),padding 0.4s ease,margin 0.4s ease,opacity 0.3s ease}
+.discuss-form.collapsed{max-height:0;padding-top:0;padding-bottom:0;margin-bottom:0;opacity:0;border-width:0}
 .discuss-form input,.discuss-form textarea{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.85rem;outline:none;font-family:inherit;margin-bottom:8px;resize:vertical}
 .discuss-form textarea{min-height:60px}
 .discuss-form input:focus,.discuss-form textarea:focus{border-color:var(--accent)}
@@ -27,7 +28,8 @@
 .thread .th-actions{display:flex;gap:8px;margin-top:4px}
 .thread .th-btn{font-size:0.7rem;color:var(--text-dim);cursor:pointer;background:none;border:none;padding:2px 8px;border-radius:50px;font-family:inherit;transition:all 0.2s}
 .thread .th-btn:hover{color:var(--accent);background:rgba(56,189,248,0.08)}
-.replies{margin-top:8px;padding-left:20px;border-left:2px solid rgba(56,189,248,0.15)}
+.replies{margin-top:8px;padding-left:20px;border-left:2px solid rgba(56,189,248,0.15);max-height:2000px;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.25,0.8,0.25,1),padding 0.4s ease,margin 0.4s ease}
+.replies.collapsed{max-height:0;padding-top:0;padding-bottom:0;margin-top:0;border-left-color:transparent}
 .reply-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
 .reply-item:last-child{border-bottom:none}
 .reply-item .th-name{font-size:0.75rem}
@@ -38,9 +40,24 @@
 .reply-form button{padding:6px 14px;border-radius:50px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:inherit;flex-shrink:0}
 .discuss-empty{text-align:center;color:var(--text-dim);padding:40px 0;font-size:0.9rem}
 
-@media(max-width:500px){
-  .replies{padding-left:12px}
+@media(max-width:600px){
+  .discuss-area{max-width:100%;padding:0 8px}
+  .thread{padding:10px 12px}
+  .thread .th-content{font-size:0.8rem}
+  .thread .th-name{font-size:0.75rem}
   .discuss-form{padding:12px}
+  .discuss-form input,.discuss-form textarea{font-size:0.78rem}
+  .discuss-form button{font-size:0.78rem;padding:6px 16px}
+  .replies{padding-left:10px}
+  .reply-item .th-content{font-size:0.75rem}
+  .reply-form input{font-size:0.75rem;padding:4px 8px}
+  .reply-form button{font-size:0.7rem;padding:4px 10px}
+  .th-btn{font-size:0.65rem;padding:1px 6px}
+}
+@media(max-width:380px){
+  .reply-form{flex-wrap:wrap;gap:4px}
+  .reply-form input{flex:1 1 auto}
+  .reply-form button{width:100%}
 }
 </style>
 <script src="../shared/js/config.js?v=3.0.8"></script>
@@ -66,7 +83,7 @@
   <div style="text-align:center;margin-bottom:12px">
     <button onclick="togglePostForm()" id="togglePostBtn" style="padding:8px 24px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.85rem;font-family:inherit;transition:all 0.3s">＋ 发起新讨论</button>
   </div>
-  <div class="discuss-form" id="postForm" style="display:none">
+  <div class="discuss-form collapsed" id="postForm">
     <div class="note">💬 发起新讨论</div>
     <input type="text" id="newName" placeholder="昵称（留空则为「匿名用户」）" maxlength="30">
     <textarea id="newContent" placeholder="想说点什么..." maxlength="500"></textarea>
@@ -143,8 +160,8 @@ function fmtTime(ts){if(!ts)return'';var d=new Date(ts),now=new Date();var diff=
 
 function toggleReplies(id){
   var div=document.getElementById('replies-'+id);
-  div.style.display=div.style.display==='none'?'block':'none';
-  if(div.style.display==='block'){var inp=document.getElementById('replyContent-'+id);if(inp)inp.focus()}
+  div.classList.toggle('collapsed');
+  if(!div.classList.contains('collapsed')){var inp=document.getElementById('replyContent-'+id);if(inp)inp.focus()}
 }
 
 async function postReply(id){
@@ -160,7 +177,9 @@ async function postReply(id){
 
 function togglePostForm(){
   var f=document.getElementById('postForm'),b=document.getElementById('togglePostBtn');
-  if(f.style.display==='none'){f.style.display='block';b.style.display='none'}else{f.style.display='none';b.style.display='inline-block'}
+  f.classList.toggle('collapsed');
+  b.style.display=f.classList.contains('collapsed')?'inline-block':'none';
+  if(!f.classList.contains('collapsed')){document.getElementById('newContent').focus()}
 }
 async function postTopic(){
   var name=document.getElementById('newName').value.trim();
