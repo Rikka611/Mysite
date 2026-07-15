@@ -116,6 +116,7 @@ Deno.serve(async (req: Request) => {
           is_admin: true,
           pinned: false
         })
+        result = { ok: true }
         break
       }
       case 'discuss_pin': {
