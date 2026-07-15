@@ -195,7 +195,7 @@ async function doLogin(){
     const pw=document.getElementById('pwInput').value
     if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
     try{const r=await adminApi('check_pw',{},pw);if(!r||r.error){document.getElementById('loginErr').textContent='密码错误';return}}catch(e){document.getElementById('loginErr').textContent=e.name==='AbortError'?'连接超时，检查网络后刷新重试':'验证失败: '+(e.message||'网络异常')}
-    localStorage.setItem("admin_pw",pw);
+    sessionStorage.setItem("admin_pw",pw);
     _loginStage=1;document.getElementById('pwInput').style.display='none'
     document.getElementById('totpInput').style.display='block'
     document.getElementById('loginBtn').textContent='验证 TOTP'
@@ -214,7 +214,7 @@ function showMain(){
   document.getElementById('loginBox').style.display='none';document.getElementById('mainBox').style.display='block'
   const nb=document.getElementById('navBar');if(nb)nb.style.display='flex';init()
 }
-function doLogout(){localStorage.removeItem('admin_session');localStorage.removeItem('admin_pw');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
+function doLogout(){localStorage.removeItem('admin_session');sessionStorage.removeItem('admin_pw');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
 function toggleAuto(){autoApprove=!autoApprove;document.getElementById('autoBtn').textContent='自动通过：'+(autoApprove?'开':'关');document.getElementById('autoBtn').className='btn '+(autoApprove?'active':'');showToast(autoApprove?'新提交将自动通过':'新提交需手动审核','info')}
 
 // ---- API ----
@@ -229,7 +229,7 @@ const sbApi = async function(path, options = {}) {
   const t=await res.text();return t?JSON.parse(t):[];
 }
 async function adminApi(action, payload={}, passOverride){
-  const pw=passOverride||localStorage.getItem("admin_pw")||"";
+  const pw=passOverride||sessionStorage.getItem("admin_pw")||"";
   const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),15000);
   try{
     const res=await fetch(EDGE_URL,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+SB_KEY},body:JSON.stringify({password:pw,action,payload}),signal:ctrl.signal});
@@ -503,7 +503,7 @@ const html=document.documentElement;function applyTheme(mode){html.classList.rem
 
 // Auto refresh every 5 minutes
 setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')load()},300000)
-if(localStorage.getItem("admin_session")&&localStorage.getItem("admin_pw")){showMain()}
+if(localStorage.getItem("admin_session")&&sessionStorage.getItem("admin_pw")){showMain()}
 </script>
 <div class="modal-overlay" id="replyOverlay" style="position:fixed;inset:0;z-index:300;display:none;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)closeReply()">
   <div class="modal" style="background:var(--elevated,#1c1c1c);border:1px solid var(--border);border-radius:16px;padding:28px;width:400px;max-width:90vw">
