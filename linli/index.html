@@ -190,7 +190,7 @@ function copyCode(code,e){
   }).catch(()=>showToast('复制失败'));
 }
 
-var _pickedMajor='';document.getElementById('fab').addEventListener('click',function(){document.getElementById('modalOverlay').classList.add('show');document.getElementById('modalError').textContent='';_pickedMajor='';document.getElementById('majorPick').innerHTML=CATS.map(function(c){return '<span class="tab" style="cursor:pointer" data-cat="'+c.id+'">'+c.n+'</span>'}).join('')});
+var _pickedMajor='';document.getElementById('fab').addEventListener('click',function(){document.getElementById('modalOverlay').classList.add('show');document.getElementById('modalError').textContent='';_pickedMajor='';document.getElementById('majorPick').innerHTML=CATS.map(function(c){return '<span class="tab" style="cursor:pointer" data-cat="'+c.n+'">'+c.n+'</span>'}).join('')});
 document.getElementById('feedbackBtn').addEventListener('click',()=>{document.getElementById('feedbackOverlay').classList.add('show');document.getElementById('feedbackError').textContent=''});
 document.getElementById('feedbackOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeFeedback()});
 function closeFeedback(){document.getElementById('feedbackOverlay').classList.remove('show');document.getElementById('feedbackContent').value=''}
