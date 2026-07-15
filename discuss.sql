@@ -12,4 +12,6 @@ ALTER TABLE discussions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "anon can read discussions" ON discussions FOR SELECT TO anon USING (true);
 CREATE POLICY "anon can insert discussions" ON discussions FOR INSERT TO anon WITH CHECK (true);
 GRANT SELECT, INSERT ON discussions TO anon;
+GRANT SELECT, INSERT, DELETE ON discussions TO authenticated;
+GRANT ALL ON discussions TO service_role;
 GRANT USAGE ON SEQUENCE discussions_id_seq TO anon;
