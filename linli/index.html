@@ -196,7 +196,7 @@ function applyTheme(mode){html.classList.remove('light','dark');if(mode==='light
 const st=localStorage.getItem('theme');if(st)applyTheme(st);
 document.getElementById('themeToggle').addEventListener('click',()=>{const cur=html.classList.contains('light')?'light':html.classList.contains('dark')?'dark':'auto';if(cur==='auto'){const sd=matchMedia('(prefers-color-scheme:dark)').matches;localStorage.setItem('theme',sd?'light':'dark');applyTheme(sd?'light':'dark')}else if(cur==='dark'){localStorage.setItem('theme','light');applyTheme('light')}else{localStorage.setItem('theme','dark');applyTheme('dark')}});
 
-let tab='hot',liked=JSON.parse(localStorage.getItem('linli_liked')||'[]'),page=1,pageSize=15,totalPages=1,activeCat="";
+let tab=sessionStorage.getItem('linli_tab')||'hot',liked=JSON.parse(localStorage.getItem('linli_liked')||'[]'),page=1,pageSize=15,totalPages=1,activeCat=sessionStorage.getItem('linli_cat')||'';
 let viewMode=localStorage.getItem('linli_view')||'list';
 function getCardCols(){var g=document.getElementById('grid');if(!g)return 4;return Math.max(1,Math.floor((g.clientWidth+12)/192))}
 function applyView(){var g=document.getElementById('grid'),sw=document.getElementById('viewSwitch');if(viewMode==='card'){g.classList.add('card-mode');sw.classList.add('card');pageSize=getCardCols()*Math.round(20/getCardCols())}else{g.classList.remove('card-mode');sw.classList.remove('card');pageSize=(window.innerWidth>=700?2:1)*Math.round(16/(window.innerWidth>=700?2:1))}}
@@ -206,21 +206,21 @@ const CATS=[{id:"vocaloid",n:"术力口",k:["v家","术力口","vocaloid","初�
 function classify(tags){var t=(tags||"").toLowerCase(),words=t.split(/[\s,]+/);for(var i=0;i<CATS.length;i++){var c=CATS[i];if(!c.k.length)continue;for(var j=0;j<c.k.length;j++){var kw=c.k[j].toLowerCase();for(var w=0;w<words.length;w++){if(words[w]===kw)return c.id}if(t.indexOf(kw)>=0&&kw.length>4)return c.id}}return"other"}
 function buildCatBar(){var h="";CATS.forEach(function(c){h+="<button class=\"tab cat-btn\" data-cat=\""+c.id+"\">"+c.n+"</button>"});document.getElementById("catBar").innerHTML=h;updateCatCounts()}
 async function updateCatCounts(){try{var d=await fetchApproved();document.querySelectorAll("#catBar .cat-btn").forEach(function(b){var cid=b.dataset.cat;b.textContent=CATS.find(function(c){return c.id===cid}).n+" ("+d.filter(function(x){return classify(x.tags)===cid}).length+")"})}catch(e){}}
-function pickCat(id){activeCat=id;document.querySelectorAll("#catBar .cat-btn").forEach(function(b){b.classList.toggle("active",b.dataset.cat===id)});renderCategories()}
+function pickCat(id){activeCat=id;sessionStorage.setItem('linli_cat',id);document.querySelectorAll("#catBar .cat-btn").forEach(function(b){b.classList.toggle("active",b.dataset.cat===id)});renderCategories()}
 async function renderCategories(){var g=document.getElementById("grid"),e=document.getElementById("empty");document.getElementById("pager").innerHTML="";g.innerHTML="";e.style.display="none";if(!activeCat)return;try{var d=await fetchApproved(),items=d.filter(function(x){return classify(x.tags)===activeCat});if(!items.length){e.style.display="block";e.textContent="暂无歌曲";return}items.forEach(function(item,i){var div=document.createElement("div");div.innerHTML=buildRow(item,i);g.appendChild(div.firstElementChild);trackView(item.id)})}catch(ex){e.style.display="block";e.textContent="加载失败"}}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
 document.getElementById('catBar').addEventListener('click',function(e){var b=e.target.closest('.cat-btn');if(!b)return;pickCat(b.dataset.cat)});
 // 主视图切换（分享码/讨论区）
-var mainView='share';
+var mainView=sessionStorage.getItem('linli_main')||'share';
 document.getElementById('mainShare').addEventListener('click',function(){switchMainView('share')});
 document.getElementById('mainDiscuss').addEventListener('click',function(){switchMainView('discuss')});
 function switchMainView(v){
-  mainView=v;document.getElementById('mainShare').classList.toggle('active',v==='share');document.getElementById('mainDiscuss').classList.toggle('active',v==='discuss');
+  mainView=v;sessionStorage.setItem('linli_main',v);document.getElementById('mainShare').classList.toggle('active',v==='share');document.getElementById('mainDiscuss').classList.toggle('active',v==='discuss');
   var sp=document.getElementById('sharePanel'),dp=document.getElementById('discussPanel'),tabs=document.getElementById('tabs'),vs=document.getElementById('viewSwitch'),fab=document.getElementById('fab'),vc=document.getElementById('viewContainer');
   if(v==='share'){sp.className='view-panel share-active';dp.className='view-panel discuss-inactive';vs.style.display='';fab.style.display='';render()}else{sp.className='view-panel share-inactive';dp.className='view-panel discuss-active';vs.style.display='none';fab.style.display='none';if(!window._discussLoaded){loadThreads();window._discussLoaded=true}}
 }
 // 二级Tab（分享码子标签）
-document.getElementById('tabs').addEventListener('click',function(e){var btn=e.target.closest('.tab');if(!btn)return;document.querySelectorAll('#tabs .tab').forEach(function(b){return b.classList.remove('active')});btn.classList.add('active');tab=btn.dataset.tab;page=1;var sb=document.getElementById('searchBar'),cb=document.getElementById('catBar');sb.classList.toggle('hidden',tab!=='search');cb.style.display=tab==='category'?'flex':'none';if(tab==='category'){activeCat='';buildCatBar();renderCategories();return}render()});
+document.getElementById('tabs').addEventListener('click',function(e){var btn=e.target.closest('.tab');if(!btn)return;document.querySelectorAll('#tabs .tab').forEach(function(b){return b.classList.remove('active')});btn.classList.add('active');tab=btn.dataset.tab;sessionStorage.setItem('linli_tab',tab);page=1;var sb=document.getElementById('searchBar'),cb=document.getElementById('catBar');sb.classList.toggle('hidden',tab!=='search');cb.style.display=tab==='category'?'flex':'none';if(tab==='category'){activeCat='';buildCatBar();renderCategories();return}render()});
 document.getElementById('searchInput').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch()});
 var _searchTimer=null;document.getElementById('searchInput').addEventListener('input',function(){clearTimeout(_searchTimer);_searchTimer=setTimeout(doSearch,400)});
 function doSearch(){page=1;render()}
@@ -279,9 +279,15 @@ async function doDiscussLike(id){var idx=discussLiked.indexOf(id),isLiked=idx>=0
 async function reportDiscuss(id){try{var d=await sbApi('discussions?select=reports&id=eq.'+id),n=(d[0]?.reports||0)+1;await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reports:n})});showToast('已举报')}catch(e){showToast('举报失败')}}
 
 
-// 初始化
+// 初始化 + 恢复上次状态
 document.getElementById('lastUpdate').textContent=new Date().toLocaleDateString('zh-CN');
-render();
+if(mainView==='discuss'){switchMainView('discuss')}
+else{
+  document.querySelector('#tabs .tab[data-tab="'+tab+'"]').classList.add('active');
+  if(tab==='category'){buildCatBar();if(activeCat)pickCat(activeCat)}
+  else if(tab==='search'){document.getElementById('searchBar').classList.remove('hidden');render()}
+  else{render()}
+}
 </script>
 </body>
 </html>
