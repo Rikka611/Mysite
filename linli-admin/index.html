@@ -260,7 +260,7 @@ async function load(){
   try{
     dataCache=filter==='feedback'?[]:await sbApi('linli_codes?select=*&order=created_at.desc&limit=1000')
     renderStats();renderChart();renderList()
-  }catch(e){document.getElementById('empty').textContent='加载失败: '+e.message}
+  }catch(e){console.error(e);document.getElementById('empty').textContent='加载失败，请检查网络后刷新重试'}
 }
 
 async function renderStats(){
@@ -444,6 +444,7 @@ function renderList(){
 // ---- Tag editing ----
 function editTags(el){
   if(el.querySelector('input'))return
+  _isEditing=true
   var code=el.dataset.code
   var curTags=el.closest('.row').dataset.itemTags||''
   el.innerHTML='<input class="tag-input" value="'+curTags.replace(/"/g,'&quot;')+'" data-code="'+code+'" data-old="'+curTags.replace(/"/g,'&quot;')+'" onkeydown="if(event.key===\'Enter\')saveTags(this)" onblur="saveTags(this)" style="width:'+Math.max(80,(curTags.length||4)*10)+'px;padding:2px 6px;border-radius:6px;border:1px solid var(--accent);background:var(--card-bg);color:var(--text);font-size:0.7rem;outline:none;font-family:inherit">'
@@ -461,9 +462,11 @@ async function saveTags(input){
     var tagList=newTags?newTags.split(/[\s,]+/).filter(Boolean):[]
     var span=input.parentElement
     span.innerHTML=tagList.length?tagList.map(function(t){return '#'+escapeHtml(t)}).join(' '):'<i style="color:var(--text-dim)">无标签</i>'
+    _isEditing=false
   }catch(e){showToast('更新失败','err');cancelTagEdit(input)}
 }
 function cancelTagEdit(input){
+  _isEditing=false
   var span=input.parentElement,oldTags=input.dataset.old
   var tagList=oldTags?oldTags.split(/[\s,]+/).filter(Boolean):[]
   span.innerHTML=tagList.length?tagList.map(function(t){return '#'+escapeHtml(t)}).join(' '):'<i style="color:var(--text-dim)">无标签</i>'
@@ -502,7 +505,8 @@ async function doReply(){const txt=document.getElementById('replyText').value.tr
 const html=document.documentElement;function applyTheme(mode){html.classList.remove("light","dark");if(mode==="light")html.classList.add("light");if(mode==="dark")html.classList.add("dark")}const st=localStorage.getItem("theme");if(st)applyTheme(st);document.getElementById("themeToggle").addEventListener("click",()=>{const cur=html.classList.contains("light")?"light":html.classList.contains("dark")?"dark":"auto";if(cur==="auto"){const sd=matchMedia("(prefers-color-scheme:dark)").matches;localStorage.setItem("theme",sd?"light":"dark");applyTheme(sd?"light":"dark")}else if(cur==="dark"){localStorage.setItem("theme","light");applyTheme("light")}else{localStorage.setItem("theme","dark");applyTheme("dark")}});
 
 // Auto refresh every 5 minutes
-setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')load()},300000)
+var _isEditing=false
+setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none'&&!_isEditing&&!_replyId)load()},300000)
 if(localStorage.getItem("admin_session")&&sessionStorage.getItem("admin_pw")){showMain()}
 </script>
 <div class="modal-overlay" id="replyOverlay" style="position:fixed;inset:0;z-index:300;display:none;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center" onclick="if(event.target===this)closeReply()">
