@@ -84,7 +84,7 @@ Deno.serve(async (req: Request) => {
         break
       }
       case 'check_pw': {
-        if (payload.pw !== ADMIN_PW) result = { error: 'wrong password' }
+        // password already validated at top of function
         break
       }
       case 'check_totp': {
