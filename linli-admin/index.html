@@ -530,7 +530,7 @@ function renderDiscuss(){
     lst.appendChild(d)
   })
 }
-async function delDiscuss(id){if(!confirm('确认删除？子回复也会被删除'))return;try{await adminApi('discuss_delete',{id:id});loadDiscuss();showToast('已删除','ok')}catch(e){showToast('操作失败','err')}}
+async function delDiscuss(id){if(!confirm('确认删除？子回复也会被删除'))return;try{await adminApi('discuss_delete',{id:id});loadDiscuss();showToast('已删除','ok')}catch(e){showToast('删除失败: '+(e.message||'请确认discussions表已创建'),'err')}}
 
 var _isEditing=false
 setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none'&&!_isEditing&&!_replyId)load()},300000)
