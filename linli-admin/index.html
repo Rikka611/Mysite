@@ -466,7 +466,7 @@ async function doLogin(){
     const pw=document.getElementById('pwInput').value
     if(!pw){document.getElementById('loginErr').textContent='请输入密码';return}
     try{const r=await adminApi('check_pw',{pw});if(!r||r.error){document.getElementById('loginErr').textContent='密码错误';return}}catch(e){document.getElementById('loginErr').textContent='验证失败';return}
-    sessionStorage.setItem("admin_pw",pw);
+    localStorage.setItem("admin_pw",pw);
     _loginStage=1;document.getElementById('pwInput').style.display='none'
     document.getElementById('totpInput').style.display='block'
     document.getElementById('loginBtn').textContent='验证 TOTP'
@@ -500,7 +500,7 @@ const sbApi = async function(path, options = {}) {
   const t=await res.text();return t?JSON.parse(t):[];
 }
 async function adminApi(action, payload={}){
-  const pw=sessionStorage.getItem("admin_pw")||"";
+  const pw=localStorage.getItem("admin_pw")||"";
   const res=await fetch(EDGE_URL,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+SB_KEY},body:JSON.stringify({password:pw,action,payload})});
   if(!res.ok)throw new Error(await res.text());
   return res.json();
@@ -650,6 +650,6 @@ setInterval(()=>{if(document.getElementById('mainBox').style.display!=='none')lo
     </div>
   </div>
 </div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.11</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.75rem;color:var(--text-muted);z-index:99;opacity:0.8;background:var(--card-bg);padding:2px 8px;border-radius:4px">v2.2.12</div>
 </body>
 </html>

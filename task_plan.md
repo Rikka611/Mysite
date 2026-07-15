@@ -31,7 +31,18 @@
 | page_views | 旧版页面计数器（已弃用）|
 
 ## 当前阶段
-v1.2 稳定运行 ✅
+v2.2.11 ✅ — 安全加固完成 + UI统一 + Edge Function上线
+
+## 安全架构（第三轮红队后）
+- **anon 权限**：仅 SELECT + INSERT，UPDATE/DELETE 已 REVOKE
+- **写操作**：所有 PATCH/DELETE 通过 Edge Function (`--no-verify-jwt`) + service_role key
+- **密码验证**：移至 Edge Function 服务端，PW_HASH 已从源码删除
+- **2FA**：TOTP 双重验证（check_totp RPC + Edge Function）
+- **登录持久化**：localStorage（关闭浏览器保持登录）
+- **速率限制**：INSERT 每分钟最多 10 条
+- **反馈 RLS**：已启用，anon 仅 INSERT + SELECT
+- **CSP**：meta 标签限制脚本和数据源
+- **Supabase key**：sb_publishable 已轮换，config.template.js 用占位符
 
 ## 阶段历史
 

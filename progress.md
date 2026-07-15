@@ -1,5 +1,30 @@
 # 进度日志：Mysite
 
+## 会话：2026-07-15
+
+### 第三轮安全加固
+- REVOKE UPDATE/DELETE FROM anon → 权限最小化
+- Edge Function 部署 + adminApi 改造
+- PW_HASH 删除，密码校验服务端化
+- 2FA 修复（Edge Function check_totp）
+- 反馈 RLS + SELECT GRANT
+- INSERT 速率限制 SQL
+- config.template.js 占位符
+- CSP meta 标签
+- 全部数据备份到 backup-*.json
+
+### UI 统一
+- 后台 CSS 完全替换为主页风格（变量、星空、流星、按钮、横条）
+- 主题切换按钮 + JS
+- 排版容器 max-width 1000px 居中
+- 修复 loginBox 闭合标签 bug
+- 修复 mainBox 提前关闭 bug
+- 登录持久化 localStorage
+
+### 数据恢复
+- likes 被攻击设为 99999 → 从 visitors 表恢复
+- 导入第二批 27 条分享码
+
 ## 会话：2026-07-14
 
 ### 统计系统升级
