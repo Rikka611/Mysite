@@ -249,9 +249,10 @@ function renderPager(){
   let h=`<button onclick="goPage(${page-1})" ${page<=1?'disabled':''}>‹</button>`;
   h+=`<span class="info">${page} / ${totalPages}</span>`;
   h+=`<button onclick="goPage(${page+1})" ${page>=totalPages?'disabled':''}>›</button>`;
+  h+=`<span style="margin-left:10px;font-size:0.75rem;color:var(--text-dim)">跳至</span><input id="jumpPage" type="number" min="1" max="${totalPages}" value="${page}" onkeydown="if(event.key==='Enter')goPage(parseInt(this.value))" style="width:42px;padding:4px 6px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);font-size:0.75rem;text-align:center;font-family:system-ui;outline:none;-moz-appearance:textfield" onfocus="this.select()">`;
   p.innerHTML=h;
 }
-function goPage(n){if(n<1||n>totalPages)return;page=n;render();window.scrollTo({top:0,behavior:'smooth'})}
+function goPage(n){if(isNaN(n)||n<1||n>totalPages)return;page=n;render();window.scrollTo({top:0,behavior:'smooth'})}
 
 async function render(skipAnim){
   const grid=document.getElementById('grid'),empty=document.getElementById('empty');
