@@ -311,7 +311,7 @@ async function openReplies(){
   empty.style.display='none';
   list.innerHTML=replyData.map(r=>'<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px"><div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:6px;word-break:break-word;white-space:pre-wrap">💬 '+(r.fp?'<span style="font-size:0.65rem;color:var(--text-dim)">'+new Date(r.created_at).toLocaleString('zh-CN')+'</span><br>':'')+escapeHtml(r.content)+'</div><div style="font-size:0.85rem;color:var(--accent);background:rgba(56,189,248,0.08);padding:8px 12px;border-radius:8px;word-break:break-word;white-space:pre-wrap">回复'+(r.fp&&r.replied_at?' <span style="font-size:0.65rem;opacity:0.7">'+new Date(r.replied_at).toLocaleString('zh-CN')+'</span>':'')+'：'+escapeHtml(r.reply)+'</div></div>').join('');
   // Mark all as read
-  replyData.forEach(r=>{if(!r.reply_read){sbApi('feedbacks?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({reply_read:true})});r.reply_read=true}});
+  replyData.forEach(r=>{if(!r.reply_read){try{sbApi('feedbacks?id=eq.'+r.id,{method:'PATCH',body:JSON.stringify({reply_read:true})})}catch(e){}r.reply_read=true}});
   document.getElementById('replyBadge').style.display='none'
 }
 function closeReplies(){document.getElementById('replyListOverlay').style.display='none'}
