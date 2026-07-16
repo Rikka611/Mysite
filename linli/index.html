@@ -44,6 +44,28 @@
 .list.card-mode .skeleton{height:120px}
 @media(max-width:400px){.list.card-mode{grid-template-columns:repeat(2,1fr)}.list.card-mode .row .stats{display:flex}}
 @media(max-width:500px){.view-switch .sw-label{font-size:0.6rem}.view-switch .sw-track{width:30px;height:18px}.view-switch .sw-thumb{width:14px;height:14px}.view-switch.card .sw-thumb{transform:translateX(12px)}}
+
+/* 手机端全局适配 */
+@media(max-width:640px){
+  body{padding-top:48px}
+  .top-bar{height:48px}
+  .top-bar .brand-link{font-size:1rem}
+  .main-tab{padding:5px 12px;font-size:0.72rem}
+  .tabs{margin-top:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 4px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{padding:6px 14px;font-size:0.7rem}
+  .content,.discuss-area{max-width:100%;padding:0 8px 40px}
+  .hero{display:none}
+  .search-bar input{width:180px;font-size:0.78rem}
+  .search-bar button{font-size:0.78rem;padding:8px 14px}
+  .pagination button{padding:5px 10px;font-size:0.7rem}
+  .pagination .info{font-size:0.7rem}
+  .fab{bottom:16px;right:16px;width:44px;height:44px;font-size:1.2rem}
+  footer{padding:12px 8px;font-size:0.65rem}
+  .modal{width:95vw;padding:16px}
+  .discuss-form{padding:10px}
+  .thread{padding:10px}
+}
 @keyframes cardIn{from{opacity:0;transform:scale(0.85) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
 /* 顶栏主Tab */
