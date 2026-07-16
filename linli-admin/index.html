@@ -546,14 +546,14 @@ function renderDiscuss(){
   })
   // 管理发帖表单
   var formDiv=document.createElement('div');formDiv.className='row';formDiv.style.borderLeft='3px solid #f59e0b'
-  formDiv.innerHTML='<div class="info"><textarea id="adminPostContent" placeholder="以 Admin 身份发帖..." maxlength="500" rows="2" style="width:100%;padding:6px 10px;border-radius:8px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);font-size:0.75rem;outline:none;font-family:inherit;resize:vertical"></textarea></div><div class="actions"><button class="btn warn sm" onclick="adminPost()">发布</button></div>'
+  formDiv.innerHTML='<div class="info"><input id="adminPostTitle" placeholder="标题" maxlength="80" style="width:100%;padding:5px 8px;margin-bottom:4px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);font-size:0.8rem;outline:none;font-family:inherit;font-weight:600"><textarea id="adminPostContent" placeholder="内容..." maxlength="500" rows="2" style="width:100%;padding:6px 10px;border-radius:8px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);font-size:0.75rem;outline:none;font-family:inherit;resize:vertical"></textarea></div><div class="actions"><button class="btn warn sm" onclick="adminPost()">发布</button></div>'
   lst.appendChild(formDiv)
 }
 var _adminReplyId=0
 function adminReply(id){_adminReplyId=id;var inp=document.getElementById('adminPostContent');if(inp){inp.placeholder='以 Admin 身份回复...';inp.focus()}}
 function adminPost(){
-  var content=document.getElementById('adminPostContent').value.trim();if(!content)return
-  adminApi('discuss_create',{content:content,parent_id:_adminReplyId||null}).then(function(){document.getElementById('adminPostContent').value='';_adminReplyId=0;document.getElementById('adminPostContent').placeholder='以 Admin 身份发帖...';loadDiscuss()}).catch(function(e){showToast('发布失败: '+(e.message||'请运行discuss-v2.sql'),'err')})
+  var title=document.getElementById('adminPostTitle').value.trim(),content=document.getElementById('adminPostContent').value.trim();if(!title||!content){showToast('请填写标题和内容','info');return}
+  adminApi('discuss_create',{content:content,parent_id:_adminReplyId||null,title:title}).then(function(){document.getElementById('adminPostTitle').value='';document.getElementById('adminPostContent').value='';_adminReplyId=0;document.getElementById('adminPostContent').placeholder='内容...';loadDiscuss()}).catch(function(e){showToast('发布失败: '+(e.message||''),'err')})
 }
 async function togglePin(id,pinned){try{await adminApi('discuss_pin',{id:id,pinned:!!pinned});loadDiscuss()}catch(e){showToast('操作失败','err')}}
 async function clearReports(id){try{await adminApi('discuss_clear_reports',{id:id});loadDiscuss()}catch(e){}}

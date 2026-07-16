@@ -113,6 +113,7 @@ Deno.serve(async (req: Request) => {
         const { error } = await db.from('discussions').insert({
           name: 'Admin',
           content: payload.content,
+          title: payload.title || null,
           parent_id: payload.parent_id || null,
           is_admin: true,
           pinned: false
