@@ -70,11 +70,11 @@
 
 /* 顶栏主Tab */
 .main-tab{padding:10px 24px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.85rem;font-weight:500;font-family:system-ui,-apple-system,sans-serif;transition:all 0.35s cubic-bezier(0.25,0.8,0.25,1.2);position:relative;overflow:hidden;white-space:nowrap}
-.main-tab::after{content:'';position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,#38bdf8,#818cf8);opacity:0;transition:opacity 0.3s}
+.main-tab::after{content:'';position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,#0ea5e9,#818cf8);opacity:0;transition:opacity 0.3s}
 .main-tab:hover{transform:translateY(-2px);color:var(--text)}
 .main-tab:active{transform:scale(0.95)}
-.main-tab.active{background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;box-shadow:0 4px 16px rgba(56,189,248,0.35)}
-.top-bar .brand-link{text-decoration:underline;text-underline-offset:6px;color:#38bdf8;transition:text-underline-offset 0.3s}
+.main-tab.active{background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;box-shadow:0 4px 16px rgba(56,189,248,0.35)}
+.top-bar .brand-link{text-decoration:underline;text-underline-offset:6px;color:#0ea5e9;transition:text-underline-offset 0.3s}
 .top-bar .brand-link:hover{text-underline-offset:10px}
 /* 隐藏原hero和原nav，顶栏fixed偏移 */
 body{padding-top:56px}
@@ -95,7 +95,7 @@ body>nav{display:none}
 .discuss-form.collapsed{max-height:0;padding-top:0;padding-bottom:0;margin-bottom:0;opacity:0;border-width:0}
 .discuss-form input,.discuss-form textarea{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.85rem;outline:none;font-family:inherit;margin-bottom:8px;resize:vertical}
 .discuss-form textarea{min-height:60px}
-.discuss-form button{padding:8px 20px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:inherit}
+.discuss-form button{padding:8px 20px;border-radius:50px;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:inherit}
 .thread{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;backdrop-filter:blur(10px);transition:border-color 0.3s}
 .thread:hover{border-color:rgba(56,189,248,0.3)}.thread.pinned{border-left:3px solid #f59e0b}
 .thread .th-name{font-size:0.8rem;color:var(--accent);font-weight:600}
@@ -129,7 +129,7 @@ body>nav{display:none}
 <!-- 置顶导航 -->
 <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--nav-border);height:56px;overflow:visible">
   <div style="max-width:min(96vw,1400px);margin:0 auto;padding:0 clamp(8px,1.5vw,24px);display:flex;align-items:center;height:100%;gap:16px">
-    <a href="https://store.steampowered.com/app/4532590/BSide_Olivia_Lin/" target="_blank" class="brand-link" style="font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#38bdf8,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0">BSide Olivia Lin</a>
+    <a href="https://store.steampowered.com/app/4532590/BSide_Olivia_Lin/" target="_blank" class="brand-link" style="font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#0ea5e9,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0">BSide Olivia Lin</a>
     <button class="main-tab active" data-view="share" id="mainShare">🎼 分享码</button>
     <button class="main-tab" data-view="discuss" id="mainDiscuss">💬 讨论区</button>
     <div style="flex:1"></div>
@@ -202,7 +202,8 @@ body>nav{display:none}
     <div class="error" id="modalError" style="color:#ef4444;font-size:0.8rem;text-align:center;margin-top:8px"></div>
     <div style="display:flex;gap:8px;margin-top:20px;justify-content:center">
       <button onclick="closeModal()" style="padding:10px 28px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">取消</button>
-      <button onclick="doSubmit()" style="padding:10px 28px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">提交</button>
+      <button onclick="previewSubmit()" style="padding:10px 28px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">预览</button>
+      <button onclick="doSubmit()" style="padding:10px 28px;border-radius:50px;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">提交</button>
     </div>
   </div>
 </div>
@@ -250,7 +251,8 @@ document.getElementById('viewSwitch').addEventListener('click',toggleView);
 var _resizeDebounce;window.addEventListener('resize',function(){clearTimeout(_resizeDebounce);_resizeDebounce=setTimeout(function(){var old=pageSize;applyView();if(pageSize!==old&&page>1&&totalPages>0){page=Math.min(page,Math.ceil(totalPages*old/pageSize));render()}},300)});
 
 async function fetchApproved(){var q='status=eq.approved';q+=tab==='hot'?'&order=likes.desc&limit=1000':'&order=created_at.desc&limit=1000';return sbApi('linli_codes?select=*&'+q)}
-async function searchCodes(q){return sbApi('linli_codes?select=*&status=eq.approved&or=(title.ilike.*'+q+'*,description.ilike.*'+q+'*,author.ilike.*'+q+'*,tags.ilike.*'+q+'*)&order=likes.desc&limit=1000')}
+async function searchCodes(q){return sbApi('linli_codes?select=*&status=eq.approved&or=(title.ilike.*'+q+'*,description.ilike.*'+q+'*,author.ilike.*'+q+'*,tags.ilike.*'+q+'*)&order=likes.desc&limit=1000').then(function(d){return d.sort(function(a,b){var sa=similarity(a.title||'',q)+similarity(a.tags||'',q)*0.5, sb=similarity(b.title||'',q)+similarity(b.tags||'',q)*0.5;return sb-sa})})}
+function similarity(s,q){s=s.toLowerCase();q=q.toLowerCase();if(s.indexOf(q)>=0)return 1;var m=0;for(var i=0;i<q.length;i++){if(s.indexOf(q[i])>=0)m++}return m/q.length*0.5}
 async function trackView(id){var f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'view'})})}catch(e){}}
 async function doLike(id,e){var f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));render(true);if(e){var rect=e.target.getBoundingClientRect();for(var i=0;i<8;i++){var h=document.createElement('div');h.className='heart-burst';h.textContent='❤';h.style.left=rect.left+rect.width/2+'px';h.style.top=rect.top+rect.height/2+'px';var a=Math.PI*2*i/8;h.style.setProperty('--hx',Math.cos(a)*40+'px');h.style.setProperty('--hy',Math.sin(a)*40+'px');h.style.color='hsl('+(350+Math.random()*20)+',90%,'+(55+Math.random()*20)+'%)';document.body.appendChild(h);h.addEventListener('animationend',function(){h.remove()})}}}
 async function reportCode(id,e){if(e){e.preventDefault();e.stopPropagation()}try{var d=await sbApi('linli_codes?select=reports&id=eq.'+id);var n=(d[0]?.reports||0)+1;await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reports:n})});showToast('已反馈')}catch(_){}}
@@ -260,6 +262,14 @@ document.getElementById('modalOverlay').addEventListener('click',function(e){if(
 document.getElementById('majorPick').addEventListener('click',function(e){var s=e.target.closest('.tab');if(!s)return;_pickedMajor=s.dataset.cat;document.querySelectorAll('#majorPick .tab').forEach(function(b){b.classList.toggle('active',b.dataset.cat===_pickedMajor)})});
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');['inputCode','inputTitle','inputAuthor','inputDesc','inputTags'].forEach(function(id){document.getElementById(id).value=''})}
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeReplies()}});
+function previewSubmit(){
+  var code=document.getElementById('inputCode').value.trim().toUpperCase(),title=document.getElementById('inputTitle').value.trim(),desc=document.getElementById('inputDesc').value.trim(),tags=document.getElementById('inputTags').value.trim(),errEl=document.getElementById('modalError');
+  if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请先填写六位分享码';return}
+  if(!title){errEl.textContent='请先填写曲名';return}
+  errEl.textContent='';
+  var previewHTML='<div class="row"><div class="glare"></div><div class="rank"></div><div class="code">'+esc(code)+'</div><div class="info"><div class="title">'+esc(title)+'</div><div class="sub">'+(desc?esc(desc):'')+' '+(tags?tags.split(/[\s,]+/).filter(Boolean).map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join(' '):'')+'</div></div><div class="stats">待审核</div></div>';
+  document.getElementById('modalError').innerHTML='<div style="margin-top:8px;font-size:0.7rem;color:var(--text-dim)">预览效果：</div><div style="border:2px dashed rgba(245,158,11,0.4);border-radius:12px;padding:8px;margin-top:4px">'+previewHTML+'</div>';
+}
 async function doSubmit(){var code=document.getElementById('inputCode').value.trim().toUpperCase(),title=document.getElementById('inputTitle').value.trim(),author=document.getElementById('inputAuthor').value.trim()||'匿名',desc=document.getElementById('inputDesc').value.trim(),tags=document.getElementById('inputTags').value.trim(),errEl=document.getElementById('modalError');if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请输入六位分享码（字母或数字）';return}if(!title||title.length>50){errEl.textContent='曲名不能为空且不超过50字';return}if(!desc){errEl.textContent='请填写简介（MIDI来源）';return}if(!_pickedMajor){errEl.textContent='请选择一个大分类';return}var fullTags=(_pickedMajor+' '+tags).trim();try{await sbApi('linli_codes',{method:'POST',body:JSON.stringify({code:code,title:title,description:desc,author:author,tags:fullTags,status:'pending',views:0,likes:0,reports:0})});closeModal();showToast('提交成功，审核后显示');render()}catch(e){var msg=e.message;try{msg=JSON.parse(e.message).message||msg}catch(_){}errEl.textContent=msg}}
 function esc(s){var d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
 function buildRow(item,idx){var tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[],rank=tab==='hot'?idx+1:null,isLiked=liked.includes(item.id),desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');return '<div class="row" style="animation-delay:'+(idx*0.04)+'s" role="button" tabindex="0" aria-label="歌曲 '+esc(item.title)+'，分享码 '+esc(item.code)+'"><div class="glare"></div><div class="rank">'+(rank!==null?'#'+rank:'')+'</div><div class="info"><div class="title">'+esc(item.title)+'</div><div class="desc-text">'+(desc?esc(desc):'')+'</div><div class="sub">'+(tagList.length?tagList.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join(''):'')+'</div></div><div class="meta-row"><div class="code" onclick="copyCode(\''+esc(item.code)+'\',event)" title="点击复制">'+esc(item.code)+'</div><div class="stats">👁 '+(item.views||0)+' ❤ '+(item.likes||0)+'</div></div><div class="actions"><button class="btn btn-copy" onclick="copyCode(\''+esc(item.code)+'\',event)">📋 复制</button><button class="btn btn-like'+(isLiked?' liked':'')+'" onclick="doLike('+item.id+',event)">'+(isLiked?'❤':'🤍')+'</button><button class="btn btn-like" onclick="reportCode('+item.id+',event)" title="分享码无效">⚠</button></div></div>'}

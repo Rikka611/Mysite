@@ -111,6 +111,7 @@
     <button class="btn ok" onclick="approveAllPending()">全部通过</button>
     <button class="btn warn" onclick="rejectAllPending()">全部拒绝</button>
     <button class="btn danger" onclick="deleteRejected()">清理已拒绝</button>
+    <button class="btn" onclick="exportCSV()">导出</button>
     <button class="btn" onclick="doLogout()">退出</button>
   </div>
 </div>
@@ -219,6 +220,12 @@ async function doLogin(){
 function showMain(){
   document.getElementById('loginBox').style.display='none';document.getElementById('mainBox').style.display='block'
   const nb=document.getElementById('navBar');if(nb)nb.style.display='flex';init()
+}
+function exportCSV(){
+  var items=dataCache;if(!items.length){showToast('无数据可导出','info');return}
+  var csv='code,title,description,tags,views,likes,status,created_at\n';
+  items.forEach(function(x){csv+=[x.code,x.title,(x.description||'').replace(/"/g,'""'),(x.tags||'').replace(/"/g,'""'),x.views,x.likes,x.status,x.created_at].map(function(v){return'"'+v+'"'}).join(',')+'\n'});
+  var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='linli_codes_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 function doLogout(){localStorage.removeItem('admin_session');sessionStorage.removeItem('admin_pw');document.getElementById('loginBox').style.display='flex';document.getElementById('mainBox').style.display='none';const nb=document.getElementById('navBar');if(nb)nb.style.display='none'}
 function toggleAuto(){autoApprove=!autoApprove;document.getElementById('autoBtn').textContent='自动通过：'+(autoApprove?'开':'关');document.getElementById('autoBtn').className='btn '+(autoApprove?'active':'');showToast(autoApprove?'新提交将自动通过':'新提交需手动审核','info')}

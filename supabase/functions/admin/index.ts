@@ -34,6 +34,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     let result: any = { ok: true }
+    const audit = (a: string, t: string, id: number, d?: string) => { db.from('audit_log').insert({ action: a, target_type: t, target_id: id, detail: d }).then(()=>{}).catch(()=>{}) }
     switch (action) {
       case 'stats': {
         const { data } = await db.from('linli_codes').select('*').order('created_at', { ascending: false }).limit(200)
