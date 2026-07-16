@@ -553,10 +553,10 @@ function renderDiscuss(){
   lst.appendChild(formDiv)
 }
 var _adminReplyId=0
-function adminReply(id){_adminReplyId=id;var inp=document.getElementById('adminPostContent');if(inp){inp.placeholder='以 Admin 身份回复...';inp.focus()}}
+function adminReply(id){_adminReplyId=id;var inp=document.getElementById('adminPostContent'),ti=document.getElementById('adminPostTitle');if(ti)ti.style.display='none';if(inp){inp.placeholder='回复内容...';inp.focus()}}
 function adminPost(){
-  var title=document.getElementById('adminPostTitle').value.trim(),content=document.getElementById('adminPostContent').value.trim();if(!title||!content){showToast('请填写标题和内容','info');return}
-  adminApi('discuss_create',{content:content,parent_id:_adminReplyId||null,title:title}).then(function(){document.getElementById('adminPostTitle').value='';document.getElementById('adminPostContent').value='';_adminReplyId=0;document.getElementById('adminPostContent').placeholder='内容...';loadDiscuss()}).catch(function(e){showToast('发布失败: '+(e.message||''),'err')})
+  var title=document.getElementById('adminPostTitle').value.trim(),content=document.getElementById('adminPostContent').value.trim();if(!content){showToast('请填写内容','info');return};if(!_adminReplyId&&!title){showToast('请填写标题','info');return}
+  adminApi('discuss_create',{content:content,parent_id:_adminReplyId||null,title:title}).then(function(){document.getElementById('adminPostTitle').value='';document.getElementById('adminPostTitle').style.display='';document.getElementById('adminPostContent').value='';_adminReplyId=0;document.getElementById('adminPostContent').placeholder='内容...';loadDiscuss()}).catch(function(e){showToast('发布失败: '+(e.message||''),'err')})
 }
 async function togglePin(id,pinned){try{await adminApi('discuss_pin',{id:id,pinned:!!pinned});loadDiscuss()}catch(e){showToast('操作失败','err')}}
 async function clearReports(id){try{await adminApi('discuss_clear_reports',{id:id});loadDiscuss()}catch(e){}}
