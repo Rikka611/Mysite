@@ -44,37 +44,15 @@
 .list.card-mode .skeleton{height:120px}
 @media(max-width:400px){.list.card-mode{grid-template-columns:repeat(2,1fr)}.list.card-mode .row .stats{display:flex}}
 @media(max-width:500px){.view-switch .sw-label{font-size:0.6rem}.view-switch .sw-track{width:30px;height:18px}.view-switch .sw-thumb{width:14px;height:14px}.view-switch.card .sw-thumb{transform:translateX(12px)}}
-
-/* 手机端全局适配 */
-@media(max-width:640px){
-  body{padding-top:48px}
-  .top-bar{height:48px}
-  .top-bar .brand-link{font-size:1rem}
-  .main-tab{padding:5px 12px;font-size:0.72rem}
-  .tabs{margin-top:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 4px}
-  .tabs::-webkit-scrollbar{display:none}
-  .tab{padding:6px 14px;font-size:0.7rem}
-  .content,.discuss-area{max-width:100%;padding:0 8px 40px}
-  .hero{display:none}
-  .search-bar input{width:180px;font-size:0.78rem}
-  .search-bar button{font-size:0.78rem;padding:8px 14px}
-  .pagination button{padding:5px 10px;font-size:0.7rem}
-  .pagination .info{font-size:0.7rem}
-  .fab{bottom:16px;right:16px;width:44px;height:44px;font-size:1.2rem}
-  footer{padding:12px 8px;font-size:0.65rem}
-  .modal{width:95vw;padding:16px}
-  .discuss-form{padding:10px}
-  .thread{padding:10px}
-}
 @keyframes cardIn{from{opacity:0;transform:scale(0.85) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
 /* 顶栏主Tab */
 .main-tab{padding:10px 24px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.85rem;font-weight:500;font-family:system-ui,-apple-system,sans-serif;transition:all 0.35s cubic-bezier(0.25,0.8,0.25,1.2);position:relative;overflow:hidden;white-space:nowrap}
-.main-tab::after{content:'';position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,#0ea5e9,#818cf8);opacity:0;transition:opacity 0.3s}
+.main-tab::after{content:'';position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,#38bdf8,#818cf8);opacity:0;transition:opacity 0.3s}
 .main-tab:hover{transform:translateY(-2px);color:var(--text)}
 .main-tab:active{transform:scale(0.95)}
-.main-tab.active{background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;box-shadow:0 4px 16px rgba(56,189,248,0.35)}
-.top-bar .brand-link{text-decoration:underline;text-underline-offset:6px;color:#0ea5e9;transition:text-underline-offset 0.3s}
+.main-tab.active{background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;box-shadow:0 4px 16px rgba(56,189,248,0.35)}
+.top-bar .brand-link{text-decoration:underline;text-underline-offset:6px;color:#38bdf8;transition:text-underline-offset 0.3s}
 .top-bar .brand-link:hover{text-underline-offset:10px}
 /* 隐藏原hero和原nav，顶栏fixed偏移 */
 body{padding-top:56px}
@@ -95,32 +73,40 @@ body>nav{display:none}
 .discuss-form.collapsed{max-height:0;padding-top:0;padding-bottom:0;margin-bottom:0;opacity:0;border-width:0}
 .discuss-form input,.discuss-form textarea{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.85rem;outline:none;font-family:inherit;margin-bottom:8px;resize:vertical}
 .discuss-form textarea{min-height:60px}
-.discuss-form button{padding:8px 20px;border-radius:50px;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:inherit}
-.thread{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;backdrop-filter:blur(10px);transition:border-color 0.3s}
-.thread:hover{border-color:rgba(56,189,248,0.3)}.thread.pinned{border-left:3px solid #f59e0b}
-.thread .th-name{font-size:0.8rem;color:var(--accent);font-weight:600}
-.thread .th-time{font-size:0.65rem;color:var(--text-dim);margin-left:8px}
-.thread .th-content{font-size:0.85rem;color:var(--text);margin:6px 0;white-space:pre-wrap;word-break:break-word}
-.thread .th-actions{display:flex;gap:8px;margin-top:4px}
-.thread .th-btn{font-size:0.7rem;color:var(--text-dim);cursor:pointer;background:var(--card-bg);border:1px solid var(--card-border);padding:3px 10px;border-radius:50px;font-family:inherit;transition:all 0.2s}
-.thread .th-btn:hover{color:var(--accent);border-color:rgba(56,189,248,0.4);background:rgba(56,189,248,0.08)}
-.replies{margin-top:8px;padding-left:20px;border-left:2px solid rgba(56,189,248,0.15);max-height:2000px;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.25,0.8,0.25,1),padding 0.4s ease,margin 0.4s ease}
-.replies.collapsed{max-height:0;padding-top:0;padding-bottom:0;margin-top:0;border-left-color:transparent}
-.reply-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03)}.reply-item:last-child{border-bottom:none}
-.reply-item .th-name{font-size:0.75rem}.reply-item .th-content{font-size:0.8rem}
-.reply-form{display:flex;gap:6px;margin-top:8px;align-items:flex-start}
-.reply-form input{flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.8rem;outline:none;font-family:inherit}
-.reply-form button{padding:6px 14px;border-radius:50px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:inherit;flex-shrink:0}
+.discuss-form button{padding:8px 20px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:inherit}
+/* 帖子卡片 */
+.thread{background:linear-gradient(135deg,var(--card-bg),rgba(14,165,233,0.02));border:1px solid var(--card-border);border-radius:16px;overflow:hidden;margin-bottom:14px;backdrop-filter:blur(12px);box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:all 0.3s}
+.thread:hover{border-color:rgba(14,165,233,0.25);box-shadow:0 4px 20px rgba(0,0,0,0.15),0 0 0 1px rgba(14,165,233,0.08)}
+.thread.pinned{box-shadow:inset 3px 0 0 #f59e0b,0 1px 3px rgba(0,0,0,0.1)}
+.thread .th-header{display:flex;align-items:center;gap:6px;padding:10px 16px;background:rgba(14,165,233,0.03);border-bottom:1px solid rgba(255,255,255,0.03)}
+.thread .th-body{padding:12px 16px}
+.thread .th-footer{padding:6px 16px 10px;display:flex;align-items:center;gap:6px}
+.thread .th-name{font-size:0.82rem;font-weight:600;color:var(--accent)}
+.thread .th-time{font-size:0.62rem;color:var(--text-dim)}
+.thread .th-title{font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.thread .th-content{font-size:0.85rem;color:var(--text);white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.thread .th-btn{font-size:0.68rem;color:var(--text-dim);cursor:pointer;background:var(--card-bg);border:1px solid var(--card-border);padding:3px 10px;border-radius:50px;font-family:inherit;transition:all 0.2s;display:inline-flex;align-items:center;gap:3px}
+.thread .th-btn:hover{color:var(--accent);border-color:rgba(14,165,233,0.4);background:rgba(14,165,233,0.08)}
+/* 回复区 */
+.replies{margin-top:4px;margin-left:12px;padding:8px 0 8px 16px;border-left:1px solid rgba(14,165,233,0.1);max-height:3000px;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.25,0.8,0.25,1),padding 0.4s ease,margin 0.4s ease,opacity 0.3s ease}
+.replies.collapsed{max-height:0;padding-top:0;padding-bottom:0;margin-top:0;opacity:0;border-left-color:transparent}
+.reply-item{padding:8px 10px;margin:3px 0;border-radius:10px;background:rgba(14,165,233,0.02);border:1px solid rgba(255,255,255,0.02)}
+.reply-item .th-name{font-size:0.78rem;font-weight:600;color:var(--accent)}
+.reply-item .th-content{font-size:0.78rem;margin-top:2px}
+.reply-form{display:flex;gap:4px;margin-top:10px;align-items:center}
+.reply-form input{flex:1;padding:7px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--text);font-size:0.78rem;outline:none;font-family:inherit}
+.reply-form input:focus{border-color:rgba(14,165,233,0.4)}
+.reply-form button{padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.72rem;font-weight:600;font-family:inherit;flex-shrink:0}
 @media(max-width:600px){#discussPanel{max-width:100%;padding:0 8px}.thread{padding:10px 12px}.thread .th-content{font-size:0.8rem}.replies{padding-left:10px}.reply-form input{font-size:0.75rem}.reply-form button{font-size:0.7rem;padding:4px 10px}.th-btn{font-size:0.65rem}}
 @media(max-width:380px){.reply-form{flex-wrap:wrap;gap:4px}.reply-form button{width:100%}}
 </style>
-<script src="../shared/js/config.js?v=3.0.8"></script>
-<script src="../shared/js/sanitize.js?v=3.0.8"></script>
-<script src="../shared/js/api.js?v=3.0.8"></script>
-<script src="../shared/js/charts.js?v=3.0.8"></script>
-<script src="../shared/js/paginate.js?v=3.0.8"></script>
-<script src="../shared/js/batch.js?v=3.0.8"></script>
-<script src="../shared/js/cache.js?v=3.0.8"></script>
+<script src="../shared/js/config.js?v=4.1.0"></script>
+<script src="../shared/js/sanitize.js?v=4.1.0"></script>
+<script src="../shared/js/api.js?v=4.1.0"></script>
+<script src="../shared/js/charts.js?v=4.1.0"></script>
+<script src="../shared/js/paginate.js?v=4.1.0"></script>
+<script src="../shared/js/batch.js?v=4.1.0"></script>
+<script src="../shared/js/cache.js?v=4.1.0"></script>
 </head>
 <body>
 <div class="stars"></div>
@@ -129,7 +115,7 @@ body>nav{display:none}
 <!-- 置顶导航 -->
 <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--nav-border);height:56px;overflow:visible">
   <div style="max-width:min(96vw,1400px);margin:0 auto;padding:0 clamp(8px,1.5vw,24px);display:flex;align-items:center;height:100%;gap:16px">
-    <a href="https://store.steampowered.com/app/4532590/BSide_Olivia_Lin/" target="_blank" class="brand-link" style="font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#0ea5e9,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0">BSide Olivia Lin</a>
+    <a href="https://store.steampowered.com/app/4532590/BSide_Olivia_Lin/" target="_blank" class="brand-link" style="font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#38bdf8,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0">BSide Olivia Lin</a>
     <button class="main-tab active" data-view="share" id="mainShare">🎼 分享码</button>
     <button class="main-tab" data-view="discuss" id="mainDiscuss">💬 讨论区</button>
     <div style="flex:1"></div>
@@ -165,17 +151,21 @@ body>nav{display:none}
 
 <!-- 讨论区 -->
 <div class="view-panel discuss-inactive" id="discussPanel">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <div style="display:flex;gap:8px">
-      <button class="tab" id="discussTabHot" onclick="switchDiscussTab('hot')">🔥 推荐</button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px">
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button class="tab active" id="discussTabHot" onclick="switchDiscussTab('hot')">🔥 推荐</button>
       <button class="tab" id="discussTabNew" onclick="switchDiscussTab('new')">🆕 最新</button>
     </div>
-    <button onclick="togglePostForm()" id="togglePostBtn" style="padding:6px 18px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-family:inherit;flex-shrink:0">＋ 发起新讨论</button>
+    <span style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;margin-left:auto;margin-right:4px">
+      <input type="text" id="newName" placeholder="昵称" maxlength="12" oninput="onNameInput()" style="width:110px;padding:6px 28px 6px 10px;border-radius:20px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.04);color:var(--text);font-size:0.75rem;outline:none;font-family:inherit;text-align:left">
+      <button id="nameConfirmBtn" onclick="confirmName()" style="position:absolute;right:3px;top:50%;padding:4px 6px;border-radius:50%;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.6rem;font-weight:700;font-family:inherit;line-height:1;transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1.3);opacity:0;pointer-events:none;transform:translateY(-50%) scale(0.5)">✓</button>
+    </span>
+    <button onclick="togglePostForm()" id="togglePostBtn" style="padding:6px 14px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.78rem;font-family:inherit;flex-shrink:0;transition:all 0.35s cubic-bezier(0.25,0.8,0.25,1);white-space:nowrap">＋ 发帖</button>
   </div>
   <div class="discuss-form collapsed" id="postForm">
-    <input type="text" id="newName" placeholder="昵称（留空则为「匿名用户」）" maxlength="30">
+    <input type="text" id="newTitle" placeholder="标题" maxlength="80">
     <textarea id="newContent" placeholder="想说点什么..." maxlength="500"></textarea>
-    <button onclick="postTopic()">📨 发布</button>
+    <button onclick="postTopic()">发布</button>
   </div>
   <div id="threadList"></div>
   <div class="discuss-empty" id="discussEmpty" style="text-align:center;color:var(--text-dim);padding:40px 0;font-size:0.9rem">加载中...</div>
@@ -202,15 +192,14 @@ body>nav{display:none}
     <div class="error" id="modalError" style="color:#ef4444;font-size:0.8rem;text-align:center;margin-top:8px"></div>
     <div style="display:flex;gap:8px;margin-top:20px;justify-content:center">
       <button onclick="closeModal()" style="padding:10px 28px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">取消</button>
-      <button onclick="previewSubmit()" style="padding:10px 28px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">预览</button>
-      <button onclick="doSubmit()" style="padding:10px 28px;border-radius:50px;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">提交</button>
+      <button onclick="doSubmit()" style="padding:10px 28px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">提交</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v4.0.1</div>
-<footer>本站为粉丝自发整理的社区索引平台，非商业运营，与米哈游/HoYoverse 及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务，不存储不分发任何曲谱内容。索引曲谱的版权归原始权利人所有，如有侵权请联系删除。用户使用本站服务产生的任何版权问题，本站不承担法律责任。<br><span style="opacity:0.5;font-size:0.65rem">页面更新: <time id="lastUpdate"></time> · 联系：QQ 3332984386 · <a href="../privacy.html" style="color:inherit">隐私政策</a> · 申请删除数据请联系QQ</span></footer>
+<div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v4.1.0</div>
+<footer>本站为粉丝自发整理的社区索引平台，非商业运营，与米哈游/HoYoverse 及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务，不存储不分发任何曲谱内容。索引曲谱的版权归原始权利人所有，如有侵权请联系删除。用户使用本站服务产生的任何版权问题，本站不承担法律责任。<br><span style="opacity:0.5;font-size:0.65rem">页面更新: <time id="lastUpdate"></time> · 联系：QQ 3332984386</span></footer>
 
 <script>
 // ====== 复用原版 linli JS 核心逻辑 ======
@@ -219,7 +208,7 @@ function applyTheme(mode){html.classList.remove('light','dark');if(mode==='light
 const st=localStorage.getItem('theme');if(st)applyTheme(st);
 document.getElementById('themeToggle').addEventListener('click',()=>{const cur=html.classList.contains('light')?'light':html.classList.contains('dark')?'dark':'auto';if(cur==='auto'){const sd=matchMedia('(prefers-color-scheme:dark)').matches;localStorage.setItem('theme',sd?'light':'dark');applyTheme(sd?'light':'dark')}else if(cur==='dark'){localStorage.setItem('theme','light');applyTheme('light')}else{localStorage.setItem('theme','dark');applyTheme('dark')}});
 
-let tab=sessionStorage.getItem('linli_tab')||'hot',liked=JSON.parse(localStorage.getItem('linli_liked')||'[]'),page=1,pageSize=15,totalPages=1,activeCat=sessionStorage.getItem('linli_cat')||'';
+let tab='hot',liked=JSON.parse(localStorage.getItem('linli_liked')||'[]'),page=1,pageSize=15,totalPages=1,activeCat="";
 let viewMode=localStorage.getItem('linli_view')||'list';
 function getCardCols(){var g=document.getElementById('grid');if(!g)return 4;return Math.max(1,Math.floor((g.clientWidth+12)/192))}
 function applyView(){var g=document.getElementById('grid'),sw=document.getElementById('viewSwitch');if(viewMode==='card'){g.classList.add('card-mode');sw.classList.add('card');pageSize=getCardCols()*Math.round(20/getCardCols())}else{g.classList.remove('card-mode');sw.classList.remove('card');pageSize=(window.innerWidth>=700?2:1)*Math.round(16/(window.innerWidth>=700?2:1))}}
@@ -229,21 +218,21 @@ const CATS=[{id:"vocaloid",n:"术力口",k:["v家","术力口","vocaloid","初�
 function classify(tags){var t=(tags||"").toLowerCase(),words=t.split(/[\s,]+/);for(var i=0;i<CATS.length;i++){var c=CATS[i];if(!c.k.length)continue;for(var j=0;j<c.k.length;j++){var kw=c.k[j].toLowerCase();for(var w=0;w<words.length;w++){if(words[w]===kw)return c.id}if(t.indexOf(kw)>=0&&kw.length>4)return c.id}}return"other"}
 function buildCatBar(){var h="";CATS.forEach(function(c){h+="<button class=\"tab cat-btn\" data-cat=\""+c.id+"\">"+c.n+"</button>"});document.getElementById("catBar").innerHTML=h;updateCatCounts()}
 async function updateCatCounts(){try{var d=await fetchApproved();document.querySelectorAll("#catBar .cat-btn").forEach(function(b){var cid=b.dataset.cat;b.textContent=CATS.find(function(c){return c.id===cid}).n+" ("+d.filter(function(x){return classify(x.tags)===cid}).length+")"})}catch(e){}}
-function pickCat(id){activeCat=id;sessionStorage.setItem('linli_cat',id);document.querySelectorAll("#catBar .cat-btn").forEach(function(b){b.classList.toggle("active",b.dataset.cat===id)});renderCategories()}
+function pickCat(id){activeCat=id;document.querySelectorAll("#catBar .cat-btn").forEach(function(b){b.classList.toggle("active",b.dataset.cat===id)});renderCategories()}
 async function renderCategories(){var g=document.getElementById("grid"),e=document.getElementById("empty");document.getElementById("pager").innerHTML="";g.innerHTML="";e.style.display="none";if(!activeCat)return;try{var d=await fetchApproved(),items=d.filter(function(x){return classify(x.tags)===activeCat});if(!items.length){e.style.display="block";e.textContent="暂无歌曲";return}items.forEach(function(item,i){var div=document.createElement("div");div.innerHTML=buildRow(item,i);g.appendChild(div.firstElementChild);trackView(item.id)})}catch(ex){e.style.display="block";e.textContent="加载失败"}}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
 document.getElementById('catBar').addEventListener('click',function(e){var b=e.target.closest('.cat-btn');if(!b)return;pickCat(b.dataset.cat)});
 // 主视图切换（分享码/讨论区）
-var mainView=sessionStorage.getItem('linli_main')||'share';
+var mainView='share';
 document.getElementById('mainShare').addEventListener('click',function(){switchMainView('share')});
 document.getElementById('mainDiscuss').addEventListener('click',function(){switchMainView('discuss')});
 function switchMainView(v){
-  mainView=v;sessionStorage.setItem('linli_main',v);document.getElementById('mainShare').classList.toggle('active',v==='share');document.getElementById('mainDiscuss').classList.toggle('active',v==='discuss');
+  mainView=v;document.getElementById('mainShare').classList.toggle('active',v==='share');document.getElementById('mainDiscuss').classList.toggle('active',v==='discuss');
   var sp=document.getElementById('sharePanel'),dp=document.getElementById('discussPanel'),tabs=document.getElementById('tabs'),vs=document.getElementById('viewSwitch'),fab=document.getElementById('fab'),vc=document.getElementById('viewContainer');
-  if(v==='share'){sp.className='view-panel share-active';dp.className='view-panel discuss-inactive';vs.style.display='';fab.style.display='';render()}else{sp.className='view-panel share-inactive';dp.className='view-panel discuss-active';vs.style.display='none';fab.style.display='none';if(!window._discussLoaded){document.getElementById('discussTabHot').classList.toggle('active',discussTab==='hot');document.getElementById('discussTabNew').classList.toggle('active',discussTab==='new');loadThreads();window._discussLoaded=true}}
+  if(v==='share'){sp.className='view-panel share-active';dp.className='view-panel discuss-inactive';vs.style.display='';fab.style.display='';render()}else{sp.className='view-panel share-inactive';dp.className='view-panel discuss-active';vs.style.display='none';fab.style.display='none';if(!window._discussLoaded){loadThreads();window._discussLoaded=true}}
 }
 // 二级Tab（分享码子标签）
-document.getElementById('tabs').addEventListener('click',function(e){var btn=e.target.closest('.tab');if(!btn)return;document.querySelectorAll('#tabs .tab').forEach(function(b){return b.classList.remove('active')});btn.classList.add('active');tab=btn.dataset.tab;sessionStorage.setItem('linli_tab',tab);page=1;var sb=document.getElementById('searchBar'),cb=document.getElementById('catBar');sb.classList.toggle('hidden',tab!=='search');cb.style.display=tab==='category'?'flex':'none';if(tab==='category'){activeCat='';buildCatBar();renderCategories();return}render()});
+document.getElementById('tabs').addEventListener('click',function(e){var btn=e.target.closest('.tab');if(!btn)return;document.querySelectorAll('#tabs .tab').forEach(function(b){return b.classList.remove('active')});btn.classList.add('active');tab=btn.dataset.tab;page=1;var sb=document.getElementById('searchBar'),cb=document.getElementById('catBar');sb.classList.toggle('hidden',tab!=='search');cb.style.display=tab==='category'?'flex':'none';if(tab==='category'){activeCat='';buildCatBar();renderCategories();return}render()});
 document.getElementById('searchInput').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch()});
 var _searchTimer=null;document.getElementById('searchInput').addEventListener('input',function(){clearTimeout(_searchTimer);_searchTimer=setTimeout(doSearch,400)});
 function doSearch(){page=1;render()}
@@ -251,8 +240,7 @@ document.getElementById('viewSwitch').addEventListener('click',toggleView);
 var _resizeDebounce;window.addEventListener('resize',function(){clearTimeout(_resizeDebounce);_resizeDebounce=setTimeout(function(){var old=pageSize;applyView();if(pageSize!==old&&page>1&&totalPages>0){page=Math.min(page,Math.ceil(totalPages*old/pageSize));render()}},300)});
 
 async function fetchApproved(){var q='status=eq.approved';q+=tab==='hot'?'&order=likes.desc&limit=1000':'&order=created_at.desc&limit=1000';return sbApi('linli_codes?select=*&'+q)}
-async function searchCodes(q){return sbApi('linli_codes?select=*&status=eq.approved&or=(title.ilike.*'+q+'*,description.ilike.*'+q+'*,author.ilike.*'+q+'*,tags.ilike.*'+q+'*)&order=likes.desc&limit=1000').then(function(d){return d.sort(function(a,b){var sa=similarity(a.title||'',q)+similarity(a.tags||'',q)*0.5, sb=similarity(b.title||'',q)+similarity(b.tags||'',q)*0.5;return sb-sa})})}
-function similarity(s,q){s=s.toLowerCase();q=q.toLowerCase();if(s.indexOf(q)>=0)return 1;var m=0;for(var i=0;i<q.length;i++){if(s.indexOf(q[i])>=0)m++}return m/q.length*0.5}
+async function searchCodes(q){return sbApi('linli_codes?select=*&status=eq.approved&or=(title.ilike.*'+q+'*,description.ilike.*'+q+'*,author.ilike.*'+q+'*,tags.ilike.*'+q+'*)&order=likes.desc&limit=1000')}
 async function trackView(id){var f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'view'})})}catch(e){}}
 async function doLike(id,e){var f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));render(true);if(e){var rect=e.target.getBoundingClientRect();for(var i=0;i<8;i++){var h=document.createElement('div');h.className='heart-burst';h.textContent='❤';h.style.left=rect.left+rect.width/2+'px';h.style.top=rect.top+rect.height/2+'px';var a=Math.PI*2*i/8;h.style.setProperty('--hx',Math.cos(a)*40+'px');h.style.setProperty('--hy',Math.sin(a)*40+'px');h.style.color='hsl('+(350+Math.random()*20)+',90%,'+(55+Math.random()*20)+'%)';document.body.appendChild(h);h.addEventListener('animationend',function(){h.remove()})}}}
 async function reportCode(id,e){if(e){e.preventDefault();e.stopPropagation()}try{var d=await sbApi('linli_codes?select=reports&id=eq.'+id);var n=(d[0]?.reports||0)+1;await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reports:n})});showToast('已反馈')}catch(_){}}
@@ -262,14 +250,6 @@ document.getElementById('modalOverlay').addEventListener('click',function(e){if(
 document.getElementById('majorPick').addEventListener('click',function(e){var s=e.target.closest('.tab');if(!s)return;_pickedMajor=s.dataset.cat;document.querySelectorAll('#majorPick .tab').forEach(function(b){b.classList.toggle('active',b.dataset.cat===_pickedMajor)})});
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');['inputCode','inputTitle','inputAuthor','inputDesc','inputTags'].forEach(function(id){document.getElementById(id).value=''})}
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeReplies()}});
-function previewSubmit(){
-  var code=document.getElementById('inputCode').value.trim().toUpperCase(),title=document.getElementById('inputTitle').value.trim(),desc=document.getElementById('inputDesc').value.trim(),tags=document.getElementById('inputTags').value.trim(),errEl=document.getElementById('modalError');
-  if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请先填写六位分享码';return}
-  if(!title){errEl.textContent='请先填写曲名';return}
-  errEl.textContent='';
-  var previewHTML='<div class="row"><div class="glare"></div><div class="rank"></div><div class="code">'+esc(code)+'</div><div class="info"><div class="title">'+esc(title)+'</div><div class="sub">'+(desc?esc(desc):'')+' '+(tags?tags.split(/[\s,]+/).filter(Boolean).map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join(' '):'')+'</div></div><div class="stats">待审核</div></div>';
-  document.getElementById('modalError').innerHTML='<div style="margin-top:8px;font-size:0.7rem;color:var(--text-dim)">预览效果：</div><div style="border:2px dashed rgba(245,158,11,0.4);border-radius:12px;padding:8px;margin-top:4px">'+previewHTML+'</div>';
-}
 async function doSubmit(){var code=document.getElementById('inputCode').value.trim().toUpperCase(),title=document.getElementById('inputTitle').value.trim(),author=document.getElementById('inputAuthor').value.trim()||'匿名',desc=document.getElementById('inputDesc').value.trim(),tags=document.getElementById('inputTags').value.trim(),errEl=document.getElementById('modalError');if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请输入六位分享码（字母或数字）';return}if(!title||title.length>50){errEl.textContent='曲名不能为空且不超过50字';return}if(!desc){errEl.textContent='请填写简介（MIDI来源）';return}if(!_pickedMajor){errEl.textContent='请选择一个大分类';return}var fullTags=(_pickedMajor+' '+tags).trim();try{await sbApi('linli_codes',{method:'POST',body:JSON.stringify({code:code,title:title,description:desc,author:author,tags:fullTags,status:'pending',views:0,likes:0,reports:0})});closeModal();showToast('提交成功，审核后显示');render()}catch(e){var msg=e.message;try{msg=JSON.parse(e.message).message||msg}catch(_){}errEl.textContent=msg}}
 function esc(s){var d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
 function buildRow(item,idx){var tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[],rank=tab==='hot'?idx+1:null,isLiked=liked.includes(item.id),desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');return '<div class="row" style="animation-delay:'+(idx*0.04)+'s" role="button" tabindex="0" aria-label="歌曲 '+esc(item.title)+'，分享码 '+esc(item.code)+'"><div class="glare"></div><div class="rank">'+(rank!==null?'#'+rank:'')+'</div><div class="info"><div class="title">'+esc(item.title)+'</div><div class="desc-text">'+(desc?esc(desc):'')+'</div><div class="sub">'+(tagList.length?tagList.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join(''):'')+'</div></div><div class="meta-row"><div class="code" onclick="copyCode(\''+esc(item.code)+'\',event)" title="点击复制">'+esc(item.code)+'</div><div class="stats">👁 '+(item.views||0)+' ❤ '+(item.likes||0)+'</div></div><div class="actions"><button class="btn btn-copy" onclick="copyCode(\''+esc(item.code)+'\',event)">📋 复制</button><button class="btn btn-like'+(isLiked?' liked':'')+'" onclick="doLike('+item.id+',event)">'+(isLiked?'❤':'🤍')+'</button><button class="btn btn-like" onclick="reportCode('+item.id+',event)" title="分享码无效">⚠</button></div></div>'}
@@ -283,43 +263,55 @@ if(glow&&!_reduceMotion){var _pending=false;document.addEventListener('mousemove
 (function(){if(_reduceMotion)return;var maxAngle=10,cur=null,rect=null,raf=null;function begin(card,x,y){if(card!==cur){if(cur)reset(cur);if(!document.contains(card))return;cur=card;card.classList.add('tilting');rect=card.getBoundingClientRect()}}function move(x,y){if(!cur||!rect)return;if(!raf){raf=requestAnimationFrame(function(){raf=null;if(!cur||!rect)return;var rx=(y-rect.top)/rect.height,ry=(x-rect.left)/rect.width;cur.style.setProperty('--rx',((rx-0.5)*-maxAngle).toFixed(2)+'deg');cur.style.setProperty('--ry',((ry-0.5)*maxAngle).toFixed(2)+'deg');cur.style.setProperty('--gx',(ry*100).toFixed(1)+'%');cur.style.setProperty('--gy',(rx*100).toFixed(1)+'%')})}}function end(card){if(card===cur){reset(cur);cur=null;rect=null}}function reset(card){card.classList.remove('tilting');var glare=card.querySelector('.glare'),done=function(){card.style.transition='transform 0.4s ease-out';card.style.removeProperty('--rx');card.style.removeProperty('--ry');card.style.removeProperty('--gx');card.style.removeProperty('--gy');card.addEventListener('transitionend',function c(){card.style.transition='';card.removeEventListener('transitionend',c)},{once:true})};if(glare)glare.addEventListener('transitionend',function(){done()},{once:true});else done()}document.addEventListener('mouseover',function(e){begin(e.target.closest('.row'),e.clientX,e.clientY)});document.addEventListener('mousemove',function(e){move(e.clientX,e.clientY)});document.addEventListener('mouseout',function(e){var row=e.target.closest('.row');if(!row)return;if(e.relatedTarget&&row.contains(e.relatedTarget))return;end(row)});document.addEventListener('touchstart',function(e){var t=e.touches[0];begin(t.target.closest('.row'),t.clientX,t.clientY)},{passive:true});document.addEventListener('touchmove',function(e){var t=e.touches[0];move(t.clientX,t.clientY)},{passive:true});document.addEventListener('touchend',function(){if(cur){reset(cur);cur=null;rect=null}})})();
 
 // ====== 讨论区 ======
-var threads=[],discussLiked=JSON.parse(localStorage.getItem('linli_discuss_liked')||'[]'),discussTab=sessionStorage.getItem('linli_discuss_tab')||'hot';
-function switchDiscussTab(t){discussTab=t;sessionStorage.setItem('linli_discuss_tab',t);document.querySelectorAll('#discussTabHot,#discussTabNew').forEach(function(b){b.classList.toggle('active',b.id==='discussTabHot'&&t==='hot'||b.id==='discussTabNew'&&t==='new')});renderThreads()}
+var threads=[],discussLiked=JSON.parse(localStorage.getItem('linli_discuss_liked')||'[]'),discussTab='hot';
+function switchDiscussTab(t){discussTab=t;document.querySelectorAll('#discussTabHot,#discussTabNew').forEach(function(b){b.classList.toggle('active',b.id==='discussTabHot'&&t==='hot'||b.id==='discussTabNew'&&t==='new')});renderThreads()}
 function hotScore(t){var now=Date.now(),postHours=(now-new Date(t.created_at).getTime())/3600000,latestReply=0;if(t._replies&&t._replies.length){t._replies.forEach(function(r){var rt=new Date(r.created_at).getTime();if(rt>latestReply)latestReply=rt})}var replyHours=(now-latestReply)/3600000,likeScore=(t.likes||0)/Math.pow(postHours+2,2),replyScore=(t._replies?t._replies.length:0)/Math.pow(replyHours+1,1.2);return likeScore+replyScore+Math.random()*2}
-function togglePostForm(){var f=document.getElementById('postForm'),b=document.getElementById('togglePostBtn');f.classList.toggle('collapsed');b.textContent=f.classList.contains('collapsed')?'＋ 发起新讨论':'－ 收起';if(!f.classList.contains('collapsed'))document.getElementById('newContent').focus()}
+function togglePostForm(){var f=document.getElementById('postForm'),b=document.getElementById('togglePostBtn');b.style.transform='scale(0.95)';b.style.opacity='0.6';setTimeout(function(){f.classList.toggle('collapsed');b.textContent=f.classList.contains('collapsed')?'＋ 发帖':'－ 收起';b.style.transform='scale(1)';b.style.opacity='1';if(!f.classList.contains('collapsed'))document.getElementById('newTitle').focus()},200)}
 function fmtTime(ts){if(!ts)return'';var d=new Date(ts),now=new Date(),diffM=Math.floor((now-d)/60000);if(diffM<10)return diffM<=0?'刚刚':diffM+'分钟前';if(d.toDateString()===now.toDateString())return d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0')}
 
-async function loadThreads(){try{var data=await sbApi('discussions?select=*&parent_id=is.null&order=created_at.desc&limit=100'),replies=await sbApi('discussions?select=*&parent_id=not.is.null&order=created_at.asc&limit=500');document.getElementById('discussTabHot').classList.toggle('active',discussTab==='hot');document.getElementById('discussTabNew').classList.toggle('active',discussTab==='new');threads=data.map(function(t){t._replies=replies.filter(function(r){return r.parent_id===t.id});return t});renderThreads()}catch(e){document.getElementById('discussEmpty').textContent='加载失败'}}
+async function loadThreads(){try{var data=await sbApi('discussions?select=*&parent_id=is.null&order=created_at.desc&limit=100'),replies=await sbApi('discussions?select=*&parent_id=not.is.null&order=created_at.asc&limit=500');threads=data.map(function(t){t._replies=replies.filter(function(r){return r.parent_id===t.id});return t});renderThreads()}catch(e){document.getElementById('discussEmpty').textContent='加载失败'}}
 function renderThreads(){
   var list=document.getElementById('threadList'),empty=document.getElementById('discussEmpty');
   threads.sort(function(a,b){if(b.pinned!==a.pinned)return(b.pinned?1:0)-(a.pinned?1:0);if(discussTab==='new')return new Date(b.created_at)-new Date(a.created_at);return hotScore(b)-hotScore(a)});
   if(!threads.length){list.innerHTML='';empty.style.display='block';empty.textContent='暂无讨论，来发第一个帖子吧';return}empty.style.display='none';
   list.innerHTML=threads.map(function(t){
-    var hasAdminReply=t._replies.some(function(r){return r.is_admin}),nameHtml=t.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':'<span class="th-name">'+(t.name||'匿名用户')+'</span>',pinBadge=t.pinned?' 📌':'';
+    var hasAdminReply=t._replies.some(function(r){return r.is_admin}),nameHtml=t.is_admin?'<span class="th-name" style="color:#f59e0b">Admin</span>':'<span class="th-name">'+(t.name||'匿名用户')+'</span>',pinBadge=t.pinned?' 📌':'';
     return '<div class="thread'+(t.pinned?' pinned':'')+'" id="th-'+t.id+'">'+
-      '<div>'+pinBadge+nameHtml+'<span class="th-time">'+fmtTime(t.created_at)+'</span></div><div class="th-content">'+esc(t.content)+'</div>'+
-      '<div class="th-actions"><button class="th-btn" onclick="doDiscussLike('+t.id+')">'+(discussLiked.indexOf(t.id)>=0?'❤️':'🤍')+' '+(t.likes||0)+'</button><button class="th-btn" onclick="reportDiscuss('+t.id+')">⚠</button><button class="th-btn" onclick="toggleReplies('+t.id+')">💬 '+(t._replies.length?t._replies.length+' 回复':'回复')+'</button></div>'+
+      '<div class="th-header">'+pinBadge+nameHtml+'<span class="th-time">'+fmtTime(t.created_at)+'</span></div>'+
+      '<div class="th-body">'+(t.title?'<div class="th-title">'+esc(t.title)+'</div>':'')+'<div class="th-content">'+esc(t.content)+'</div></div>'+
+      '<div class="th-footer"><button class="th-btn" onclick="doDiscussLike('+t.id+')">'+(discussLiked.indexOf(t.id)>=0?'❤️':'🤍')+' '+(t.likes||0)+'</button><button class="th-btn" onclick="reportDiscuss('+t.id+')">⚠</button><button class="th-btn" onclick="toggleReplies('+t.id+')">💬 '+(t._replies.length?t._replies.length+' 回复':'回复')+'</button></div>'+
       '<div class="replies'+(hasAdminReply?'':' collapsed')+'" id="replies-'+t.id+'">'+
-        (t._replies.length?t._replies.map(function(r){return '<div class="reply-item">'+(r.is_admin?'<span style="color:#f59e0b;font-weight:700">Admin</span>':'<span class="th-name">'+(r.name||'匿名用户')+'</span>')+'<span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
-        '<div class="reply-form"><input type="text" id="replyName-'+t.id+'" placeholder="昵称" maxlength="30" style="max-width:100px"><input type="text" id="replyContent-'+t.id+'" placeholder="回复 TA..." maxlength="300" onkeydown="if(event.key===\'Enter\')postReply('+t.id+')"><button onclick="postReply('+t.id+')">回复</button></div>'+
+        (t._replies.length?t._replies.map(function(r){return '<div class="reply-item">'+(r.is_admin?'<span class="th-name" style="color:#f59e0b">Admin</span>':'<span class="th-name">'+(r.name||'匿名用户')+'</span>')+'<span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
+        '<div class="reply-form"><input type="text" id="replyContent-'+t.id+'" placeholder="回复..." maxlength="300" onkeydown="if(event.key===\'Enter\')postReply('+t.id+')"><button onclick="postReply('+t.id+')">回复</button></div>'+
       '</div></div>';
   }).join('')}
 function toggleReplies(id){var div=document.getElementById('replies-'+id);div.classList.toggle('collapsed');if(!div.classList.contains('collapsed')){var inp=document.getElementById('replyContent-'+id);if(inp)inp.focus()}}
-async function postReply(id){var name=document.getElementById('replyName-'+id),content=document.getElementById('replyContent-'+id),n=name?name.value.trim():'',c=content?content.value.trim():'';if(!c)return;try{await sbApi('discussions',{method:'POST',body:JSON.stringify({name:n||'匿名用户',content:c,parent_id:id})});showToast('回复成功');await loadThreads()}catch(e){showToast('回复失败')}}
-async function postTopic(){var name=document.getElementById('newName').value.trim(),content=document.getElementById('newContent').value.trim();if(!content)return;try{await sbApi('discussions',{method:'POST',body:JSON.stringify({name:name||'匿名用户',content:content})});showToast('发布成功');document.getElementById('newName').value='';document.getElementById('newContent').value='';togglePostForm();await loadThreads()}catch(e){showToast('发布失败')}}
+var _myName=localStorage.getItem('linli_myname')||'';
+document.getElementById('newName').value=_myName;
+function onNameInput(){
+  var v=document.getElementById('newName').value.trim(),btn=document.getElementById('nameConfirmBtn');
+  if(v&&v!==_myName){btn.style.opacity='1';btn.style.pointerEvents='auto';btn.style.transform='translateY(-50%) scale(1)'}
+  else{btn.style.opacity='0';btn.style.pointerEvents='none';btn.style.transform='translateY(-50%) scale(0.5)'}
+}
+async function confirmName(){
+  var v=document.getElementById('newName').value.trim();if(!v||v===_myName)return;
+  var old=_myName;_myName=v;localStorage.setItem('linli_myname',v);
+  var cb=document.getElementById('nameConfirmBtn');cb.style.opacity='0';cb.style.pointerEvents='none';cb.style.transform='translateY(-50%) scale(0.5)';
+  // 批量更新旧帖+旧回复昵称
+  var allItems=[];threads.forEach(function(t){allItems.push(t);if(t._replies)t._replies.forEach(function(r){allItems.push(r)})});
+  var toUpdate=allItems.filter(function(x){return x.name===old});
+  for(var i=0;i<toUpdate.length;i++){try{await sbApi('discussions?id=eq.'+toUpdate[i].id,{method:'PATCH',body:JSON.stringify({name:v})})}catch(e){};toUpdate[i].name=v}
+  renderThreads();
+}
+async function postReply(id){var content=document.getElementById('replyContent-'+id),c=content?content.value.trim():'';if(!c)return;try{await sbApi('discussions',{method:'POST',body:JSON.stringify({name:_myName||'匿名用户',content:c,parent_id:id})});showToast('回复成功');await loadThreads()}catch(e){showToast('回复失败')}}
+async function postTopic(){var title=document.getElementById('newTitle').value.trim(),content=document.getElementById('newContent').value.trim();if(!title||!content){showToast('请填写标题和内容');return};var nn=_myName||'匿名用户';if(nn!=='匿名用户'&&threads.some(function(t){return t.name===nn})){showToast('昵称已被使用，请换一个');return};try{await sbApi('discussions',{method:'POST',body:JSON.stringify({name:nn,content:content,title:title})});showToast('发布成功');document.getElementById('newTitle').value='';document.getElementById('newContent').value='';togglePostForm();await loadThreads()}catch(e){showToast('发布失败')}}
 async function doDiscussLike(id){var idx=discussLiked.indexOf(id),isLiked=idx>=0;if(isLiked)discussLiked.splice(idx,1);else discussLiked.push(id);localStorage.setItem('linli_discuss_liked',JSON.stringify(discussLiked));var t=threads.find(function(x){return x.id===id}),n=(t?t.likes||0:0)+(isLiked?-1:1);try{await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({likes:Math.max(0,n)})})}catch(e){}loadThreads()}
 async function reportDiscuss(id){try{var d=await sbApi('discussions?select=reports&id=eq.'+id),n=(d[0]?.reports||0)+1;await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reports:n})});showToast('已举报')}catch(e){showToast('举报失败')}}
 
 
-// 初始化 + 恢复上次状态
+// 初始化
 document.getElementById('lastUpdate').textContent=new Date().toLocaleDateString('zh-CN');
-if(mainView==='discuss'){switchMainView('discuss')}
-else{
-  try{var tabBtn=document.querySelector('#tabs .tab[data-tab="'+tab+'"]');if(tabBtn){tabBtn.classList.add('active');document.querySelectorAll('#tabs .tab').forEach(function(b){if(b.dataset.tab!==tab)b.classList.remove('active')})}}catch(e){}
-  if(tab==='category'){document.getElementById('catBar').style.display='flex';buildCatBar();if(activeCat)pickCat(activeCat)}
-  else if(tab==='search'){document.getElementById('searchBar').classList.remove('hidden');if(typeof render==='function')render()}
-  else{if(typeof render==='function')render()}
-}
+render();
 </script>
 </body>
 </html>
