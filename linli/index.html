@@ -63,12 +63,11 @@ body>nav{display:none}
 #discussPanel{max-width:800px;margin:16px auto 0;position:relative;z-index:1}
 /* 滑动切换 */
 .view-container{position:relative;overflow:hidden;min-height:100vh}
-.view-panel{position:absolute;top:0;left:0;width:100%;transition:transform 0.6s cubic-bezier(0.25,0.8,0.25,1),opacity 0.5s ease}
-.view-panel.share-active{transform:translateX(0);opacity:1;position:relative;z-index:1}
-.view-panel.share-inactive{transform:translateX(-100%);opacity:0;position:absolute;z-index:0;pointer-events:none}
-.view-panel.discuss-active{transform:translateX(0);opacity:1;position:relative;z-index:1}
-.view-panel.discuss-inactive{transform:translateX(100%);opacity:0;position:absolute;z-index:0;pointer-events:none}
-@media(max-width:600px){.view-panel.share-inactive{transform:translateX(-100%)}}
+.view-panel{transition:transform 0.6s cubic-bezier(0.25,0.8,0.25,1),opacity 0.5s ease}
+.view-panel.share-active{transform:translateX(0);opacity:1}
+.view-panel.share-inactive{transform:translateX(-100%);opacity:0;pointer-events:none;height:0;overflow:hidden}
+.view-panel.discuss-active{transform:translateX(0);opacity:1}
+.view-panel.discuss-inactive{transform:translateX(100%);opacity:0;pointer-events:none;height:0;overflow:hidden}
 .discuss-form{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:16px;backdrop-filter:blur(10px);max-height:300px;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.25,0.8,0.25,1),padding 0.4s ease,margin 0.4s ease,opacity 0.3s ease}
 .discuss-form.collapsed{max-height:0;padding-top:0;padding-bottom:0;margin-bottom:0;opacity:0;border-width:0}
 .discuss-form input,.discuss-form textarea{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.85rem;outline:none;font-family:inherit;margin-bottom:8px;resize:vertical}
