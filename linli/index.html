@@ -326,6 +326,9 @@ async function doDiscussLike(id){var idx=discussLiked.indexOf(id),isLiked=idx>=0
 async function reportDiscuss(id){try{var d=await sbApi('discussions?select=reports&id=eq.'+id),n=(d[0]?.reports||0)+1;await sbApi('discussions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reports:n})});showToast('已举报')}catch(e){showToast('举报失败')}}
 
 
+// 页面访问计数（关标签重开才计）
+(async function(){if(sessionStorage.getItem('pv_counted'))return;sessionStorage.setItem('pv_counted','1');try{await sbApi('page_visits',{method:'POST',body:JSON.stringify({page:'linli'})})}catch(e){}})();
+
 // 初始化 + 恢复状态
 document.getElementById('lastUpdate').textContent=new Date().toLocaleDateString('zh-CN');
 if(mainView==='discuss'){switchMainView('discuss')}else{
