@@ -273,6 +273,11 @@ function doAdminSearch(){
 async function load(){
   try{
     dataCache=filter==='feedback'?[]:await sbApi('linli_codes?select=*&order=created_at.desc&limit=1000')
+    // 自动审核
+    if(autoApprove&&dataCache.length){
+      var pending=dataCache.filter(function(x){return x.status==='pending'});
+      if(pending.length){try{await adminApi('batch_approve',{ids:pending.map(function(x){return x.id})});dataCache.forEach(function(x){if(x.status==='pending')x.status='approved'})}catch(e){}}
+    }
     renderStats();renderChart();renderList()
   }catch(e){console.error(e);document.getElementById('empty').textContent='加载失败，请检查网络后刷新重试'}
 }
