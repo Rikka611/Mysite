@@ -101,6 +101,8 @@ td.c-cat{white-space:nowrap}
 td.c-tags .t{font-size:11.5px;color:var(--muted);background:var(--bg);border:1px solid var(--line);padding:2px 7px;border-radius:5px;margin-right:5px;white-space:nowrap}
 td.c-tags .t.clickable,.ccard .tags span.clickable{cursor:pointer;font-family:inherit;transition:color .13s,background .13s,border-color .13s}
 td.c-tags .t.clickable:hover,.ccard .tags span.clickable:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+td.c-tags .t.expand,.ccard .tags .t.expand{color:var(--accent);border-style:dashed;border-color:var(--accent-line);cursor:pointer;font-weight:600;font-family:inherit;transition:color .13s,background .13s,border-color .13s}
+td.c-tags .t.expand:hover,.ccard .tags .t.expand:hover{background:var(--accent-soft)}
 td.c-code{white-space:nowrap}
 .code-pill{display:inline-flex;align-items:center;gap:7px;font:700 14px var(--mono);letter-spacing:.12em;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;transition:border-color .15s}
 .code-pill:hover{border-color:var(--accent)}
@@ -515,7 +517,7 @@ function buildRow(item,idx){
     '<td class="c-rank r'+(rank&&rank<=3?rank:'')+'">'+(rank?'#'+rank:'—')+'</td>'+
     '<td class="c-title">'+esc(item.title)+'<div class="tagline">'+esc(desc)+'</div></td>'+
     '<td class="c-cat"><span class="cat-badge">'+esc(catName(cat))+'</span></td>'+
-    '<td class="c-tags">'+(tagShow.length?tagShow.map(function(t){return '<button class="t clickable" onclick="setTagFilter(\''+esc(t)+'\',event)" title="筛选标签 '+esc(t)+'">'+esc(t)+'</button>'}).join('')+(extra>0?'<span class="t">+'+extra+'</span>':''):'—')+'</td>'+
+    '<td class="c-tags" data-item-tags="'+esc(item.tags||'')+'">'+tagsHtml(item.tags,false)+'</td>'+
     '<td class="c-code"><button class="code-pill" onclick="copyCode(\''+esc(item.code)+'\',event)" aria-label="复制分享码 '+esc(item.code)+'" title="点击复制"><span>'+esc(item.code)+'</span>'+svg('copy')+'</button></td>'+
     '<td class="c-num">'+(item.views||0)+'</td>'+
     '<td class="c-num">'+(item.likes||0)+'</td>'+
@@ -530,7 +532,7 @@ function buildCard(item,idx){
   var isLiked=liked.indexOf(item.id)>=0;
   return '<div class="ccard">'+
     '<div class="cc-top">'+(rank?'<span class="rank r'+(rank<=3?rank:'')+'">#'+rank+'</span>':'')+'<h3>'+esc(item.title)+'</h3></div>'+
-    '<div class="tags">'+tagList.map(function(t){return '<span class="clickable" onclick="setTagFilter(\''+esc(t)+'\',event)" title="筛选标签 '+esc(t)+'">'+esc(t)+'</span>'}).join('')+'</div>'+
+    '<div class="tags" data-item-tags="'+esc(item.tags||'')+'">'+tagsHtml(item.tags,false)+'</div>'+
     '<div class="cc-code"><span class="code" onclick="copyCode(\''+esc(item.code)+'\',event)">'+esc(item.code)+'</span><span class="cc-meta"><span class="m">'+svg('eye',12)+'<b>'+(item.views||0)+'</b></span><span class="m">'+heartSvg(false)+'<b>'+(item.likes||0)+'</b></span></span></div>'+
     '<div class="cc-actions">'+
       '<button class="cpy" onclick="copyCode(\''+esc(item.code)+'\',event)">'+svg('copy',12)+'复制</button>'+
@@ -603,6 +605,22 @@ function updateFilterChip(){var chip=document.getElementById('filterChip');if(ta
 function clearCat(){activeCat='';sessionStorage.removeItem('linli_cat');setMode('hot');buildCatList()}
 function setTagFilter(t,e){if(e){e.preventDefault();e.stopPropagation()}tagFilter=t;page=1;updateModeUI();resetSort();render()}
 function clearTagFilter(){tagFilter='';updateModeUI();render()}
+function tagsHtml(tags,expanded){
+  var list=(tags||'').split(/[\s,]+/).filter(Boolean);
+  if(!list.length)return '<span style="color:var(--faint)">—</span>';
+  var show=expanded?list:list.slice(0,2);
+  var h=show.map(function(t){return '<button class="t clickable" onclick="setTagFilter(\''+esc(t)+'\',event)" title="筛选标签 '+esc(t)+'">'+esc(t)+'</button>'}).join('');
+  if(list.length>2)h+='<button class="t expand" onclick="toggleTags(this)" title="'+(expanded?'收起':'展开全部标签')+'">'+(expanded?'收起':'+'+ (list.length-2))+'</button>';
+  return h;
+}
+function toggleTags(btn){
+  var cell=btn.closest('.c-tags')||btn.closest('.tags');
+  if(!cell)return;
+  var host=cell.closest('[data-item-tags]')||cell;
+  var expanded=host.getAttribute('data-expanded')==='1';
+  host.setAttribute('data-expanded',expanded?'0':'1');
+  cell.innerHTML=tagsHtml(host.getAttribute('data-item-tags')||'',!expanded);
+}
 function setMode(m){tab=m;sessionStorage.setItem('linli_tab',m);page=1;resetSort();updateModeUI();render()}
 document.getElementById('modes').addEventListener('click',function(e){var b=e.target.closest('.mode-tab');if(!b)return;setMode(b.dataset.mode)});
 document.getElementById('searchInput').addEventListener('keydown',function(e){if(e.key==='Enter')setMode('search')});
