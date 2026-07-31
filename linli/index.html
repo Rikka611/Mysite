@@ -508,7 +508,16 @@ async function fetchApproved(){var q='status=eq.approved';q+=tab==='hot'?'&order
 var _fullPromise=null,_fullCache=null;
 function getFull(){
   if(_fullCache)return Promise.resolve(_fullCache);
-  if(!_fullPromise)_fullPromise=sbApi('linli_codes?select=*&status=eq.approved&order=likes.desc&limit=1000').then(function(d){_fullCache=d;return d}).catch(function(e){_fullPromise=null;throw e});
+  if(!_fullPromise)_fullPromise=(async function(){
+    var all=[],offset=0,ps=1000;
+    while(true){
+      var batch=await sbApi('linli_codes?select=*&status=eq.approved&order=likes.desc&limit='+ps+'&offset='+offset);
+      all=all.concat(batch);
+      if(batch.length<ps)break;
+      offset+=ps;
+    }
+    _fullCache=all;return all;
+  })().catch(function(e){_fullPromise=null;throw e});
   return _fullPromise;
 }
 function invalidateCache(){_fullCache=null;_fullPromise=null}

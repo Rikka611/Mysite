@@ -450,9 +450,19 @@ function switchPanel(f){
 function doAdminSearch(){_searchQ=document.getElementById('searchAdmin').value.trim().toLowerCase();_catFilter=document.getElementById('catFilter').value;if(filter!=='discuss'&&filter!=='data')renderList()}
 
 // ---- Load ----
+async function loadAllCodes(){
+  var all=[],offset=0,ps=1000;
+  while(true){
+    var batch=await sbApi('linli_codes?select=*&order=created_at.desc&limit='+ps+'&offset='+offset);
+    all=all.concat(batch);
+    if(batch.length<ps)break;
+    offset+=ps;
+  }
+  return all;
+}
 async function load(){
   try{
-    dataCache=await sbApi('linli_codes?select=*&order=created_at.desc&limit=1000')
+    dataCache=await loadAllCodes()
     if(autoApprove&&dataCache.length){
       var pending=dataCache.filter(function(x){return x.status==='pending'});
       if(pending.length){try{await adminApi('batch_approve',{ids:pending.map(function(x){return x.id})});dataCache.forEach(function(x){if(x.status==='pending')x.status='approved'})}catch(e){}}
