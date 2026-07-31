@@ -4,6 +4,51 @@ const SB_URL = Deno.env.get('SB_URL')!
 const SR_KEY = Deno.env.get('SB_SR_KEY')!
 const ADMIN_PW = Deno.env.get('ADMIN_PASSWORD')!
 
+// 登录失败限流：同一来源 5 次失败后锁定 15 分钟
+const MAX_FAILS = 5
+const LOCK_MS = 15 * 60 * 1000
+const MAX_ENTRIES = 1000
+const fails = new Map<string, { count: number; lockedUntil: number }>()
+
+function pruneFails(now: number): void {
+  if (fails.size < MAX_ENTRIES) return
+  for (const [k, v] of fails) {
+    if (v.lockedUntil <= now) fails.delete(k)
+    if (fails.size < MAX_ENTRIES) break
+  }
+}
+
+function clientIp(req: Request): string {
+  const fwd = req.headers.get('x-forwarded-for')
+  if (fwd) return fwd.split(',')[0].trim()
+  return req.headers.get('x-real-ip') || 'unknown'
+}
+
+function isLocked(ip: string): boolean {
+  const now = Date.now()
+  const e = fails.get(ip)
+  if (!e) return false
+  if (e.lockedUntil > now) return true
+  fails.delete(ip)
+  return false
+}
+
+function recordFail(ip: string): void {
+  const now = Date.now()
+  pruneFails(now)
+  const e = fails.get(ip) || { count: 0, lockedUntil: 0 }
+  e.count += 1
+  if (e.count >= MAX_FAILS) {
+    e.lockedUntil = now + LOCK_MS
+    e.count = 0
+  }
+  fails.set(ip, e)
+}
+
+function resetFails(ip: string): void {
+  fails.delete(ip)
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -22,13 +67,22 @@ Deno.serve(async (req: Request) => {
 
   const { password, action, payload } = await req.json()
 
-  // Auth
+  // Auth —— 带失败限流
+  const ip = clientIp(req)
+  if (isLocked(ip)) {
+    return new Response(JSON.stringify({ error: 'too many attempts, try later' }), {
+      status: 429,
+      headers: { 'Access-Control-Allow-Origin': '*' }
+    })
+  }
   if (password !== ADMIN_PW) {
+    recordFail(ip)
     return new Response(JSON.stringify({ error: 'unauthorized' }), {
       status: 401,
       headers: { 'Access-Control-Allow-Origin': '*' }
     })
   }
+  resetFails(ip)
 
   const db = createClient(SB_URL, SR_KEY)
 

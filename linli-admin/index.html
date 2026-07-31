@@ -353,7 +353,7 @@ td.c-act .btn{margin-left:6px}
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
-<div style="position:fixed;bottom:8px;right:12px;font-size:11px;color:var(--faint);z-index:99;opacity:.6">v4.2.0</div>
+<div style="position:fixed;bottom:8px;right:12px;font-size:11px;color:var(--faint);z-index:99;opacity:.6">v4.2.1</div>
 
 <script>
 // ================================================================
@@ -453,7 +453,7 @@ function doAdminSearch(){_searchQ=document.getElementById('searchAdmin').value.t
 async function loadAllCodes(){
   var all=[],offset=0,ps=1000;
   while(true){
-    var batch=await sbApi('linli_codes?select=*&order=created_at.desc&limit='+ps+'&offset='+offset);
+    var batch=await sbApi('linli_codes?select=id,code,title,description,author,tags,views,likes,status,created_at,reports&order=created_at.desc&limit='+ps+'&offset='+offset);
     all=all.concat(batch);
     if(batch.length<ps)break;
     offset+=ps;
@@ -767,7 +767,7 @@ async function delDiscuss(id){if(!confirm('确认删除？子回复也会被删�
 function renderEdits(){
   var lst=document.getElementById('editsList');
   lst.innerHTML='<div style="color:var(--faint);font-size:12px;padding:10px 0">加载中…</div>';
-  sbApi('code_edits?select=*&status=eq.pending&order=created_at.desc&limit=100').then(function(rows){
+  sbApi('rpc/get_pending_edits').then(function(rows){
     if(!rows||!rows.length){lst.innerHTML='<div class="empty" style="display:block"><b>暂无待审编辑</b></div>';return}
     lst.innerHTML=rows.map(function(e){
       return '<div class="drow"><div class="d-head"><div class="d-title">'+escapeHtml(e.new_title||'')+'</div><span class="d-time">'+new Date(e.created_at).toLocaleString('zh-CN')+'</span></div>'+
@@ -779,7 +779,7 @@ function renderEdits(){
         '</div>'+
         '<div class="d-actions"><button class="btn ok sm" onclick="applyEdit('+e.id+')">通过</button><button class="btn danger sm" onclick="rejectEdit('+e.id+')">拒绝</button></div></div>';
     }).join('');
-  }).catch(function(){lst.innerHTML='<div class="empty" style="display:block"><b>加载失败</b>需先执行 safe-updates.sql 建表</div>'});
+  }).catch(function(){lst.innerHTML='<div class="empty" style="display:block"><b>加载失败</b>需先执行 security-fix.sql 创建审核队列函数</div>'});
 }
 async function applyEdit(id){try{await sbApi('rpc/apply_edit',{method:'POST',body:JSON.stringify({edit_id:id})});showToast('已应用编辑','ok');renderEdits();load()}catch(e){showToast('操作失败','err')}}
 async function rejectEdit(id){try{await sbApi('rpc/reject_edit',{method:'POST',body:JSON.stringify({edit_id:id})});showToast('已拒绝','info');renderEdits()}catch(e){showToast('操作失败','err')}}
