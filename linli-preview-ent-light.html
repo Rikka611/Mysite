@@ -118,6 +118,9 @@ td.c-act{white-space:nowrap;text-align:right}
 .ic:hover{color:var(--accent);border-color:var(--accent-line)}
 .ic.liked{color:var(--heart);border-color:rgba(229,56,94,.4);background:var(--danger-soft)}
 .ic.danger:hover{color:var(--danger);border-color:#F2C9C9}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:600 12px var(--sans);padding:6px 12px;border-radius:8px;cursor:pointer;transition:all .15s}
+.btn:hover{color:var(--ink);border-color:var(--line-strong)}
+.btn.sm{padding:4px 10px;font-size:11.5px}
 
 /* ── card view ── */
 .cardgrid{display:none;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:4px 22px}
@@ -486,7 +489,7 @@ var SPEC={
   honkai:["崩坏","崩铁","honkai","知更鸟","希儿","星期日","昔涟","翁法洛斯","遐蝶","奥托"],
   zzz:["绝区零","zzz"],
   game:["ff14","ff7","最终幻想","尼尔","轨迹","我的世界","minecraft","动物森友会","女神异闻录","荒野大镖客","生化危机","明日方舟","dnf","地下城与勇士","战地","outer wilds","愤怒的小鸟","蒂法","宝可梦","塞尔达","去月球","星之所在","blacksouls"],
-  anime:["游戏人生","ngnl","no game no life","未闻花名","人渣的本愿","魂之轮回","凡人修仙传","泽野弘之","鸟之诗","紫罗兰永恒花园","我推的孩子","凉宫","咒术回战","进击的巨人","高达","罪恶王冠","寄生兽","末日三问","fate","命运石之门","莉可丽丝","斩服少女","千与千寻","你的名字","eva","吉卜力","驱魔少年","缘之空","无职转生","86不存在的战区"],
+  anime:["游戏人生","ngnl","no game no life","未闻花名","人渣的本愿","魂之轮回","凡人修仙传","泽野弘之","鸟之诗","紫罗兰永恒花园","我推的孩子","凉宫","咒术回战","进击的巨人","高达","罪恶王冠","寄生兽","末日三问","fate","命运石之门","莉可丽丝","斩服少女","千与千寻","你的名字","eva","吉卜力","驱魔少年","缘之空","无职转生","86不存在的战区","re:zero","从零开始","evangelion"],
   vocaloid:["术力口","vocaloid","初音未来","miku","巡音","镜音","kaito"],
   jpop:["米津玄师","椎名林檎","宇多田光","yoasobi","aimer","akb48","初日","radwimps","日系","丸の内","lemon"],
   pop_cn:["周杰伦","陈奕迅","汪苏泷","孙燕姿","许嵩","粤语","华语","beyond","周深","道姑朋友","伍佰","胡夏","黄龄"],
@@ -496,8 +499,15 @@ var SPEC={
 var BROAD=[["game","游戏",1],["anime","动漫",0],["anime","番剧",0],["acg","acg",0],["pop_cn","流行",0],["classical","古典",0],["vocaloid","术力口",0],["vocaloid","vocaloid",0],["kpop","kpop",0]];
 function classify(tags,title){
   var s=((tags||"")+" "+(title||"")).toLowerCase();
-  for(var i=0;i<SPEC_ORDER.length;i++){var id=SPEC_ORDER[i];var k=SPEC[id]||[];for(var j=0;j<k.length;j++){if(k[j].length>=2&&s.indexOf(k[j].toLowerCase())>=0)return id}}
   var toks=(tags||"").toLowerCase().split(/[\s,]+/);
+  for(var i=0;i<SPEC_ORDER.length;i++){
+    var id=SPEC_ORDER[i];var k=SPEC[id]||[];
+    for(var j=0;j<k.length;j++){
+      var kw=k[j].toLowerCase();
+      if(kw.length>=4){if(s.indexOf(kw)>=0)return id}
+      else if(toks.indexOf(kw)>=0)return id; // 短词(≤3字)整词匹配，避免误伤 alive→ive
+    }
+  }
   for(var b=0;b<BROAD.length;b++){if(BROAD[b][2]){if(toks.indexOf(BROAD[b][1])>=0)return BROAD[b][0]}else{if((tags||"").toLowerCase().indexOf(BROAD[b][1])>=0)return BROAD[b][0]}}
   return "other";
 }

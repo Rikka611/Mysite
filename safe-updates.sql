@@ -25,9 +25,9 @@ as $$
 begin
   if not exists (
     select 1 from public.report_log
-    where fp = report_code.fp
-      and item_id = report_code.item_id
-      and created_at > now() - interval '10 minutes'
+    where report_log.fp = report_code.fp
+      and report_log.item_id = report_code.item_id
+      and report_log.created_at > now() - interval '10 minutes'
   ) then
     update public.linli_codes set reports = coalesce(reports,0) + 1 where id = item_id;
     insert into public.report_log(fp, item_id) values (report_code.fp, report_code.item_id);
