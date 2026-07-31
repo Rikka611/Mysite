@@ -453,8 +453,29 @@ function showToast(msg){toastEl.textContent=msg;toastEl.classList.add('show');cl
 
 // ====== 分类 ======
 var CATS=[{id:"anime",n:"番剧OP/ED"},{id:"game",n:"游戏原声"},{id:"touhou",n:"东方"},{id:"genshin",n:"原神"},{id:"honkai",n:"崩坏系列"},{id:"zzz",n:"绝区零"},{id:"gal",n:"Gal/视觉小说"},{id:"acg",n:"其他ACG音乐"},{id:"vocaloid",n:"术力口"},{id:"jpop",n:"日系流行"},{id:"pop_cn",n:"华语流行"},{id:"kpop",n:"K-Pop/韩流"},{id:"classical",n:"古典/纯音乐"},{id:"other",n:"其他"}];
-var CLS_ORDER=['game','touhou','gal','anime','genshin','honkai','zzz','acg','vocaloid','jpop','pop_cn','kpop','classical'];
-function classify(tags){var t=(tags||"").toLowerCase();var map={anime:["动漫","番剧","oped","anime","eva","吉卜力","鸟之诗","你的名字","我推的孩子","凉宫","咒术回战","进击的巨人","泽野弘之","高达","罪恶王冠","寄生兽","末日三问","fate","紫罗兰永恒花园","未闻花名","命运石之门","莉可丽丝","斩服少女"],game:["游戏","ff14","ff7","最终幻想","尼尔","轨迹","我的世界","minecraft","动物森友会","女神异闻录","荒野大镖客","生化危机","明日方舟","dnf","战地","outer wilds","愤怒的小鸟","蒂法","宝可梦","塞尔达"],touhou:["东方","touhou"],genshin:["原神","genshin","蒙德","璃月","渊下宫","纳塔","可莉","芙宁娜","茜特菈莉"],honkai:["崩坏","崩铁","honkai","知更鸟","希儿","星期日","昔涟","翁法洛斯"],zzz:["绝区零","zzz"],gal:["key","key社","clannad","air","夏日口袋","summer pockets","千恋万花","魔法使之夜","白色相簿","little busters","rewrite","eden","星之梦"],acg:["acg","roselia","acg音乐","动画音乐"],vocaloid:["v家","术力口","vocaloid","初音未来","miku","巡音","镜音","kaito"],jpop:["米津玄师","椎名林檎","宇多田光","yoasobi","aimer","akb48","radwimps","日系"],pop_cn:["周杰伦","陈奕迅","汪苏泷","孙燕姿","许嵩","粤语","华语","beyond","周深","流行"],kpop:["kpop","k-pop","twice","blackpink","bts","aespa","newjeans","ive","lesserafim","nmixx"],classical:["古典","贝多芬","肖邦","李斯特","舒伯特","久石让","坂本龙一","纯音乐","钢琴","经典"]};for(var i=0;i<CLS_ORDER.length;i++){var id=CLS_ORDER[i];var k=map[id]||[];for(var j=0;j<k.length;j++){if(k[j].length>=2&&t.indexOf(k[j].toLowerCase())>=0)return id}}return"other"}
+var SPEC_ORDER=['gal','touhou','genshin','honkai','zzz','game','anime','vocaloid','jpop','pop_cn','kpop','classical'];
+var SPEC={
+  gal:["key","key社","clannad","air","夏日口袋","summer pockets","千恋万花","魔法使之夜","白色相簿","届かない恋","魔女的夜宴","little busters","rewrite","eden","星之梦","久远寺有珠"],
+  touhou:["东方","touhou","幻想乡","红魔馆","永夜抄","狂气之瞳","今宵是飘逸","竹取飞翔","少女绮想曲","感情的摩天楼","上海紅茶館"],
+  genshin:["原神","genshin","蒙德","璃月","渊下宫","纳塔","可莉","芙宁娜","茜特菈莉","水仙十字结社","宵宫","稻妻","挪德卡莱"],
+  honkai:["崩坏","崩铁","honkai","知更鸟","希儿","星期日","昔涟","翁法洛斯","遐蝶","奥托"],
+  zzz:["绝区零","zzz"],
+  game:["ff14","ff7","最终幻想","尼尔","轨迹","我的世界","minecraft","动物森友会","女神异闻录","荒野大镖客","生化危机","明日方舟","dnf","地下城与勇士","战地","outer wilds","愤怒的小鸟","蒂法","宝可梦","塞尔达","去月球","星之所在","blacksouls"],
+  anime:["游戏人生","ngnl","no game no life","未闻花名","人渣的本愿","魂之轮回","凡人修仙传","泽野弘之","鸟之诗","紫罗兰永恒花园","我推的孩子","凉宫","咒术回战","进击的巨人","高达","罪恶王冠","寄生兽","末日三问","fate","命运石之门","莉可丽丝","斩服少女","千与千寻","你的名字","eva","吉卜力","驱魔少年","缘之空","无职转生","86不存在的战区"],
+  vocaloid:["术力口","vocaloid","初音未来","miku","巡音","镜音","kaito"],
+  jpop:["米津玄师","椎名林檎","宇多田光","yoasobi","aimer","akb48","初日","radwimps","日系","丸の内","lemon"],
+  pop_cn:["周杰伦","陈奕迅","汪苏泷","孙燕姿","许嵩","粤语","华语","beyond","周深","道姑朋友","伍佰","胡夏","黄龄"],
+  kpop:["kpop","k-pop","twice","nmixx","blackpink","bts","aespa","newjeans","ive","lesserafim","seventeen","fallin flower","心连心","爻"],
+  classical:["古典","贝多芬","肖邦","李斯特","舒伯特","久石让","坂本龙一","钢琴","纯音乐","经典","巴赫","德彪西","月光奏鸣曲","欢乐颂","致爱丽丝"]
+};
+var BROAD=[["game","游戏",1],["anime","动漫",0],["anime","番剧",0],["acg","acg",0],["pop_cn","流行",0],["classical","古典",0],["vocaloid","术力口",0],["vocaloid","vocaloid",0],["kpop","kpop",0]];
+function classify(tags,title){
+  var s=((tags||"")+" "+(title||"")).toLowerCase();
+  for(var i=0;i<SPEC_ORDER.length;i++){var id=SPEC_ORDER[i];var k=SPEC[id]||[];for(var j=0;j<k.length;j++){if(k[j].length>=2&&s.indexOf(k[j].toLowerCase())>=0)return id}}
+  var toks=(tags||"").toLowerCase().split(/[\s,]+/);
+  for(var b=0;b<BROAD.length;b++){if(BROAD[b][2]){if(toks.indexOf(BROAD[b][1])>=0)return BROAD[b][0]}else{if((tags||"").toLowerCase().indexOf(BROAD[b][1])>=0)return BROAD[b][0]}}
+  return "other";
+}
 function catName(id){var c=CATS.find(function(x){return x.id===id});return c?c.n:"其他"}
 
 // ====== API ======
@@ -486,7 +507,7 @@ function buildRow(item,idx){
   var tagShow=tagList.slice(0,2),extra=tagList.length-2;
   var rank=tab==='hot'?idx+1:null;
   var isLiked=liked.indexOf(item.id)>=0;
-  var cat=classify(item.tags);
+  var cat=classify(item.tags,item.title);
   var desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');
   var delay=Math.min(idx*28,380);
   return '<tr class="data-row" style="animation-delay:'+delay+'ms">'+
@@ -545,7 +566,7 @@ async function render(skipAnim){
   try{
     var data;
     if(tab==='search'){var q=document.getElementById('searchInput').value.trim();if(!q){countEl.textContent='0';rows.innerHTML='<tr><td colspan="8" class="empty"><b>输入关键词搜索</b>在搜索框输入曲名、作者或标签</td></tr>';return}data=await searchCodes(encodeURIComponent(q))}
-    else if(tab==='category'&&activeCat){var all=await getFull();if(seq!==_renderSeq)return;data=all.filter(function(x){return classify(x.tags)===activeCat})}
+    else if(tab==='category'&&activeCat){var all=await getFull();if(seq!==_renderSeq)return;data=all.filter(function(x){return classify(x.tags,x.title)===activeCat})}
     else{data=await getFull();if(tab==='new'){data=data.slice().sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at)})}}
     if(seq!==_renderSeq)return;
     if(hSort&&data.length){data=data.slice().sort(function(a,b){return ((a[hSort]||0)-(b[hSort]||0))*hDir})}
@@ -571,7 +592,7 @@ function buildCatList(){
   c.innerHTML=CATS.map(function(cat){var n=catCounts[cat.id];return '<button class="'+(activeCat===cat.id?'active':'')+'" data-cat="'+cat.id+'">'+cat.n+'<i>'+(n!==undefined?n:'…')+'</i></button>'}).join('');
 }
 async function updateCatCounts(){
-  try{var d=await getFull();CATS.forEach(function(cat){catCounts[cat.id]=d.filter(function(x){return classify(x.tags)===cat.id}).length});buildCatList()}catch(e){}
+  try{var d=await getFull();CATS.forEach(function(cat){catCounts[cat.id]=d.filter(function(x){return classify(x.tags,x.title)===cat.id}).length});buildCatList()}catch(e){}
 }
 document.getElementById('catList').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(activeCat===b.dataset.cat){activeCat='';sessionStorage.removeItem('linli_cat');setMode('hot');buildCatList();return}activeCat=b.dataset.cat;sessionStorage.setItem('linli_cat',activeCat);tab='category';page=1;updateModeUI();resetSort();render();buildCatList()});
 
