@@ -9,14 +9,14 @@
 html{scroll-behavior:smooth;overflow-y:scroll;overscroll-behavior:none}
 :root{
   --bg-start:#0a0a0f;--bg-mid:#11111a;--bg-end:#0d0d14;
-  --text:#e0e0e0;--text-muted:#889;--text-dim:#667;
+  --text:#e0e0e0;--text-muted:#9a9ab0;--text-dim:#8e8ea4;
   --heading:#ddd;--nav-bg:rgba(10,10,15,0.45);--nav-border:rgba(255,255,255,0.06);
   --nav-link:#999;--nav-link-hover:#fff;
   --card-bg:rgba(255,255,255,0.08);--card-border:rgba(255,255,255,0.1);
   --card-hover-border:rgba(56,189,248,0.4);--card-hover-shadow:rgba(0,0,0,0.3);
   --card-hover-ring:rgba(56,189,248,0.15);
   --tag-bg:rgba(255,255,255,0.08);--tag-text:#aab;
-  --footer-text:#556;--footer-link:#778;--footer-border:rgba(255,255,255,0.06);
+  --footer-text:#778;--footer-link:#889;--footer-border:rgba(255,255,255,0.06);
   --star-color:rgba(255,255,255,0.7);--accent:#0ea5e9;--accent2:#818cf8;
 }
 @media(prefers-color-scheme:light){
@@ -45,13 +45,13 @@ html.light{
 }
 html.dark{
   --bg-start:#0a0a0f;--bg-mid:#11111a;--bg-end:#0d0d14;
-  --text:#e0e0e0;--text-muted:#889;--text-dim:#667;
+  --text:#e0e0e0;--text-muted:#9a9ab0;--text-dim:#8e8ea4;
   --heading:#ddd;--nav-bg:rgba(10,10,15,0.45);--nav-border:rgba(255,255,255,0.06);
   --nav-link:#999;--nav-link-hover:#fff;--card-bg:rgba(255,255,255,0.05);
   --card-border:rgba(255,255,255,0.08);--card-hover-border:rgba(56,189,248,0.4);
   --card-hover-shadow:rgba(0,0,0,0.3);--card-hover-ring:rgba(56,189,248,0.15);
   --tag-bg:rgba(255,255,255,0.08);--tag-text:#aab;
-  --footer-text:#556;--footer-link:#778;--footer-border:rgba(255,255,255,0.06);
+  --footer-text:#778;--footer-link:#889;--footer-border:rgba(255,255,255,0.06);
   --star-color:rgba(255,255,255,0.7);
 }
 
@@ -117,7 +117,7 @@ nav{
 }
 @keyframes navSlideIn{from{transform:translateY(-60px);opacity:0}to{transform:translateY(0);opacity:1}}
 nav .inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;height:56px}
-.theme-btn{background:none;border:1px solid var(--nav-border);color:var(--nav-link);cursor:pointer;width:36px;height:36px;border-radius:50%;font-size:1.1rem;transition:all 0.3s}
+.theme-btn{background:none;border:1px solid var(--nav-border);color:var(--nav-link);cursor:pointer;width:36px;height:36px;min-width:36px;border-radius:50%;font-size:1.1rem;transition:all 0.3s}
 .theme-btn:hover{background:var(--card-bg);color:var(--nav-link-hover);transform:rotate(30deg)}
 #feedbackBtn:hover{background:var(--card-bg);color:var(--nav-link-hover);transform:translateY(-1px)}
 #replyFab:hover{transform:scale(1.15)!important;box-shadow:0 6px 30px rgba(245,158,11,0.6)!important}
@@ -223,7 +223,7 @@ html.light .theme-btn .icon-sun{display:none}html.light .theme-btn .icon-moon{di
 .row .title{font-size:0.95rem;font-weight:600;color:var(--heading);transition:color 0.3s}
 .row:hover .title{color:var(--accent)}
 .row .sub{font-size:0.75rem;color:var(--text-dim);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.row .tag{font-size:0.65rem;padding:2px 8px;border-radius:50px;background:var(--tag-bg);color:var(--tag-text);transition:all 0.3s}
+.row .tag{font-size:0.7rem;padding:2px 8px;border-radius:50px;background:var(--tag-bg);color:var(--tag-text);transition:all 0.3s}
 .row:hover .tag{background:rgba(56,189,248,0.15);color:var(--accent)}
 .row .stats{display:flex;gap:10px;font-size:0.75rem;color:var(--text-dim);white-space:nowrap;position:relative;z-index:3;transition:all 0.3s;width:80px;flex-shrink:0;justify-content:center}
 .row .actions{display:flex;gap:4px;position:relative;z-index:3;flex-shrink:0;justify-content:center}
@@ -329,14 +329,14 @@ footer{text-align:center;padding:24px;border-top:1px solid var(--footer-border);
   .row{flex-wrap:nowrap;gap:6px;padding:8px 10px}
   .row .rank{width:22px;font-size:0.75rem}
   .row .code{width:62px;font-size:0.8rem;letter-spacing:0;padding:2px 4px}
-  .row .title{font-size:0.8rem}
-  .row .sub{font-size:0.7rem}
+  .row .title{font-size:0.85rem}
+  .row .sub{font-size:0.75rem}
   .row .stats{display:none}
   .row .actions{gap:1px}
-  .row .btn{padding:3px 5px;font-size:0.62rem;min-width:28px}
-  .fab{bottom:16px;right:16px;width:44px;height:44px;font-size:1.2rem}
+  .row .btn{padding:6px 8px;font-size:0.68rem;min-width:36px}
+  .fab{bottom:16px;right:16px;width:48px;height:48px;font-size:1.2rem}
   #replyFab{bottom:78px!important;right:16px!important;width:44px!important;height:44px!important;font-size:1.1rem!important}
   nav{padding:0 8px}
   .tabs{gap:4px}
-  .tab{padding:6px 14px;font-size:0.75rem}
+  .tab{padding:7px 14px;font-size:0.78rem}
 }

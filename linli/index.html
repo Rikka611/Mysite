@@ -23,7 +23,7 @@
 .view-switch.card .sw-track{background:rgba(56,189,248,0.4)}
 .view-switch .sw-thumb{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:transform 0.3s cubic-bezier(0.25,0.8,0.25,1.3)}
 .view-switch.card .sw-thumb{transform:translateX(16px)}
-.desc-text{font-size:0.7rem;color:var(--text-muted);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px}
+.desc-text{font-size:0.75rem;color:var(--text-muted);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px}
 .list:not(.card-mode) .desc-text:empty{display:none}
 .meta-row{display:flex;align-items:center;gap:8px}
 .content{max-width:min(96vw,1400px)}
@@ -31,32 +31,32 @@
 .list.card-mode{display:grid;grid-template-columns:repeat(auto-fit,180px);gap:clamp(8px,1vw,14px);place-content:center;width:100%}
 .list.card-mode .row{flex-direction:column;align-items:center;padding:clamp(12px,1.4vw,18px) clamp(10px,1vw,16px) clamp(8px,1vw,14px);gap:0;border-radius:clamp(10px,1.2vw,16px);animation:cardIn 0.35s cubic-bezier(0.25,0.8,0.25,1.2) both;background:linear-gradient(180deg,var(--card-bg) 0%,rgba(56,189,248,0.02) 100%)}
 .list.card-mode .row:hover{transform:translateY(-3px)!important;border-color:rgba(56,189,248,0.45);box-shadow:0 8px 30px rgba(0,0,0,0.35),0 0 0 1px rgba(56,189,248,0.2)}
-.list.card-mode .row .rank{font-size:0.6rem;width:auto;text-align:center;margin-bottom:2px;opacity:0.5}.list.card-mode .row:nth-child(1) .rank{color:#fbbf24;opacity:1}.list.card-mode .row:nth-child(2) .rank{color:#94a3b8;opacity:0.9}.list.card-mode .row:nth-child(3) .rank{color:#d97706;opacity:0.85}.list.card-mode .row .rank:empty{display:none}
+.list.card-mode .row .rank{font-size:0.72rem;width:auto;text-align:center;margin-bottom:2px;opacity:0.5}.list.card-mode .row:nth-child(1) .rank{color:#fbbf24;opacity:1}.list.card-mode .row:nth-child(2) .rank{color:#94a3b8;opacity:0.9}.list.card-mode .row:nth-child(3) .rank{color:#d97706;opacity:0.85}.list.card-mode .row .rank:empty{display:none}
 .list.card-mode .row .info{text-align:center;flex:0;margin-bottom:4px}.list.card-mode .row .sub{justify-content:center;flex-wrap:wrap;gap:4px}.list.card-mode .row .tag{padding:1px 6px;border-radius:50px;font-size:0.6rem}
-.list.card-mode .row .title{font-size:clamp(0.78rem,0.95vw,1rem);font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em;color:var(--heading)}
+.list.card-mode .row .title{font-size:clamp(0.84rem,0.95vw,1rem);font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em;color:var(--heading)}
 .list.card-mode .desc-text{display:block;min-height:1.2em;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;max-width:none}
 .list.card-mode .meta-row{display:flex;flex-direction:column;align-items:center;width:100%;margin-top:auto;margin-bottom:6px}
 .list.card-mode .meta-row .code{font-size:0.85rem;letter-spacing:3px;font-weight:700;text-align:center;-webkit-text-fill-color:var(--accent);background:none;border:none;padding:0;width:100%}
-.list.card-mode .meta-row .stats{font-size:0.6rem;text-align:center;width:auto;margin-top:1px}
+.list.card-mode .meta-row .stats{font-size:0.7rem;text-align:center;width:auto;margin-top:1px}
 .list.card-mode .row .actions{flex-wrap:wrap;justify-content:center;gap:4px;width:100%;margin-top:0!important}
-.list.card-mode .row .btn-copy{flex:0 0 100%;padding:5px 0;font-size:0.7rem;font-weight:600;border-radius:8px;max-width:140px;margin:0 auto 2px}
-.list.card-mode .row .btn-like{padding:2px 10px;font-size:0.55rem;border-radius:50px;min-width:auto;background:transparent;border:1px solid var(--card-border);flex:0 0 auto}
+.list.card-mode .row .btn-copy{flex:0 0 100%;padding:6px 0;font-size:0.75rem;font-weight:600;border-radius:8px;max-width:140px;margin:0 auto 2px}
+.list.card-mode .row .btn-like{padding:5px 10px;font-size:0.68rem;border-radius:50px;min-width:auto;background:transparent;border:1px solid var(--card-border);flex:0 0 auto}
 .list.card-mode .skeleton{height:120px}
 @media(max-width:400px){.list.card-mode{grid-template-columns:repeat(2,1fr)}.list.card-mode .row .stats{display:flex}}
-@media(max-width:500px){.view-switch .sw-label{font-size:0.6rem}.view-switch .sw-track{width:30px;height:18px}.view-switch .sw-thumb{width:14px;height:14px}.view-switch.card .sw-thumb{transform:translateX(12px)}}
+@media(max-width:500px){.view-switch{gap:3px}.view-switch .sw-label{font-size:0.68rem}.view-switch .sw-track{width:30px;height:18px}.view-switch .sw-thumb{width:14px;height:14px}.view-switch.card .sw-thumb{transform:translateX(12px)}}
 
 /* 手机端顶栏 */
 @media(max-width:640px){
   body{padding-top:44px}
   .top-bar{height:44px}
   .top-bar .brand-link{font-size:0.95rem}
-  .main-tab{padding:4px 10px;font-size:0.7rem}
+  .top-bar .main-tab{padding:5px 10px;font-size:0.76rem}
   .tabs{padding:0 4px;margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .tabs::-webkit-scrollbar{display:none}
-  .tab{padding:5px 12px;font-size:0.68rem}
+  .tab{padding:7px 12px;font-size:0.72rem}
   .content{padding:0 6px 40px}
   .search-bar input{width:160px;font-size:0.75rem}
-  .fab{bottom:12px;right:12px;width:40px;height:40px;font-size:1.1rem}
+  .fab{bottom:12px;right:12px;width:48px;height:48px;font-size:1.1rem}
 }
 @keyframes cardIn{from{opacity:0;transform:scale(0.85) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
@@ -113,6 +113,12 @@ body>nav{display:none}
 .reply-form button{padding:7px 16px;border-radius:20px;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.72rem;font-weight:600;font-family:inherit;flex-shrink:0}
 @media(max-width:600px){#discussPanel{max-width:100%;padding:0 8px}.thread{padding:10px 12px}.thread .th-content{font-size:0.8rem}.replies{padding-left:10px}.reply-form input{font-size:0.75rem}.reply-form button{font-size:0.7rem;padding:4px 10px}.th-btn{font-size:0.65rem}}
 @media(max-width:380px){.reply-form{flex-wrap:wrap;gap:4px}.reply-form button{width:100%}}
+
+/* 可访问性：视觉隐藏标题 + 输入框焦点环 + 减弱动态效果 */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent)!important;outline-offset:2px}
+button.code{border:none;background:none;padding:0;margin:0;font-family:inherit;color:inherit}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 <script src="../shared/js/config.js?v=4.1.0"></script>
 <script src="../shared/js/sanitize.js?v=4.1.0"></script>
@@ -125,16 +131,17 @@ body>nav{display:none}
 <body>
 <div class="stars"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
+<h1 class="sr-only">BSide Olivia Lin 分享码</h1>
 
 <!-- 置顶导航 -->
 <div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--nav-border);height:56px;overflow:visible">
-  <div style="max-width:min(96vw,1400px);margin:0 auto;padding:0 clamp(8px,1.5vw,24px);display:flex;align-items:center;height:100%;gap:16px">
-    <a href="https://store.steampowered.com/app/4532590/BSide_Olivia_Lin/" target="_blank" class="brand-link" style="font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#38bdf8,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0">BSide Olivia Lin</a>
+  <div style="max-width:min(96vw,1400px);margin:0 auto;padding:0 clamp(3px,1.5vw,24px);display:flex;align-items:center;height:100%;gap:clamp(4px,1.5vw,16px)">
+    <a href="https://store.steampowered.com/app/4532590/BSide_Olivia_Lin/" target="_blank" class="brand-link" style="font-size:clamp(0.95rem,4vw,1.3rem);font-weight:800;background:linear-gradient(135deg,#38bdf8,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0">BSide Olivia Lin</a>
     <button class="main-tab active" data-view="share" id="mainShare">🎼 分享码</button>
     <button class="main-tab" data-view="discuss" id="mainDiscuss">💬 讨论区</button>
     <div style="flex:1"></div>
     <label class="view-switch" id="viewSwitch"><span class="sw-label">列表</span><span class="sw-track"><span class="sw-thumb"></span></span><span class="sw-label">卡片</span></label>
-    <button class="theme-btn" id="themeToggle" title="切换日夜模式"><span class="icon-sun">☀️</span><span class="icon-moon">🌙</span></button>
+    <button class="theme-btn" id="themeToggle" title="切换日夜模式" aria-label="切换日夜模式"><span class="icon-sun">☀️</span><span class="icon-moon">🌙</span></button>
   </div>
 </div>
 
@@ -153,7 +160,7 @@ body>nav{display:none}
 </div>
 <div id="catBar" style="display:none;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:24px;position:relative;z-index:1"></div>
 <div class="search-bar hidden" id="searchBar">
-  <input type="text" id="searchInput" placeholder="搜索曲名、作者、标签..." maxlength="50">
+  <input type="text" id="searchInput" placeholder="搜索曲名、作者、标签..." maxlength="50" aria-label="搜索曲名、作者、标签">
   <button onclick="doSearch()">搜索</button>
 </div>
 <main class="content">
@@ -171,14 +178,14 @@ body>nav{display:none}
       <button class="tab" id="discussTabNew" onclick="switchDiscussTab('new')">🆕 最新</button>
     </div>
     <span style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;margin-left:auto;margin-right:4px">
-      <input type="text" id="newName" placeholder="昵称" maxlength="12" oninput="onNameInput()" style="width:110px;padding:6px 28px 6px 10px;border-radius:20px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.04);color:var(--text);font-size:0.75rem;outline:none;font-family:inherit;text-align:left">
-      <button id="nameConfirmBtn" onclick="confirmName()" style="position:absolute;right:3px;top:50%;padding:4px 6px;border-radius:50%;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.6rem;font-weight:700;font-family:inherit;line-height:1;transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1.3);opacity:0;pointer-events:none;transform:translateY(-50%) scale(0.5)">✓</button>
+      <input type="text" id="newName" placeholder="昵称" maxlength="12" oninput="onNameInput()" aria-label="昵称" style="width:110px;padding:6px 28px 6px 10px;border-radius:20px;border:1px solid rgba(14,165,233,0.3);background:rgba(14,165,233,0.04);color:var(--text);font-size:0.75rem;outline:none;font-family:inherit;text-align:left">
+      <button id="nameConfirmBtn" onclick="confirmName()" aria-label="确认昵称" style="position:absolute;right:3px;top:50%;padding:4px 6px;border-radius:50%;border:none;background:linear-gradient(90deg,#0ea5e9,#818cf8);color:#fff;cursor:pointer;font-size:0.6rem;font-weight:700;font-family:inherit;line-height:1;transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1.3);opacity:0;pointer-events:none;transform:translateY(-50%) scale(0.5)">✓</button>
     </span>
     <button onclick="togglePostForm()" id="togglePostBtn" style="padding:6px 14px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.78rem;font-family:inherit;flex-shrink:0;transition:all 0.35s cubic-bezier(0.25,0.8,0.25,1);white-space:nowrap">＋ 发帖</button>
   </div>
   <div class="discuss-form collapsed" id="postForm">
-    <input type="text" id="newTitle" placeholder="标题" maxlength="80">
-    <textarea id="newContent" placeholder="想说点什么..." maxlength="500"></textarea>
+    <input type="text" id="newTitle" placeholder="标题" maxlength="80" aria-label="标题">
+    <textarea id="newContent" placeholder="想说点什么..." maxlength="500" aria-label="内容"></textarea>
     <button onclick="postTopic()">发布</button>
   </div>
   <div id="threadList"></div>
@@ -186,24 +193,24 @@ body>nav{display:none}
 </div><!-- /discussPanel -->
 </div><!-- /view-container -->
 
-<button class="fab" id="fab" title="提交分享码">+</button>
+<button class="fab" id="fab" title="提交分享码" aria-label="提交分享码">+</button>
 
 <!-- 原有弹窗省略(提交/反馈/回复) -->
 <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="提交分享码">
   <div class="modal"><h3 style="text-align:center;font-size:1.1rem;margin-bottom:20px;color:var(--heading)">提交分享码</h3>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">六位分享码 <span style="color:#ef4444">*</span></label>
-    <input type="text" id="inputCode" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
+    <input type="text" id="inputCode" placeholder="ABC123" maxlength="6" aria-label="六位分享码" style="text-transform:uppercase;width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">曲名 <span style="color:#ef4444">*</span></label>
-    <input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
+    <input type="text" id="inputTitle" placeholder="给这首曲子起个名" maxlength="50" aria-label="曲名" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">你的昵称</label>
-    <input type="text" id="inputAuthor" placeholder="匿名" maxlength="30" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
+    <input type="text" id="inputAuthor" placeholder="匿名" maxlength="30" aria-label="你的昵称" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">简介 <span style="color:#ef4444">*</span>（MIDI来源）</label>
-    <textarea id="inputDesc" placeholder="简单介绍一下曲子来源..." maxlength="200" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:60px"></textarea>
+    <textarea id="inputDesc" placeholder="简单介绍一下曲子来源..." maxlength="200" aria-label="简介" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;resize:vertical;font-family:system-ui,-apple-system,sans-serif;min-height:60px"></textarea>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">大分类 <span style="color:#ef4444">*</span></label>
     <div id="majorPick" style="display:flex;flex-wrap:wrap;gap:4px"></div>
     <label style="display:block;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;margin-top:12px">小标签（空格分隔）</label>
-    <input type="text" id="inputTags" placeholder="璃月 抒情 钢琴" maxlength="100" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
-    <div class="error" id="modalError" style="color:#ef4444;font-size:0.8rem;text-align:center;margin-top:8px"></div>
+    <input type="text" id="inputTags" placeholder="璃月 抒情 钢琴" maxlength="100" aria-label="小标签" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:rgba(255,255,255,0.05);color:var(--text);font-size:0.9rem;outline:none;font-family:system-ui,-apple-system,sans-serif">
+    <div class="error" id="modalError" style="color:#ef4444;font-size:0.8rem;text-align:center;margin-top:8px" aria-live="polite"></div>
     <div style="display:flex;gap:8px;margin-top:20px;justify-content:center">
       <button onclick="closeModal()" style="padding:10px 28px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-muted);cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">取消</button>
       <button onclick="doSubmit()" style="padding:10px 28px;border-radius:50px;border:none;background:linear-gradient(90deg,#38bdf8,#818cf8);color:#fff;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:system-ui,-apple-system,sans-serif">提交</button>
@@ -211,7 +218,7 @@ body>nav{display:none}
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" aria-live="polite"></div>
 <div style="position:fixed;bottom:8px;right:12px;font-size:0.6rem;color:var(--text-dim);z-index:99;opacity:0.4">v4.1.0</div>
 <footer>本站为粉丝自发整理的社区索引平台，非商业运营，与米哈游/HoYoverse 及《BSide: Olivia Lin》项目无关。所有分享码由用户自行提交，本站仅提供索引服务，不存储不分发任何曲谱内容。索引曲谱的版权归原始权利人所有，如有侵权请联系删除。用户使用本站服务产生的任何版权问题，本站不承担法律责任。<br><span style="opacity:0.5;font-size:0.65rem">页面更新: <time id="lastUpdate"></time> · 联系：QQ 3332984386</span></footer>
 
@@ -235,8 +242,8 @@ async function updateCatCounts(){try{var d=await fetchApproved();document.queryS
 function pickCat(id){activeCat=id;catPage=1;sessionStorage.setItem('linli_cat',id);document.querySelectorAll("#catBar .cat-btn").forEach(function(b){b.classList.toggle("active",b.dataset.cat===id)});renderCategories()}
 var catPage=1,catPageSize=24,catTotalPages=1,catItems=[];
 async function renderCategories(){var g=document.getElementById("grid"),e=document.getElementById("empty");document.getElementById("pager").innerHTML="";g.innerHTML="";e.style.display="none";if(!activeCat)return;try{var d=await fetchApproved();catItems=d.filter(function(x){return classify(x.tags)===activeCat});if(!catItems.length){e.style.display="block";e.textContent="暂无歌曲";return}catTotalPages=Math.ceil(catItems.length/catPageSize);if(catPage>catTotalPages)catPage=catTotalPages;var slice=catItems.slice((catPage-1)*catPageSize,catPage*catPageSize);slice.forEach(function(item,i){var div=document.createElement("div");div.innerHTML=buildRow(item,(catPage-1)*catPageSize+i);g.appendChild(div.firstElementChild);trackView(item.id)});renderCatPager()}catch(ex){e.style.display="block";e.textContent="加载失败"}}
-function renderCatPager(){var p=document.getElementById("pager");if(catTotalPages<=1){p.innerHTML="";return};var h="<button onclick=\"goCatPage("+(catPage-1)+")\" "+(catPage<=1?"disabled":"")+">‹</button>";h+="<span class=\"pg-info\"><input type=\"number\" min=\"1\" max=\""+catTotalPages+"\" value=\""+catPage+"\" onkeydown=\"if(event.key==='Enter')goCatPage(parseInt(this.value))\" onfocus=\"this.select()\"> / "+catTotalPages+"</span>";h+="<button onclick=\"goCatPage("+(catPage+1)+")\" "+(catPage>=catTotalPages?"disabled":"")+">›</button>";p.innerHTML=h}
-function goCatPage(n){if(isNaN(n)||n<1||n>catTotalPages)return;catPage=n;renderCategories();window.scrollTo({top:0,behavior:"smooth"})}
+function renderCatPager(){var p=document.getElementById("pager");if(catTotalPages<=1){p.innerHTML="";return};var h="<button onclick=\"goCatPage("+(catPage-1)+")\" "+(catPage<=1?"disabled":"")+" aria-label=\"上一页\">‹</button>";h+="<span class=\"pg-info\"><input type=\"number\" min=\"1\" max=\""+catTotalPages+"\" value=\""+catPage+"\" onkeydown=\"if(event.key==='Enter')goCatPage(parseInt(this.value))\" onfocus=\"this.select()\" aria-label=\"页码\"> / "+catTotalPages+"</span>";h+="<button onclick=\"goCatPage("+(catPage+1)+")\" "+(catPage>=catTotalPages?"disabled":"")+" aria-label=\"下一页\">›</button>";p.innerHTML=h}
+function goCatPage(n){if(isNaN(n)||n<1||n>catTotalPages)return;catPage=n;renderCategories();window.scrollTo({top:0,behavior:_reduceMotion?'auto':'smooth'})}
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
 document.getElementById('catBar').addEventListener('click',function(e){var b=e.target.closest('.cat-btn');if(!b)return;pickCat(b.dataset.cat)});
 // 主视图切换（分享码/讨论区）
@@ -269,9 +276,9 @@ function closeModal(){document.getElementById('modalOverlay').classList.remove('
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeReplies()}});
 async function doSubmit(){var code=document.getElementById('inputCode').value.trim().toUpperCase(),title=document.getElementById('inputTitle').value.trim(),author=document.getElementById('inputAuthor').value.trim()||'匿名',desc=document.getElementById('inputDesc').value.trim(),tags=document.getElementById('inputTags').value.trim(),errEl=document.getElementById('modalError');if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请输入六位分享码（字母或数字）';return}if(!title||title.length>50){errEl.textContent='曲名不能为空且不超过50字';return}if(!desc){errEl.textContent='请填写简介（MIDI来源）';return}if(!_pickedMajor){errEl.textContent='请选择一个大分类';return}var fullTags=(_pickedMajor+' '+tags).trim();try{await sbApi('linli_codes',{method:'POST',body:JSON.stringify({code:code,title:title,description:desc,author:author,tags:fullTags,status:'pending',views:0,likes:0,reports:0})});closeModal();showToast('提交成功，审核后显示');render()}catch(e){var msg=e.message;try{msg=JSON.parse(e.message).message||msg}catch(_){}errEl.textContent=msg}}
 function esc(s){var d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
-function buildRow(item,idx){var tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[],rank=tab==='hot'?idx+1:null,isLiked=liked.includes(item.id),desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');return '<div class="row" style="animation-delay:'+(idx*0.04)+'s" role="button" tabindex="0" aria-label="歌曲 '+esc(item.title)+'，分享码 '+esc(item.code)+'"><div class="glare"></div><div class="rank">'+(rank!==null?'#'+rank:'')+'</div><div class="info"><div class="title">'+esc(item.title)+'</div><div class="desc-text">'+(desc?esc(desc):'')+'</div><div class="sub">'+(tagList.length?tagList.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join(''):'')+'</div></div><div class="meta-row"><div class="code" onclick="copyCode(\''+esc(item.code)+'\',event)" title="点击复制">'+esc(item.code)+'</div><div class="stats">👁 '+(item.views||0)+' ❤ '+(item.likes||0)+'</div></div><div class="actions"><button class="btn btn-copy" onclick="copyCode(\''+esc(item.code)+'\',event)">📋 复制</button><button class="btn btn-like'+(isLiked?' liked':'')+'" onclick="doLike('+item.id+',event)">'+(isLiked?'❤':'🤍')+'</button><button class="btn btn-like" onclick="reportCode('+item.id+',event)" title="分享码无效">⚠</button></div></div>'}
-function renderPager(){var p=document.getElementById('pager');if(totalPages<=1){p.innerHTML='';return}p.innerHTML='<button onclick="goPage('+(page-1)+')" '+(page<=1?'disabled':'')+'>‹</button><span class="pg-info"><input id="jumpPage" type="number" min="1" max="'+totalPages+'" value="'+page+'" onkeydown="if(event.key===\'Enter\')goPage(parseInt(this.value))" onfocus="this.select()"> / '+totalPages+'</span><button onclick="goPage('+(page+1)+')" '+(page>=totalPages?'disabled':'')+'>›</button>'}
-function goPage(n){if(isNaN(n)||n<1||n>totalPages)return;page=n;render();window.scrollTo({top:0,behavior:'smooth'})}
+function buildRow(item,idx){var tagList=item.tags?item.tags.split(/[\s,]+/).filter(Boolean).slice(0,3):[],rank=tab==='hot'?idx+1:null,isLiked=liked.includes(item.id),desc=item.description||(item.author&&item.author!=='匿名'?item.author:'');return '<div class="row" style="animation-delay:'+(idx*0.04)+'s"><div class="glare"></div><div class="rank">'+(rank!==null?'#'+rank:'')+'</div><div class="info"><div class="title">'+esc(item.title)+'</div><div class="desc-text">'+(desc?esc(desc):'')+'</div><div class="sub">'+(tagList.length?tagList.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join(''):'')+'</div></div><div class="meta-row"><button type="button" class="code" onclick="copyCode(\''+esc(item.code)+'\',event)" title="点击复制" aria-label="复制 '+esc(item.code)+'">'+esc(item.code)+'</button><div class="stats">👁 '+(item.views||0)+' ❤ '+(item.likes||0)+'</div></div><div class="actions"><button class="btn btn-copy" onclick="copyCode(\''+esc(item.code)+'\',event)">📋 复制</button><button class="btn btn-like'+(isLiked?' liked':'')+'" aria-label="'+(isLiked?'取消点赞':'点赞')+'" onclick="doLike('+item.id+',event)">'+(isLiked?'❤':'🤍')+'</button><button class="btn btn-like" onclick="reportCode('+item.id+',event)" title="分享码无效" aria-label="举报无效分享码">⚠</button></div></div>'}
+function renderPager(){var p=document.getElementById('pager');if(totalPages<=1){p.innerHTML='';return}p.innerHTML='<button onclick="goPage('+(page-1)+')" '+(page<=1?'disabled':'')+' aria-label="上一页">‹</button><span class="pg-info"><input id="jumpPage" type="number" min="1" max="'+totalPages+'" value="'+page+'" onkeydown="if(event.key===\'Enter\')goPage(parseInt(this.value))" onfocus="this.select()" aria-label="页码"> / '+totalPages+'</span><button onclick="goPage('+(page+1)+')" '+(page>=totalPages?'disabled':'')+' aria-label="下一页">›</button>'}
+function goPage(n){if(isNaN(n)||n<1||n>totalPages)return;page=n;render();window.scrollTo({top:0,behavior:_reduceMotion?'auto':'smooth'})}
 async function render(skipAnim){var grid=document.getElementById('grid'),empty=document.getElementById('empty');if(skipAnim)grid.classList.add('no-anim');grid.innerHTML='';empty.style.display='none';for(var i=0;i<5;i++){var s=document.createElement('div');s.className='skeleton';s.style.animationDelay=i*0.1+'s';grid.appendChild(s)}try{var data;if(tab==='search'){var q=document.getElementById('searchInput').value.trim();if(!q){empty.style.display='block';empty.textContent='输入关键词搜索';grid.innerHTML='';return}data=await searchCodes(encodeURIComponent(q))}else data=await fetchApproved();grid.innerHTML='';if(!data.length){empty.style.display='block';empty.textContent=tab==='search'?'没有找到匹配的分享码':'暂无分享码，点右下角 + 提交第一个吧！';document.getElementById('pager').innerHTML='';return}totalPages=Math.ceil(data.length/pageSize);if(page>totalPages)page=totalPages;var slice=data.slice((page-1)*pageSize,page*pageSize);slice.forEach(function(item,i){var d=document.createElement('div');d.innerHTML=buildRow(item,(page-1)*pageSize+i);grid.appendChild(d.firstElementChild);trackView(item.id)});renderPager()}catch(e){grid.innerHTML='';empty.style.display='block';empty.textContent='加载失败，请刷新重试'}if(skipAnim)setTimeout(function(){grid.classList.remove('no-anim')},100)}
 
 // 星空光晕+3D
@@ -299,7 +306,7 @@ function renderThreads(){
       '<div class="th-footer"><button class="th-btn" onclick="doDiscussLike('+t.id+')">'+(discussLiked.indexOf(t.id)>=0?'❤️':'🤍')+' '+(t.likes||0)+'</button><button class="th-btn" onclick="reportDiscuss('+t.id+')">⚠</button><button class="th-btn" onclick="toggleReplies('+t.id+')">💬 '+(t._replies.length?t._replies.length+' 回复':'回复')+'</button></div>'+
       '<div class="replies'+(hasAdminReply?'':' collapsed')+'" id="replies-'+t.id+'">'+
         (t._replies.length?t._replies.map(function(r){return '<div class="reply-item">'+(r.is_admin?'<span class="th-name" style="color:#f59e0b">Admin</span>':'<span class="th-name">'+(r.name||'匿名用户')+'</span>')+'<span class="th-time">'+fmtTime(r.created_at)+'</span><div class="th-content">'+esc(r.content)+'</div></div>'}).join(''):'<div style="font-size:0.7rem;color:var(--text-dim);padding:4px 0">暂无回复</div>')+
-        '<div class="reply-form"><input type="text" id="replyContent-'+t.id+'" placeholder="回复..." maxlength="300" onkeydown="if(event.key===\'Enter\')postReply('+t.id+')"><button onclick="postReply('+t.id+')">回复</button></div>'+
+        '<div class="reply-form"><input type="text" id="replyContent-'+t.id+'" placeholder="回复..." maxlength="300" aria-label="回复" onkeydown="if(event.key===\'Enter\')postReply('+t.id+')"><button onclick="postReply('+t.id+')">回复</button></div>'+
       '</div></div>';
   }).join('')}
 function toggleReplies(id){var div=document.getElementById('replies-'+id);div.classList.toggle('collapsed');if(!div.classList.contains('collapsed')){var inp=document.getElementById('replyContent-'+id);if(inp)inp.focus()}}
