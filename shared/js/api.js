@@ -32,7 +32,7 @@
       Prefer: 'return=minimal',
       ...(options.headers || {}),
     }
-    const res = await fetch(url, { headers, ...options })
+    const res = await fetch(url, { ...options, headers })
     if (!res.ok) throw new Error(await res.text())
     const t = await res.text()
     return t ? JSON.parse(t) : []
