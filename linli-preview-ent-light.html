@@ -98,11 +98,13 @@ td.c-title{font-weight:600;color:var(--ink);min-width:180px}
 td .tagline{font-size:11.5px;color:var(--faint);margin-top:2px;font-weight:400}
 td.c-cat{white-space:nowrap}
 .cat-badge{display:inline-block;font-size:11.5px;font-weight:500;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);padding:2px 9px;border-radius:999px}
-td.c-tags .t{font-size:11.5px;color:var(--muted);background:var(--bg);border:1px solid var(--line);padding:2px 7px;border-radius:5px;margin-right:5px;white-space:nowrap}
-td.c-tags .t.clickable,.ccard .tags span.clickable{cursor:pointer;font-family:inherit;transition:color .13s,background .13s,border-color .13s}
-td.c-tags .t.clickable:hover,.ccard .tags span.clickable:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
-td.c-tags .t.expand,.ccard .tags .t.expand{color:var(--accent);border-style:dashed;border-color:var(--accent-line);cursor:pointer;font-weight:600;font-family:inherit;transition:color .13s,background .13s,border-color .13s}
-td.c-tags .t.expand:hover,.ccard .tags .t.expand:hover{background:var(--accent-soft)}
+.t{font-size:11.5px;color:var(--muted);background:var(--bg);border:1px solid var(--line);padding:2px 7px;border-radius:5px;white-space:nowrap;font-family:inherit;transition:color .13s,background .13s,border-color .13s}
+td.c-tags .t{margin-right:5px}
+.t.clickable{cursor:pointer}
+.t.clickable:hover{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+.t.expand{color:var(--accent);border-style:dashed;border-color:var(--accent-line);cursor:pointer;font-weight:600}
+.t.expand:hover{background:var(--accent-soft)}
+.ccard .tags .t{font-size:11px}
 td.c-code{white-space:nowrap}
 .code-pill{display:inline-flex;align-items:center;gap:7px;font:700 14px var(--mono);letter-spacing:.12em;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;transition:border-color .15s}
 .code-pill:hover{border-color:var(--accent)}
@@ -751,7 +753,7 @@ async function saveEdit(){
 function loadMine(){
   var subs=[];try{subs=JSON.parse(localStorage.getItem('linli_my_subs')||'[]')}catch(e){}
   var list=document.getElementById('mineList'),empty=document.getElementById('mineEmpty');
-  if(!subs.length){list.innerHTML='';empty.style.display='';empty.textContent='你还没有提交过分享码，点「提交分享码」收录第一首吧';return}
+  if(!subs.length){list.innerHTML='';empty.style.display='';empty.textContent='你还没有提交过分享码，点「提交分享码」收录第一首吧。若此前已提交过但这里为空：提交记录自 v4.2.0 起才在本机保存，之前上传的无法找回。';return}
   empty.style.display='none';
   list.innerHTML=subs.map(function(s){return '<div class="mine-row"><span class="st-badge pending">待审核</span>'+(s.editPending?'<span class="st-badge" style="background:var(--accent-soft);color:var(--accent)">编辑审核中</span>':'')+'<span class="m-code" onclick="copyCode(\''+esc(s.code)+'\')">'+esc(s.code)+'</span><span class="m-title">'+esc(s.title||'')+'</span><span class="m-time">'+new Date(s.ts).toLocaleString('zh-CN')+'</span><span class="m-act"><button class="cpy" onclick="copyCode(\''+esc(s.code)+'\')">'+svg('copy',12)+'复制</button>'+(s.editPending?'':'<button class="btn sm" onclick="openEdit('+s.id+')">编辑</button>')+'</span></div>'}).join('');
   var ids=subs.map(function(s){return s.id});if(!ids.length)return;
