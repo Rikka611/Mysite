@@ -7,8 +7,11 @@
 -- 5) 清理安全审查探测数据
 -- ============================================================
 
--- ── 0) 撤销 anon 对 linli_codes.submit_token 的列级读取 ──────────
-revoke select (submit_token) on public.linli_codes from anon;
+-- ── 0) 撤销 anon 对 linli_codes.submit_token 的读取 ──────────────
+-- 注：列级 REVOKE 盖不过表级 GRANT SELECT，需先撤表级再按列重授
+revoke select on public.linli_codes from anon;
+grant select (id, code, title, description, author, tags, views, likes, status, created_at, reports)
+  on public.linli_codes to anon;
 
 -- ── 1) discussions：删除所有现存 UPDATE 策略，重建受限策略 ────────
 do $$
