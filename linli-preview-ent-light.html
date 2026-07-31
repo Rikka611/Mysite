@@ -307,8 +307,8 @@ th.sortable .arr.dim{color:var(--faint);font-weight:400}
   <nav class="snav">
     <button class="active" data-view="share" id="mainShare"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>分享码</button>
     <button data-view="discuss" id="mainDiscuss"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>讨论区</button>
+    <button data-view="requests" id="mainRequests"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>待收录</button>
     <button data-view="mine" id="mainMine"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>我的提交</button>
-    <button data-view="requests" id="mainRequests"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>待收录榜</button>
   </nav>
   <div class="slabel">分类</div>
   <div class="cats" id="catList"></div>
@@ -386,7 +386,7 @@ th.sortable .arr.dim{color:var(--faint);font-weight:400}
   </section>
 
   <section class="discuss" id="requestsPanel">
-    <div class="dc-head"><span class="count" style="margin:0"><b>待收录榜</b></span></div>
+    <div class="dc-head"><span class="count" style="margin:0"><b>待收录</b></span></div>
     <div class="req-form">
       <input id="reqTitle" placeholder="想弹哪首？输入曲名…" maxlength="60" aria-label="求谱曲名">
       <input id="reqNote" placeholder="补充说明（可选）" maxlength="100" aria-label="补充说明">
@@ -425,6 +425,26 @@ th.sortable .arr.dim{color:var(--faint);font-weight:400}
     <div class="m-btns">
       <button class="m-cancel" onclick="closeModal()">取消</button>
       <button class="m-ok" onclick="doSubmit()">提交</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <h3>编辑我的提交</h3>
+    <div class="m-sub">仅修改歌名、标签、分享码，浏览量和点赞保持不变</div>
+    <label>歌名 <b>*</b></label>
+    <input id="editTitle" maxlength="50" aria-label="歌名">
+    <label>分享码 <b>*</b></label>
+    <input id="editCode" maxlength="6" aria-label="分享码">
+    <label>标签（空格分隔）</label>
+    <input id="editTags" maxlength="100" aria-label="标签">
+    <label>编辑理由 <b>*</b></label>
+    <textarea id="editReason" placeholder="为什么修改？如官方译名、出处更正…" maxlength="200" aria-label="编辑理由"></textarea>
+    <div class="err" id="editError" aria-live="polite"></div>
+    <div class="m-btns">
+      <button class="m-cancel" onclick="closeEdit()">取消</button>
+      <button class="m-ok" onclick="saveEdit()">保存</button>
     </div>
   </div>
 </div>
@@ -493,7 +513,7 @@ function invalidateCache(){_fullCache=null;_fullPromise=null}
 async function searchCodes(q){return sbApi('linli_codes?select=*&status=eq.approved&or=(title.ilike.*'+q+'*,description.ilike.*'+q+'*,author.ilike.*'+q+'*,tags.ilike.*'+q+'*)&order=likes.desc&limit=1000')}
 async function trackView(id){var f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}var seen;try{seen=JSON.parse(sessionStorage.getItem('linli_viewed')||'[]')}catch(e){seen=[]}if(seen.indexOf(id)>=0)return;seen.push(id);if(seen.length>300)seen=seen.slice(-300);sessionStorage.setItem('linli_viewed',JSON.stringify(seen));try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'view'})})}catch(e){}}
 async function doLike(id,e){var f=sessionStorage.getItem('sid');if(!f){f=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('sid',f)}try{await sbApi('rpc/track',{method:'POST',body:JSON.stringify({fp_in:f,item_id_in:id,action_in:'like'})})}catch(e){}if(liked.indexOf(id)<0)liked.push(id);localStorage.setItem('linli_liked',JSON.stringify(liked));render(true);if(e){var r=e.target.getBoundingClientRect();for(var i=0;i<6;i++){var h=document.createElement('div');h.textContent='❤';h.style.cssText='position:fixed;z-index:400;pointer-events:none;left:'+(r.left+r.width/2)+'px;top:'+(r.top+r.height/2)+'px;font-size:14px;color:var(--heart);animation:fly .9s ease-out forwards;';var a=Math.PI*2*i/6;h.style.transform='translate(0,0)';h.style.setProperty('--dx',(Math.cos(a)*36)+'px');h.style.setProperty('--dy',(Math.sin(a)*36-20)+'px');document.body.appendChild(h);h.addEventListener('animationend',function(){h.remove()})}}}
-async function reportCode(id,e){if(e){e.preventDefault();e.stopPropagation()}try{var d=await sbApi('linli_codes?select=reports&id=eq.'+id);var n=(d[0]?.reports||0)+1;await sbApi('linli_codes?id=eq.'+id,{method:'PATCH',body:JSON.stringify({reports:n})});showToast('已反馈')}catch(_){}}
+async function reportCode(id,e){if(e){e.preventDefault();e.stopPropagation()}try{await sbApi('rpc/report_code',{method:'POST',body:JSON.stringify({item_id:id,fp:getVisitorToken()})});showToast('已反馈')}catch(_){showToast('反馈失败')}}
 function copyCode(code,e){if(e){e.preventDefault();e.stopPropagation()}var el=e&&e.currentTarget;navigator.clipboard.writeText(code).then(function(){showToast('已复制: '+code);if(el&&el.classList){el.classList.add('done');setTimeout(function(){el.classList.remove('done')},1300)}}).catch(function(){showToast('复制失败')})}
 
 // ====== 图标 + 渲染：表格行 / 卡片 ======
@@ -652,7 +672,7 @@ document.getElementById('openModalBtn').addEventListener('click',function(){docu
 document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===e.currentTarget)closeModal()});
 document.getElementById('majorPick').addEventListener('click',function(e){var b=e.target.closest('.mcat');if(!b)return;_pickedMajor=b.dataset.n;document.querySelectorAll('#majorPick .mcat').forEach(function(x){x.classList.toggle('active',x===b)})});
 function closeModal(){document.getElementById('modalOverlay').classList.remove('show');['inputCode','inputTitle','inputAuthor','inputDesc','inputTags'].forEach(function(id){document.getElementById(id).value=''})}
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeEdit()}});
 async function doSubmit(){
   var code=document.getElementById('inputCode').value.trim().toUpperCase(),title=document.getElementById('inputTitle').value.trim(),author=document.getElementById('inputAuthor').value.trim()||'匿名',desc=document.getElementById('inputDesc').value.trim(),tags=document.getElementById('inputTags').value.trim(),errEl=document.getElementById('modalError');
   if(!/^[A-Za-z0-9]{6}$/.test(code)){errEl.textContent='请输入六位分享码（字母或数字）';return}
@@ -660,7 +680,7 @@ async function doSubmit(){
   if(!desc){errEl.textContent='请填写简介（MIDI来源）';return}
   if(!_pickedMajor){errEl.textContent='请选择一个大分类';return}
   var fullTags=(_pickedMajor+' '+tags).trim();
-  try{var created=await sbApi('linli_codes',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({code:code,title:title,description:desc,author:author,tags:fullTags,status:'pending',views:0,likes:0,reports:0})});closeModal();invalidateCache();var row=created&&created[0];if(row){var subs=[];try{subs=JSON.parse(localStorage.getItem('linli_my_subs')||'[]')}catch(e){}subs.unshift({id:row.id,code:row.code,title:row.title,ts:Date.now()});localStorage.setItem('linli_my_subs',JSON.stringify(subs.slice(0,50)))}showToast('提交成功，可在「我的提交」查看进度');render()}catch(e){var msg=e.message;try{msg=JSON.parse(e.message).message||msg}catch(_){}errEl.textContent=msg}
+  try{var tk=Math.random().toString(36).slice(2)+Date.now().toString(36)+Math.random().toString(36).slice(2);var created=await sbApi('linli_codes',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({code:code,title:title,description:desc,author:author,tags:fullTags,status:'pending',views:0,likes:0,reports:0,submit_token:tk})});closeModal();invalidateCache();var row=created&&created[0];if(row){var subs=[];try{subs=JSON.parse(localStorage.getItem('linli_my_subs')||'[]')}catch(e){}subs.unshift({id:row.id,token:tk,code:row.code,title:row.title,ts:Date.now()});localStorage.setItem('linli_my_subs',JSON.stringify(subs.slice(0,50)))}showToast('提交成功，可在「我的提交」查看进度或编辑');render()}catch(e){var msg=e.message;try{msg=JSON.parse(e.message).message||msg}catch(_){}errEl.textContent=msg}
 }
 
 // ====== 讨论区 ======
@@ -698,17 +718,47 @@ async function reportDiscuss(id){try{var d=await sbApi('discussions?select=repor
 
 // ====== 我的提交 ======
 function openSubmit(){document.getElementById('openModalBtn').click()}
+var _editId=0,_editToken='';
+function openEdit(id){
+  var subs=[];try{subs=JSON.parse(localStorage.getItem('linli_my_subs')||'[]')}catch(e){}
+  var s=subs.find(function(x){return x.id===id});
+  if(!s){showToast('未找到该提交');return}
+  if(!s.token){showToast('该提交没有编辑令牌，无法编辑');return}
+  _editId=id;_editToken=s.token;
+  document.getElementById('editTitle').value=s.title||'';
+  document.getElementById('editCode').value=s.code||'';
+  document.getElementById('editTags').value='';
+  document.getElementById('editReason').value='';
+  document.getElementById('editError').textContent='';
+  document.getElementById('editOverlay').classList.add('show');
+  document.getElementById('editTitle').focus();
+}
+function closeEdit(){document.getElementById('editOverlay').classList.remove('show');_editId=0;_editToken=''}
+async function saveEdit(){
+  var title=document.getElementById('editTitle').value.trim(),code=document.getElementById('editCode').value.trim().toUpperCase(),tags=document.getElementById('editTags').value.trim(),reason=document.getElementById('editReason').value.trim(),err=document.getElementById('editError');
+  if(!title||title.length>50){err.textContent='歌名不能为空且不超过50字';return}
+  if(!/^[A-Za-z0-9]{6}$/.test(code)){err.textContent='请输入六位分享码（字母或数字）';return}
+  if(!reason){err.textContent='请填写编辑理由';return}
+  try{
+    var ok=await sbApi('rpc/submit_edit',{method:'POST',body:JSON.stringify({item_id:_editId,token:_editToken,title:title,tags:tags,code:code,reason:reason})});
+    if(ok===false||ok===null){err.textContent='提交失败：令牌无效、记录不存在或已有待审编辑';return}
+    var subs=[];try{subs=JSON.parse(localStorage.getItem('linli_my_subs')||'[]')}catch(e){}
+    subs.forEach(function(s){if(s.id===_editId){s.editPending=true}});
+    localStorage.setItem('linli_my_subs',JSON.stringify(subs));
+    closeEdit();showToast('已提交编辑，等待管理员审核');loadMine();
+  }catch(e){err.textContent='提交失败，请重试'}
+}
 function loadMine(){
   var subs=[];try{subs=JSON.parse(localStorage.getItem('linli_my_subs')||'[]')}catch(e){}
   var list=document.getElementById('mineList'),empty=document.getElementById('mineEmpty');
   if(!subs.length){list.innerHTML='';empty.style.display='';empty.textContent='你还没有提交过分享码，点「提交分享码」收录第一首吧';return}
   empty.style.display='none';
-  list.innerHTML=subs.map(function(s){return '<div class="mine-row"><span class="st-badge pending">待审核</span><span class="m-code" onclick="copyCode(\''+esc(s.code)+'\')">'+esc(s.code)+'</span><span class="m-title">'+esc(s.title||'')+'</span><span class="m-time">'+new Date(s.ts).toLocaleString('zh-CN')+'</span><span class="m-act"><button class="cpy" onclick="copyCode(\''+esc(s.code)+'\')">'+svg('copy',12)+'复制</button></span></div>'}).join('');
+  list.innerHTML=subs.map(function(s){return '<div class="mine-row"><span class="st-badge pending">待审核</span>'+(s.editPending?'<span class="st-badge" style="background:var(--accent-soft);color:var(--accent)">编辑审核中</span>':'')+'<span class="m-code" onclick="copyCode(\''+esc(s.code)+'\')">'+esc(s.code)+'</span><span class="m-title">'+esc(s.title||'')+'</span><span class="m-time">'+new Date(s.ts).toLocaleString('zh-CN')+'</span><span class="m-act"><button class="cpy" onclick="copyCode(\''+esc(s.code)+'\')">'+svg('copy',12)+'复制</button>'+(s.editPending?'':'<button class="btn sm" onclick="openEdit('+s.id+')">编辑</button>')+'</span></div>'}).join('');
   var ids=subs.map(function(s){return s.id});if(!ids.length)return;
   sbApi('linli_codes?select=id,code,title,status,created_at&id=in.('+ids.join(',')+')').then(function(rows){
     if(!rows||!rows.length)return;
     var stMap={pending:'<span class="st-badge pending">待审核</span>',approved:'<span class="st-badge approved">已通过</span>',rejected:'<span class="st-badge rejected">已拒绝</span>'};
-    list.innerHTML=rows.map(function(r){var ts=subs.find(function(s){return s.id===r.id});return '<div class="mine-row">'+(stMap[r.status]||'<span class="st-badge">'+esc(r.status)+'</span>')+'<span class="m-code" onclick="copyCode(\''+esc(r.code)+'\')">'+esc(r.code)+'</span><span class="m-title">'+esc(r.title||'')+'</span><span class="m-time">'+(ts?new Date(ts.ts).toLocaleString('zh-CN'):'')+'</span><span class="m-act"><button class="cpy" onclick="copyCode(\''+esc(r.code)+'\')">'+svg('copy',12)+'复制</button></span></div>'}).join('');
+    list.innerHTML=rows.map(function(r){var ts=subs.find(function(s){return s.id===r.id});return '<div class="mine-row">'+(stMap[r.status]||'<span class="st-badge">'+esc(r.status)+'</span>')+(ts&&ts.editPending?'<span class="st-badge" style="background:var(--accent-soft);color:var(--accent)">编辑审核中</span>':'')+'<span class="m-code" onclick="copyCode(\''+esc(r.code)+'\')">'+esc(r.code)+'</span><span class="m-title">'+esc(r.title||'')+'</span><span class="m-time">'+(ts?new Date(ts.ts).toLocaleString('zh-CN'):'')+'</span><span class="m-act"><button class="cpy" onclick="copyCode(\''+esc(r.code)+'\')">'+svg('copy',12)+'复制</button>'+(ts&&ts.editPending?'':'<button class="btn sm" onclick="openEdit('+r.id+')">编辑</button>')+'</span></div>'}).join('');
   }).catch(function(){});
 }
 
@@ -729,7 +779,7 @@ function loadRequests(){
         (r.note?'<div class="req-note">'+esc(r.note)+'</div>':'')+
         '<div class="req-meta"><button class="req-votes'+(isVoted?' voted':'')+'" onclick="upvoteRequest('+r.id+')" aria-label="求谱 +1">'+svg('heart',12)+' '+(r.votes||0)+'</button><span>'+new Date(r.created_at).toLocaleDateString('zh-CN')+'</span></div></div>';
     }).join('');
-  }).catch(function(){list.innerHTML='';empty.style.display='';empty.textContent='待收录榜尚未开启（需在数据库创建 requests 表）'});
+  }).catch(function(){list.innerHTML='';empty.style.display='';empty.textContent='待收录加载失败，请稍后重试'});
 }
 function setReqSort(s){reqSort=s;document.querySelectorAll('#reqTabs button').forEach(function(b){b.classList.toggle('active',b.textContent===(s==='hot'?'最热':'最新'))});loadRequests()}
 async function addRequest(){

@@ -253,6 +253,7 @@ td.c-act .btn{margin-left:6px}
       <button data-filter="approved"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>已通过</button>
       <button data-filter="rejected"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>已拒绝</button>
       <button data-filter="reported"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>举报</button>
+      <button data-filter="edits"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>编辑审核</button>
     </nav>
     <div class="slabel">社区</div>
     <nav class="snav">
@@ -345,6 +346,7 @@ td.c-act .btn{margin-left:6px}
       </div>
 
       <div class="dlist" id="discussList"></div>
+      <div class="dlist" id="editsList" style="display:none"></div>
       <div class="empty" id="empty" style="display:none"><b>暂无数据</b></div>
     </div>
   </main>
@@ -439,10 +441,11 @@ async function init(){
   }catch(e){console.error(e)}
 }
 function switchPanel(f){
-  var dp=document.getElementById('dataPanel'),lstWrap=document.getElementById('listWrap'),dcList=document.getElementById('discussList'),lst=document.getElementById('list')
-  if(f==='discuss'){dp.style.display='none';lstWrap.style.display='none';dcList.style.display='block';loadDiscuss()}
-  else if(f==='data'){dp.style.display='block';lstWrap.style.display='none';dcList.style.display='none';load()}
-  else{dp.style.display='none';lstWrap.style.display='block';dcList.style.display='none';lst.innerHTML='';load()}
+  var dp=document.getElementById('dataPanel'),lstWrap=document.getElementById('listWrap'),dcList=document.getElementById('discussList'),edList=document.getElementById('editsList'),lst=document.getElementById('list')
+  if(f==='discuss'){dp.style.display='none';lstWrap.style.display='none';dcList.style.display='block';edList.style.display='none';loadDiscuss()}
+  else if(f==='data'){dp.style.display='block';lstWrap.style.display='none';dcList.style.display='none';edList.style.display='none';load()}
+  else if(f==='edits'){dp.style.display='none';lstWrap.style.display='none';dcList.style.display='none';edList.style.display='block';renderEdits()}
+  else{dp.style.display='none';lstWrap.style.display='block';dcList.style.display='none';edList.style.display='none';lst.innerHTML='';load()}
 }
 function doAdminSearch(){_searchQ=document.getElementById('searchAdmin').value.trim().toLowerCase();_catFilter=document.getElementById('catFilter').value;if(filter!=='discuss'&&filter!=='data')renderList()}
 
@@ -749,6 +752,27 @@ function adminPost(){
 async function togglePin(id,pinned){try{await adminApi('discuss_pin',{id:id,pinned:!!pinned});loadDiscuss()}catch(e){showToast('操作失败','err')}}
 async function clearReports(id){try{await adminApi('discuss_clear_reports',{id:id});loadDiscuss()}catch(e){}}
 async function delDiscuss(id){if(!confirm('确认删除？子回复也会被删除'))return;try{await adminApi('discuss_delete',{id:id});loadDiscuss();showToast('已删除','ok')}catch(e){showToast('删除失败: '+(e.message||''),'err')}}
+
+// ---- 编辑审核 ----
+function renderEdits(){
+  var lst=document.getElementById('editsList');
+  lst.innerHTML='<div style="color:var(--faint);font-size:12px;padding:10px 0">加载中…</div>';
+  sbApi('code_edits?select=*&status=eq.pending&order=created_at.desc&limit=100').then(function(rows){
+    if(!rows||!rows.length){lst.innerHTML='<div class="empty" style="display:block"><b>暂无待审编辑</b></div>';return}
+    lst.innerHTML=rows.map(function(e){
+      return '<div class="drow"><div class="d-head"><div class="d-title">'+escapeHtml(e.new_title||'')+'</div><span class="d-time">'+new Date(e.created_at).toLocaleString('zh-CN')+'</span></div>'+
+        '<div class="d-body" style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12.5px">'+
+        '<div>歌名：<s style="color:var(--faint)">'+escapeHtml(e.old_title||'')+'</s> → <b>'+escapeHtml(e.new_title||'')+'</b></div>'+
+        '<div style="margin-top:4px">分享码：<s style="color:var(--faint)">'+escapeHtml(e.old_code||'')+'</s> → <b>'+escapeHtml(e.new_code||'')+'</b></div>'+
+        '<div style="margin-top:4px">标签：<s style="color:var(--faint)">'+escapeHtml(e.old_tags||'')+'</s> → <b>'+escapeHtml(e.new_tags||'')+'</b></div>'+
+        '<div style="margin-top:6px;color:var(--warn)">理由：'+escapeHtml(e.reason||'')+'</div>'+
+        '</div>'+
+        '<div class="d-actions"><button class="btn ok sm" onclick="applyEdit('+e.id+')">通过</button><button class="btn danger sm" onclick="rejectEdit('+e.id+')">拒绝</button></div></div>';
+    }).join('');
+  }).catch(function(){lst.innerHTML='<div class="empty" style="display:block"><b>加载失败</b>需先执行 safe-updates.sql 建表</div>'});
+}
+async function applyEdit(id){try{await sbApi('rpc/apply_edit',{method:'POST',body:JSON.stringify({edit_id:id})});showToast('已应用编辑','ok');renderEdits();load()}catch(e){showToast('操作失败','err')}}
+async function rejectEdit(id){try{await sbApi('rpc/reject_edit',{method:'POST',body:JSON.stringify({edit_id:id})});showToast('已拒绝','info');renderEdits()}catch(e){showToast('操作失败','err')}}
 
 // ---- Theme ----
 const html=document.documentElement;function applyTheme(mode){html.classList.remove("light","dark");if(mode==="light")html.classList.add("light");if(mode==="dark")html.classList.add("dark")}
