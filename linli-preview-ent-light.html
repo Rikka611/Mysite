@@ -488,15 +488,15 @@ var SPEC={
   genshin:["原神","genshin","蒙德","璃月","渊下宫","纳塔","可莉","芙宁娜","茜特菈莉","水仙十字结社","宵宫","稻妻","挪德卡莱"],
   honkai:["崩坏","崩铁","honkai","知更鸟","希儿","星期日","昔涟","翁法洛斯","遐蝶","奥托"],
   zzz:["绝区零","zzz"],
-  game:["ff14","ff7","最终幻想","尼尔","轨迹","我的世界","minecraft","动物森友会","女神异闻录","荒野大镖客","生化危机","明日方舟","dnf","地下城与勇士","战地","outer wilds","愤怒的小鸟","蒂法","宝可梦","塞尔达","去月球","星之所在","blacksouls"],
+  game:["ff14","ff7","最终幻想","尼尔","轨迹","我的世界","minecraft","动物森友会","女神异闻录","荒野大镖客","生化危机","明日方舟","dnf","地下城与勇士","战地","outer wilds","愤怒的小鸟","蒂法","宝可梦","塞尔达","去月球","星之所在","blacksouls","33号远征队","黑暗之魂","战争雷霆","边狱巴士","undertale","寂静岭","最后的生还者","deemo"],
   anime:["游戏人生","ngnl","no game no life","未闻花名","人渣的本愿","魂之轮回","凡人修仙传","泽野弘之","鸟之诗","紫罗兰永恒花园","我推的孩子","凉宫","咒术回战","进击的巨人","高达","罪恶王冠","寄生兽","末日三问","fate","命运石之门","莉可丽丝","斩服少女","千与千寻","你的名字","eva","吉卜力","驱魔少年","缘之空","无职转生","86不存在的战区","re:zero","从零开始","evangelion"],
-  vocaloid:["术力口","vocaloid","初音未来","miku","巡音","镜音","kaito"],
-  jpop:["米津玄师","椎名林檎","宇多田光","yoasobi","aimer","akb48","初日","radwimps","日系","丸の内","lemon"],
-  pop_cn:["周杰伦","陈奕迅","汪苏泷","孙燕姿","许嵩","粤语","华语","beyond","周深","道姑朋友","伍佰","胡夏","黄龄"],
+  vocaloid:["术力口","vocaloid","初音未来","miku","巡音","镜音","kaito","言和","洛天依"],
+  jpop:["米津玄师","椎名林檎","宇多田光","yoasobi","aimer","akb48","初日","radwimps","日系","丸の内","丸之内","鱼韵","lemon"],
+  pop_cn:["周杰伦","陈奕迅","汪苏泷","孙燕姿","许嵩","粤语","华语","beyond","周深","道姑朋友","伍佰","胡夏","黄龄","梅艳芳","王力宏","终极一班","终极三国"],
   kpop:["kpop","k-pop","twice","nmixx","blackpink","bts","aespa","newjeans","ive","lesserafim","seventeen","fallin flower","心连心","爻"],
-  classical:["古典","贝多芬","肖邦","李斯特","舒伯特","久石让","坂本龙一","钢琴","纯音乐","经典","巴赫","德彪西","月光奏鸣曲","欢乐颂","致爱丽丝"]
+  classical:["古典","贝多芬","肖邦","萧邦","李斯特","舒伯特","久石让","坂本龙一","钢琴","纯音乐","经典","巴赫","德彪西","月光奏鸣曲","欢乐颂","致爱丽丝","维瓦尔第"]
 };
-var BROAD=[["game","游戏",1],["anime","动漫",0],["anime","番剧",0],["acg","acg",0],["pop_cn","流行",0],["classical","古典",0],["vocaloid","术力口",0],["vocaloid","vocaloid",0],["kpop","kpop",0]];
+var BROAD=[["game","游戏",1],["anime","动漫",0],["anime","番剧",0],["acg","acg",0],["gal","视觉小说",0],["pop_cn","流行",0],["classical","古典",0],["vocaloid","术力口",0],["vocaloid","vocaloid",0],["kpop","kpop",0]];
 function classify(tags,title){
   var s=((tags||"")+" "+(title||"")).toLowerCase();
   var toks=(tags||"").toLowerCase().split(/[\s,]+/);
@@ -504,8 +504,9 @@ function classify(tags,title){
     var id=SPEC_ORDER[i];var k=SPEC[id]||[];
     for(var j=0;j<k.length;j++){
       var kw=k[j].toLowerCase();
-      if(kw.length>=4){if(s.indexOf(kw)>=0)return id}
-      else if(toks.indexOf(kw)>=0)return id; // 短词(≤3字)整词匹配，避免误伤 alive→ive
+      // 纯ASCII短词(≤4)整词匹配防误伤(alive→ive)；中文/长词子串匹配
+      if(/^[a-z0-9]+$/.test(kw)&&kw.length<=4){if(toks.indexOf(kw)>=0)return id}
+      else if(s.indexOf(kw)>=0)return id;
     }
   }
   for(var b=0;b<BROAD.length;b++){if(BROAD[b][2]){if(toks.indexOf(BROAD[b][1])>=0)return BROAD[b][0]}else{if((tags||"").toLowerCase().indexOf(BROAD[b][1])>=0)return BROAD[b][0]}}
