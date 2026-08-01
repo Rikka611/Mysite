@@ -515,14 +515,14 @@ function classify(tags,title){
 function catName(id){var c=CATS.find(function(x){return x.id===id});return c?c.n:"其他"}
 
 // ====== API ======
-async function fetchApproved(){var q='status=eq.approved';q+=tab==='hot'?'&order=likes.desc&limit=1000':'&order=created_at.desc&limit=1000';return sbApi('linli_codes?select=id,code,title,description,author,tags,views,likes,status,created_at&'+q)}
+async function fetchApproved(){var q='status=eq.approved';q+=tab==='hot'?'&order=likes.desc,id.desc&limit=1000':'&order=created_at.desc,id.desc&limit=1000';return sbApi('linli_codes?select=id,code,title,description,author,tags,views,likes,status,created_at&'+q)}
 var _fullPromise=null,_fullCache=null;
 function getFull(){
   if(_fullCache)return Promise.resolve(_fullCache);
   if(!_fullPromise)_fullPromise=(async function(){
     var all=[],offset=0,ps=1000;
     while(true){
-      var batch=await sbApi('linli_codes?select=id,code,title,description,author,tags,views,likes,status,created_at&status=eq.approved&order=likes.desc&limit='+ps+'&offset='+offset);
+      var batch=await sbApi('linli_codes?select=id,code,title,description,author,tags,views,likes,status,created_at&status=eq.approved&order=likes.desc,id.desc&limit='+ps+'&offset='+offset);
       all=all.concat(batch);
       if(batch.length<ps)break;
       offset+=ps;
@@ -639,19 +639,20 @@ function buildCatList(){
 async function updateCatCounts(){
   try{var d=await getFull();CATS.forEach(function(cat){catCounts[cat.id]=d.filter(function(x){return classify(x.tags,x.title)===cat.id}).length});buildCatList()}catch(e){}
 }
-document.getElementById('catList').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(activeCat===b.dataset.cat){activeCat='';sessionStorage.removeItem('linli_cat');setMode('hot');buildCatList();return}activeCat=b.dataset.cat;sessionStorage.setItem('linli_cat',activeCat);tab='category';page=1;updateModeUI();resetSort();render();buildCatList()});
+document.getElementById('catList').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;if(activeCat===b.dataset.cat){activeCat='';sessionStorage.removeItem('linli_cat');sessionStorage.removeItem('linli_tab');setMode('hot');buildCatList();return}activeCat=b.dataset.cat;sessionStorage.setItem('linli_cat',activeCat);sessionStorage.setItem('linli_tab','category');tab='category';page=1;updateModeUI();resetSort();render();buildCatList()});
 
 // ====== 模式 Tab（热门/最新/分类/搜索） ======
 function updateModeUI(){var modes=document.getElementById('modes');if(tab==='category'||tab==='search'||tagFilter){modes.style.display='none'}else{modes.style.display='';document.querySelectorAll('#modes .mode-tab').forEach(function(b){b.classList.toggle('active',b.dataset.mode===tab)})}updateFilterChip()}
 function updateFilterChip(){var chip=document.getElementById('filterChip');if(tagFilter){chip.style.display='inline-flex';chip.innerHTML='标签：'+esc(tagFilter)+'<button onclick="clearTagFilter()" aria-label="清除标签筛选"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>'}else if(tab==='category'&&activeCat){chip.style.display='inline-flex';chip.innerHTML=esc(catName(activeCat))+'<button onclick="clearCat()" aria-label="清除分类筛选"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>'}else{chip.style.display='none'}}
 function clearCat(){activeCat='';sessionStorage.removeItem('linli_cat');setMode('hot');buildCatList()}
 function setTagFilter(t,e){if(e){e.preventDefault();e.stopPropagation()}tagFilter=t;page=1;updateModeUI();resetSort();render()}
+document.addEventListener('click',function(e){var b=e.target.closest('.t.clickable');if(!b)return;setTagFilter(b.dataset.tag||'',e)});
 function clearTagFilter(){tagFilter='';updateModeUI();render()}
 function tagsHtml(tags,expanded){
   var list=(tags||'').split(/[\s,]+/).filter(Boolean);
   if(!list.length)return '<span style="color:var(--faint)">—</span>';
   var show=expanded?list:list.slice(0,2);
-  var h=show.map(function(t){return '<button class="t clickable" onclick="setTagFilter(\''+esc(t)+'\',event)" title="筛选标签 '+esc(t)+'">'+esc(t)+'</button>'}).join('');
+  var h=show.map(function(t){return '<button class="t clickable" data-tag="'+esc(t)+'" title="筛选标签 '+esc(t)+'">'+esc(t)+'</button>'}).join('');
   if(list.length>2)h+='<button class="t expand" onclick="toggleTags(this)" title="'+(expanded?'收起':'展开全部标签')+'">'+(expanded?'收起':'+'+ (list.length-2))+'</button>';
   return h;
 }

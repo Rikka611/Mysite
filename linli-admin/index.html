@@ -453,7 +453,7 @@ function doAdminSearch(){_searchQ=document.getElementById('searchAdmin').value.t
 async function loadAllCodes(){
   var all=[],offset=0,ps=1000;
   while(true){
-    var batch=await sbApi('linli_codes?select=id,code,title,description,author,tags,views,likes,status,created_at,reports&order=created_at.desc&limit='+ps+'&offset='+offset);
+    var batch=await sbApi('linli_codes?select=id,code,title,description,author,tags,views,likes,status,created_at,reports&order=created_at.desc,id.desc&limit='+ps+'&offset='+offset);
     all=all.concat(batch);
     if(batch.length<ps)break;
     offset+=ps;
@@ -781,8 +781,8 @@ function renderEdits(){
     }).join('');
   }).catch(function(){lst.innerHTML='<div class="empty" style="display:block"><b>加载失败</b>需先执行 security-fix.sql 创建审核队列函数</div>'});
 }
-async function applyEdit(id){try{await sbApi('rpc/apply_edit',{method:'POST',body:JSON.stringify({edit_id:id})});showToast('已应用编辑','ok');renderEdits();load()}catch(e){showToast('操作失败','err')}}
-async function rejectEdit(id){try{await sbApi('rpc/reject_edit',{method:'POST',body:JSON.stringify({edit_id:id})});showToast('已拒绝','info');renderEdits()}catch(e){showToast('操作失败','err')}}
+async function applyEdit(id){try{await sbApi('rpc/apply_edit',{method:'POST',body:JSON.stringify({edit_id:id,p_admin:sessionStorage.getItem('admin_pw')||''})});showToast('已应用编辑','ok');renderEdits();load()}catch(e){showToast('操作失败','err')}}
+async function rejectEdit(id){try{await sbApi('rpc/reject_edit',{method:'POST',body:JSON.stringify({edit_id:id,p_admin:sessionStorage.getItem('admin_pw')||''})});showToast('已拒绝','info');renderEdits()}catch(e){showToast('操作失败','err')}}
 
 // ---- Theme ----
 const html=document.documentElement;function applyTheme(mode){html.classList.remove("light","dark");if(mode==="light")html.classList.add("light");if(mode==="dark")html.classList.add("dark")}
