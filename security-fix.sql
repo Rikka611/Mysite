@@ -90,6 +90,12 @@ grant execute on function public.get_pending_edits to anon;
 -- ── 3a) apply_edit / reject_edit 越权修复：加管理员令牌校验 ────────
 -- 此前二函数仅凭 edit_id 即可生效（SECURITY DEFINER 无鉴权），匿名者可自提编辑→自批通过。
 -- 现要求 p_admin 匹配 admin_config.admin_token 才放行。
+-- 依赖表：admin_config（Mysite 此前无此表，需先建；token = 后台登录密码）
+create table if not exists public.admin_config (
+  key text primary key,
+  value text not null
+);
+alter table public.admin_config enable row level security;
 create or replace function public.apply_edit(edit_id bigint, p_admin text)
 returns void
 language plpgsql
