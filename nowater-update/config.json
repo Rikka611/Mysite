@@ -1,9 +1,9 @@
 ﻿{
   "app": "nowater",
-  "appVersion": "1.2.1",
-  "apkUrl": "https://rikka611.github.io/Mysite/nowater-update/nowater-v1.2.1.apk",
+  "appVersion": "1.2.2",
+  "apkUrl": "https://rikka611.github.io/Mysite/nowater-update/nowater-v1.2.2.apk",
   "parserVersion": "1.0.0",
   "parserUrl": "https://rikka611.github.io/Mysite/nowater-update/parser-core.js",
   "webVersion": "1.0.0",
-  "releaseNotes": "v1.2.1: 检查更新超时提示"
+  "releaseNotes": "v1.2.2: 修复安装授权引导 + 弹窗按钮语言"
 }
