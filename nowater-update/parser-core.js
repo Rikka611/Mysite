@@ -461,14 +461,38 @@
     const playAddr = video.play_addr || {};
     const urls = (playAddr.url_list || []).map(cleanDouyinUrl);
     const cover = ((video.cover || {}).url_list || [])[0] || null;
-    const images = Array.isArray(d.images)
-      ? d.images.map(img => (img.url_list || [])[0]).filter(Boolean)
-      : [];
+
+    // 图集：images 数组；实况照片（Live Photo）的实况视频在 img.video.bit_rate[0].play_addr
+    const images = [];
+    const liveVideos = [];
+    if (Array.isArray(d.images)) {
+      d.images.forEach(img => {
+        const u = (img.url_list || [])[0];
+        if (u) images.push(u);
+        // 实况视频（无水印）：img.video.bit_rate[0].play_addr.url_list[0]
+        let live = null;
+        try {
+          const imgVideo = img.video || {};
+          const bitRates = imgVideo.bit_rate || [];
+          if (bitRates.length) {
+            const pa = bitRates[0].play_addr || {};
+            if (pa.url_list && pa.url_list.length) live = cleanDouyinUrl(pa.url_list[0]);
+          }
+          if (!live && imgVideo.play_addr && imgVideo.play_addr.url_list && imgVideo.play_addr.url_list.length) {
+            live = cleanDouyinUrl(imgVideo.play_addr.url_list[0]);
+          }
+        } catch (e) { /* ignore */ }
+        liveVideos.push(live);
+      });
+    }
     const isImage = images.length > 0;
+    // 图集里若存在实况视频 → 归为 livephoto 子类型
+    const hasLive = liveVideos.some(Boolean);
 
     return {
       platform: 'douyin',
       type: isImage ? 'image' : 'video',
+      subtype: isImage ? (hasLive ? 'livephoto' : 'album') : 'video',
       id: String(d.aweme_id || awemeId),
       title: (d.desc || '').trim(),
       author: (d.author && d.author.nickname) || '',
@@ -477,6 +501,7 @@
       videoUrl: urls[0] || null,
       videoUrls: urls,
       images: images,
+      liveVideos: liveVideos,
       stats: {
         likes: d.statistics ? d.statistics.digg_count : 0,
         comments: d.statistics ? d.statistics.comment_count : 0,
