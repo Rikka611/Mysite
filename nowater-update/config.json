@@ -1,9 +1,9 @@
 {
   "app": "nowater",
-  "appVersion": "1.2.5",
-  "apkUrl": "https://rikka611.github.io/Mysite/nowater-update/nowater-v1.2.5.apk",
+  "appVersion": "1.2.6",
+  "apkUrl": "https://rikka611.github.io/Mysite/nowater-update/nowater-v1.2.6.apk",
   "parserVersion": "1.0.0",
   "parserUrl": "https://rikka611.github.io/Mysite/nowater-update/parser-core.js",
   "webVersion": "1.0.0",
-  "releaseNotes": "v1.2.5: 多系统安装适配（Android 14+ 走系统安装页）、图集/实况 9:16 白底卡片、图片转 PNG 保存"
+  "releaseNotes": "v1.2.6: 播放器进度条加宽、底部操作栏间距优化"
 }
