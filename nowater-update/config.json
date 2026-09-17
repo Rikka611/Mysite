@@ -1,9 +1,9 @@
 {
-  "app": "nowater",
-  "appVersion": "1.2.6",
-  "apkUrl": "https://rikka611.github.io/Mysite/nowater-update/nowater-v1.2.6.apk",
-  "parserVersion": "1.0.0",
-  "parserUrl": "https://rikka611.github.io/Mysite/nowater-update/parser-core.js",
-  "webVersion": "1.0.0",
-  "releaseNotes": "v1.2.6: 播放器进度条加宽、底部操作栏间距优化"
+    "app":  "nowater",
+    "appVersion":  "1.2.7",
+    "apkUrl":  "https://rikka611.github.io/Mysite/nowater-update/nowater-v1.2.7.apk",
+    "parserVersion":  "1.0.1",
+    "parserUrl":  "https://rikka611.github.io/Mysite/nowater-update/parser-core.js",
+    "webVersion":  "1.0.0",
+    "releaseNotes":  "v1.2.7: 修复抖音解析（风控限速+冷却，避免被临时封禁）；修复热更新被内置资源覆盖的缺陷；版本比对改为\"是否更新\""
 }

@@ -387,6 +387,10 @@
     return abGenerateResult(s1 + s2, 's4');
   }
 
+  // 注意：浏览器请求的查询串里还带 webid / uifid / msToken，
+  // 且 detail 类接口现已要求 secsdk 追加的 timestamp + x-secsdk-web-signature。
+  // 这些值由浏览器端 secsdk 生成并与 cookie 会话同源绑定，纯 HTTP 侧无法伪造，
+  // 详见 README「抖音解析现状」一节。此处仍保留字段占位，便于签名路径接入。
   const DY_DEVICE_PARAMS = {
     device_platform: 'webapp', aid: '6383', channel: 'channel_pc_web',
     update_version_code: '170400', pc_client_type: '1', pc_libra_divert: 'Windows',
@@ -397,13 +401,32 @@
     engine_version: '150.0.0.0', os_name: 'Windows', os_version: '10',
     cpu_core_num: '16', device_memory: '8', platform: 'PC',
     downlink: '10', effective_type: '4g', round_trip_time: '50',
-    uifid: '', msToken: '',
+    webid: '', uifid: '', msToken: '',
   };
 
   function douyinQuery(awemeId) {
     return Object.entries({ ...DY_DEVICE_PARAMS, aweme_id: awemeId })
       .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
       .join('&');
+  }
+
+  // 风控拦截时抖音返回的是纯文本（非 JSON），必须显式识别，
+  // 否则 JSON.parse 会抛出 "Unexpected token ..." 这种对用户毫无意义的错误。
+  const BLOCK_PATTERNS = [
+    [/Uifid Not Found/i, 'Uifid Not Found'],
+    [/ArgusSecurityPlugin/i, 'Signature Not Found'],
+    [/Blocked by/i, 'unknown'],
+  ];
+  function classifyDouyinResponse(status, text) {
+    if (status === 403) {
+      for (const [re, kind] of BLOCK_PATTERNS) {
+        if (re.test(text)) return { kind: 'blocked', detail: kind };
+      }
+      return { kind: 'blocked', detail: 'http 403' };
+    }
+    if (!text || !text.trim()) return { kind: 'empty', detail: 'empty body' };
+    if (!text.trim().startsWith('{')) return { kind: 'nonjson', detail: 'non-JSON (' + text.slice(0, 40).replace(/\s+/g, ' ') + ')' };
+    return { kind: 'json' };
   }
 
   async function douyinDetail(awemeId, ttwid) {
@@ -418,8 +441,33 @@
       },
     });
     const text = await r.text();
-    if (!text || !text.trim()) return null;
-    return JSON.parse(text);
+    const cls = classifyDouyinResponse(r.status, text);
+    if (cls.kind !== 'json') return { __error: cls };
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      return { __error: { kind: 'nonjson', detail: 'JSON 解析失败' } };
+    }
+  }
+
+  /**
+   * 解析抖音短链：v.douyin.com 会 302 到 iesdouyin 分享页，
+   * 分享页 URL 里同时带 aweme_id 和 did/iid 等设备参数。
+   * 返回 { awemeId, shareUrl }，失败则 awemeId 为 null。
+   */
+  async function resolveDouyinShortLink(shortUrl) {
+    try {
+      const res = await followRedirects(shortUrl, UA_MOBILE);
+      const finalUrl = res.finalUrl || '';
+      const m = finalUrl.match(/(?:video|note|slides)\/(\d{15,})/) || finalUrl.match(/modal_id=(\d{15,})/);
+      if (m) return { awemeId: m[1], shareUrl: finalUrl };
+      // 兜底：分享页可能把 id 放在查询串里
+      const q = finalUrl.match(/[?&]item_?[Ii]ds?=(\d{15,})/);
+      if (q) return { awemeId: q[1], shareUrl: finalUrl };
+      return { awemeId: null, shareUrl: finalUrl };
+    } catch (e) {
+      return { awemeId: null, shareUrl: '', error: e.message };
+    }
   }
 
   function cleanDouyinUrl(url) {
@@ -427,33 +475,90 @@
     return url.replace('/playwm/', '/play/').replace(/playwm/g, 'play');
   }
 
+  /* ---- 抖音请求节流与冷却 ----
+   * 实测结论（2026-09）：
+   *   抖音 detail 接口对**请求密度**非常敏感。连续密集请求达到一定次数后，
+   *   出口 IP 会被标记，此后所有请求返回 403 "Uifid Not Found"，
+   *   且静默 60~90 秒后才会自动恢复。标记期间无论快慢重试一律失败。
+   *   因此正确策略是「限速 + 命中后冷却」，而不是失败后连续重试。
+   */
+  const DY_MIN_GAP_MS = 700;        // 两次 detail 请求最小间隔
+  const DY_COOLDOWN_MS = 75 * 1000; // 命中风控后的冷却时长
+  let dyLastRequestAt = 0;
+  let dyBlockedUntil = 0;
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  function dyCooldownLeft() {
+    return Math.max(0, dyBlockedUntil - Date.now());
+  }
+
+  async function dyThrottle() {
+    const since = Date.now() - dyLastRequestAt;
+    if (since < DY_MIN_GAP_MS) await sleep(DY_MIN_GAP_MS - since);
+    dyLastRequestAt = Date.now();
+  }
+
   async function parseDouyin(input) {
     const extracted = extractDouyinId(input);
     if (!extracted) throw new Error('未识别到抖音链接，请粘贴完整的分享链接');
     let awemeId = extracted;
     if (typeof extracted === 'object') {
-      const res = await followRedirects(extracted.shortUrl, UA_MOBILE);
-      const m = res.finalUrl.match(/(?:video|note)\/(\d{15,})/) || res.finalUrl.match(/modal_id=(\d{15,})/);
-      if (!m) throw new Error('抖音短链解析失败：' + res.finalUrl);
-      awemeId = m[1];
+      const resolved = await resolveDouyinShortLink(extracted.shortUrl);
+      if (!resolved.awemeId) {
+        throw new Error('抖音短链解析失败：未能从跳转结果中取到视频 ID' + (resolved.shareUrl ? '（' + resolved.shareUrl.slice(0, 80) + '）' : ''));
+      }
+      awemeId = resolved.awemeId;
     }
 
+    // 冷却期内直接拒绝，避免把标记状态越拖越久
+    const left = dyCooldownLeft();
+    if (left > 0) {
+      throw new Error('抖音解析暂时受限：风控冷却中，请 ' + Math.ceil(left / 1000) + ' 秒后再试。' +
+        '（短时间内请求过多会触发抖音风控，本工具已自动限速）');
+    }
+
+    // 失败模式与应对（实测结论）：
+    //   · ttwid 陈旧 / 缺失 → HTTP 200 但无 aweme_detail。丢弃缓存重新注册 ttwid 即可恢复，
+    //     所以这里必须真的重新注册，而不是复用 cachedTtwid 空转一次。
+    //   · Argus 风控 → HTTP 403 纯文本。重试会加重标记，必须立刻停手并进入冷却。
+    //   · 视频不存在 / 已删除 → 200 但一直无数据，重试后如实报告。
     let ttwid = null, json = null;
     const errors = [];
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
+        if (attempt > 0) {
+          cachedTtwid = null;   // 强制重新注册，避免拿陈旧会话空转
+          await sleep(400);     // 第二次尝试留出间隔，不要贴脸连打
+        }
+        await dyThrottle();
         ttwid = await getTtwid();
         json = await douyinDetail(awemeId, ttwid);
         if (json && json.aweme_detail) break;
-        cachedTtwid = null;
-        errors.push('detail 空响应(第' + (attempt + 1) + '次)');
+        if (json && json.__error) {
+          const e = json.__error;
+          if (e.kind === 'blocked') {
+            // 命中风控：进入冷却并立即停止重试
+            dyBlockedUntil = Date.now() + DY_COOLDOWN_MS;
+            errors.push('被抖音风控拦截（' + e.detail + '）');
+            break;
+          }
+          errors.push(e.kind === 'empty' ? '接口返回空响应' : '接口返回非 JSON 内容');
+        } else {
+          errors.push('接口未返回视频数据');
+        }
       } catch (e) {
         cachedTtwid = null;
-        errors.push(e.message);
+        errors.push(e.message || String(e));
       }
     }
     if (!json || !json.aweme_detail) {
-      throw new Error('抖音解析失败：' + (errors.join('；') || '未知错误') + '。可稍后重试（抖音风控偶尔波动）');
+      const uniq = [...new Set(errors)];
+      const blocked = /风控/.test(uniq.join());
+      const tail = blocked
+        ? '。已自动进入 ' + Math.round(DY_COOLDOWN_MS / 1000) + ' 秒冷却，请稍后再试（短时间内请求过多会触发抖音风控）。'
+        : '。可能是视频已删除/仅作者可见，或抖音接口策略变动。';
+      throw new Error('抖音解析失败：' + (uniq.join('；') || '未知错误') + tail);
     }
 
     const d = json.aweme_detail;
@@ -616,7 +721,7 @@
   }
 
   global.NowaterParser = {
-    VERSION: '1.0.0',
+    VERSION: '1.0.1',
     parse,
     parseDouyin,
     parseBilibili,
@@ -624,6 +729,7 @@
     makeABogus,
     extractDouyinId,
     extractBilibiliBv,
+    resolveDouyinShortLink,
     getTtwid,
     configure,
     UA_PC,
