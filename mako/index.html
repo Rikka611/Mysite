@@ -8,11 +8,14 @@
 <meta name="theme-color" content="#14120f" media="(prefers-color-scheme:dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>日记</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css">
 <style>
 :root{
   --bg:#f6f1e8; --paper:#fbf7f0; --ink:#2b2521; --ink-soft:#6d6259;
   --rule:#e3d8c8; --accent:#96684f; --accent-soft:#f0e3d6; --mark:#f3d9a4;
-  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong",Georgia,serif;
+  /* 手写味：霞鹜文楷（OFL）。CDN 挂了自动退回系统楷体，不会白屏。 */
+  --serif:"LXGW WenKai","Noto Serif SC","Source Han Serif SC","Kaiti SC","STKaiti","KaiTi","Songti SC",Georgia,serif;
   --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
   --fs:17px; --lh:1.95;
   --pad:22px;
