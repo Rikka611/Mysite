@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#f6f1e8" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#14120f" media="(prefers-color-scheme:dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>在读</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cn-fontsource-yozai@1.0.6/font.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css">
+<style>
+:root{
+  --bg:#f6f1e8; --paper:#fbf7f0; --ink:#2b2521; --ink-soft:#6d6259;
+  --rule:#e3d8c8; --accent:#96684f; --accent-soft:#f0e3d6;
+  --serif:"Yozai","LXGW WenKai","Zen Kurenaido","Klee One","Noto Serif SC","Kaiti SC","KaiTi",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+}
+html[data-theme="dark"]{
+  --bg:#14120f; --paper:#1b1815; --ink:#e9e2d6; --ink-soft:#9d9386; --rule:#302a22; --accent:#c99a83; --accent-soft:#2a231c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding:18px 18px 60px}
+.top{display:flex;align-items:center;gap:10px;margin:6px 0 18px}
+.top h1{font-family:var(--serif);font-weight:400;font-size:22px;letter-spacing:.18em;margin:0;color:var(--accent)}
+.top .sp{flex:1}
+.btn{border:1px solid var(--rule);background:transparent;color:var(--ink-soft);font-size:13px;
+     padding:6px 12px;border-radius:999px;cursor:pointer;font-family:var(--sans)}
+.btn:active{background:var(--accent-soft)}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+.now .book{font-family:var(--serif);font-size:20px;line-height:1.5}
+.now .meta{color:var(--ink-soft);font-size:13px;margin-top:6px}
+.bar{height:6px;background:var(--rule);border-radius:99px;overflow:hidden;margin:14px 0 8px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.pct{font-family:var(--serif);font-size:15px;color:var(--accent)}
+.row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--ink-soft);margin:14px 0 6px;letter-spacing:.04em}
+.row b{font-family:var(--serif);font-size:15px;color:var(--accent);font-weight:400}
+.sub{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.03em}
+.bar.thin{height:4px;margin:6px 0 0}
+.spark{display:flex;align-items:flex-end;gap:6px;height:86px;padding:6px 2px 0;overflow-x:auto}
+.spark .col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;flex:0 0 auto}
+.spark .col i{width:14px;background:var(--accent);opacity:.75;border-radius:3px 3px 0 0;display:block}
+.spark .col em{font-style:normal;font-size:10px;color:var(--ink-soft);white-space:nowrap}
+.shelfitem{padding:12px 0;border-bottom:1px dashed var(--rule)}
+.shelfitem:last-child{border-bottom:0}
+.shelfitem .st{font-family:var(--serif);font-size:16px;line-height:1.6}
+.shelfitem .sm{font-size:12px;color:var(--ink-soft);margin:4px 0 8px}
+h2{font-family:var(--serif);font-weight:400;font-size:16px;letter-spacing:.1em;color:var(--accent);
+   margin:26px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.note{font-family:var(--serif);font-size:16.5px;line-height:1.9;padding:12px 0;border-bottom:1px dashed var(--rule)}
+.note:last-child{border-bottom:0}
+.note .d{display:block;font-family:var(--sans);font-size:12px;color:var(--ink-soft);margin-bottom:4px;letter-spacing:.06em}
+.day{display:flex;justify-content:space-between;font-size:14px;padding:8px 0;border-bottom:1px dashed var(--rule);color:var(--ink-soft)}
+.day b{font-family:var(--serif);color:var(--ink);font-weight:400}
+.empty{color:var(--ink-soft);font-size:14px;padding:8px 0}
+.shelf{font-size:14px;color:var(--ink-soft);line-height:1.9}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>在读</h1>
+    <span class="sp"></span>
+    <button class="btn" id="theme">深浅</button>
+    <a class="btn" href="./index.html" style="text-decoration:none">日记</a>
+  </div>
+  <div id="app"></div>
+</div>
+<script src="reading.js"></script>
+<script>
+(function(){
+  var d = window.__READING__ || {};
+  var app = document.getElementById('app');
+  function esc(s){ return String(s==null?'':s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+  var html = '';
+
+  if (d.progress) {
+    var p = d.progress;
+    var left = Math.max(0, (p.totalChars||0) - (p.readChars||0));
+    html += '<div class="card now">'
+      + '<div class="book">《' + esc(p.book) + '》</div>'
+      + '<div class="meta">' + (p.chapterTitle ? esc(p.chapterTitle) + '　·　' : '') + '第 ' + p.chapter + ' / ' + p.chapters + ' 章</div>'
+
+      // 本章进度
+      + '<div class="row"><span>这一章</span><b>' + (p.chapterPct||0) + '%</b></div>'
+      + '<div class="bar"><i style="width:' + (p.chapterPct||0) + '%"></i></div>'
+      + '<div class="sub">' + (p.readChars ? '' : '') + '本章 ' + (p.chapterChars||0) + ' 字</div>'
+
+      // 全书进度
+      + '<div class="row" style="margin-top:16px"><span>整本</span><b>' + (p.charsPct||0) + '%</b></div>'
+      + '<div class="bar"><i style="width:' + (p.charsPct||0) + '%"></i></div>'
+      + '<div class="sub">已读 ' + (p.readChars||0).toLocaleString() + ' 字 · 还剩 ' + left.toLocaleString() + ' 字</div>'
+
+      // 今日额度
+      + '<div class="row" style="margin-top:16px"><span>今天</span><b>' + (p.todayChars||0) + ' / ' + p.perDay + ' 字</b></div>'
+      + '<div class="bar thin"><i style="width:' + Math.min(100, ((p.todayChars||0)/p.perDay)*100) + '%"></i></div>'
+      + (p.updatedAt ? '<div class="sub">上次翻页 ' + new Date(p.updatedAt).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) + '</div>' : '')
+      + '</div>';
+  } else {
+    html += '<div class="card"><div class="empty">还没开始读。</div></div>';
+  }
+
+  html += '<h2>她写下的</h2>';
+  if (d.notes && d.notes.length) {
+    for (var i=0;i<d.notes.length;i++){
+      var n = d.notes[i];
+      var m = /^(\d{4}-\d{2}-\d{2})\s*(.*)$/.exec(n);
+      var date = m ? m[1] : '';
+      var body = m ? m[2] : n;
+      html += '<div class="note">' + (date ? '<span class="d">' + date + '</span>' : '') + esc(body) + '</div>';
+    }
+  } else {
+    html += '<div class="empty">还没有笔记。</div>';
+  }
+
+  html += '<h2>每天读了多少</h2>';
+  if (d.daily && d.daily.length) {
+    var max = 1, i2;
+    for (i2=0;i2<d.daily.length;i2++) max = Math.max(max, d.daily[i2].chars);
+    html += '<div class="spark">';
+    var days = d.daily.slice(0, 21).reverse();
+    for (i2=0;i2<days.length;i2++){
+      var h = Math.max(3, Math.round((days[i2].chars / max) * 56));
+      html += '<span class="col" title="' + days[i2].date + '：' + days[i2].chars + ' 字">'
+        + '<i style="height:' + h + 'px"></i>'
+        + '<em>' + days[i2].date.slice(5) + '</em></span>';
+    }
+    html += '</div>';
+  } else {
+    html += '<div class="empty">还没有记录。</div>';
+  }
+
+  if (d.books && d.books.length) {
+    html += '<h2>书架</h2>';
+    for (var k=0;k<d.books.length;k++){
+      var b = d.books[k];
+      html += '<div class="shelfitem">'
+        + '<div class="st">《' + esc(b.title) + '》</div>'
+        + '<div class="sm">' + b.chapters + ' 章 · ' + Math.round(b.chars/10000) + ' 万字' + (b.art ? ' · 插图 ' + b.art : '') + (b.reading ? ' · 在读 ' + b.reading + '%' : '') + '</div>'
+        + (b.reading ? '<div class="bar thin"><i style="width:' + b.reading + '%"></i></div>' : '')
+        + '</div>';
+    }
+  }
+
+  app.innerHTML = html;
+
+  document.getElementById('theme').addEventListener('click', function(){
+    var r = document.documentElement;
+    if (r.getAttribute('data-theme') === 'dark') r.removeAttribute('data-theme');
+    else r.setAttribute('data-theme','dark');
+  });
+})();
+</script>
+</body>
+</html>
