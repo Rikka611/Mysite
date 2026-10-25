@@ -7,10 +7,7 @@
 <meta name="theme-color" content="#f6f1e8" media="(prefers-color-scheme:light)">
 <meta name="theme-color" content="#14120f" media="(prefers-color-scheme:dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>日记</title>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cn-fontsource-yozai@1.0.6/font.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css">
+<title>茉子日记</title>
 <style>
 :root{
   --bg:#f6f1e8; --paper:#fbf7f0; --ink:#2b2521; --ink-soft:#6d6259;
@@ -148,15 +145,194 @@ nav.bottom .go{border-color:var(--accent); color:var(--accent)}
   .deskonly{display:none}
 }
 </style>
+<link rel="stylesheet" href="./fonts/yozai/font.css">
+<style id="mk-shell">
+:root{
+  --bg:#f6f1e8; --paper:#fbf7f0; --ink:#2b2521; --ink-soft:#6d6259;
+  --rule:#e3d8c8; --accent:#96684f; --accent-soft:#f0e3d6;
+  --serif:"Yozai","LXGW WenKai","Zen Kurenaido","Klee One","Noto Serif SC","Source Han Serif SC","Kaiti SC","STKaiti","KaiTi","Songti SC",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+}
+html[data-theme="dark"]{
+  --bg:#14120f; --paper:#1b1815; --ink:#e9e2d6; --ink-soft:#9d9386;
+  --rule:#302a22; --accent:#c99a83; --accent-soft:#2a2118;
+}
+html,body{background:var(--bg)!important;color:var(--ink)!important;font-family:var(--serif)!important;
+  padding-top:0!important;margin:0!important}
+
+/* 顶栏：三个页面完全同一套（高度/位置/字距全部写死） */
+html body header.mk-head{
+  position:sticky!important; top:0!important; z-index:60!important;
+  height:54px!important; min-height:54px!important; max-height:54px!important;
+  padding:0 24px!important; margin:0!important;
+  display:flex!important; align-items:center!important; gap:18px!important;
+  box-sizing:border-box!important;
+  background:color-mix(in srgb, var(--bg) 90%, transparent)!important;
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule)!important;
+}
+html body header.mk-head .mk-brand{
+  font-family:var(--serif)!important; font-weight:600!important;
+  font-size:17.5px!important; letter-spacing:.14em!important; line-height:54px!important;
+  color:var(--ink)!important; text-decoration:none!important; margin:0!important; padding:0!important;
+}
+html body header.mk-head .mk-seg{margin-left:auto!important; display:flex!important; align-items:center!important; gap:6px!important}
+html body header.mk-head .mk-seg a{
+  font-family:var(--sans)!important; font-size:13px!important;
+  line-height:27px!important; height:27px!important; padding:0 14px!important;
+  border-radius:999px!important; box-sizing:border-box!important; display:inline-block!important;
+  color:var(--ink-soft)!important; text-decoration:none!important; border:1px solid transparent!important;
+}
+html body header.mk-head .mk-seg a.on{color:var(--accent)!important;border-color:var(--accent)!important;background:var(--accent-soft)!important}
+html body header.mk-head #themeBtn{
+  font-family:var(--sans)!important; font-size:12px!important; letter-spacing:.06em!important;
+  line-height:28px!important; height:28px!important; min-height:28px!important; max-height:28px!important;
+  padding:0 12px!important; margin:0!important;
+  border:1px solid var(--rule)!important; border-radius:999px!important;
+  background:transparent!important; color:var(--ink-soft)!important; cursor:pointer!important;
+  display:inline-flex!important; align-items:center!important; box-sizing:border-box!important;
+}
+html body header.mk-head #themeBtn:hover{color:var(--ink)!important;border-color:var(--accent)!important}
+
+/* 两栏外壳：左栏 264px + 正文 760px 居中 */
+html body .shell{
+  display:grid!important; grid-template-columns:264px minmax(0,1fr)!important;
+  align-items:start!important; padding:0!important; margin:0!important; gap:0!important;
+}
+html body .shell > aside.mk-side{
+  position:sticky!important; top:54px!important;
+  max-height:calc(100vh - 54px)!important; overflow:auto!important;
+  padding:26px 18px 40px 24px!important; box-sizing:border-box!important;
+  border-right:1px solid var(--rule)!important;
+}
+html body .shell > main{
+  max-width:760px!important; width:100%!important; min-width:0!important;
+  margin:0 auto!important; padding:34px 24px 120px!important; box-sizing:border-box!important;
+  justify-self:center!important;
+}
+html body .shell > aside.mk-side h2{
+  font-family:var(--sans)!important; font-size:12px!important; letter-spacing:.18em!important;
+  color:var(--ink-soft)!important; font-weight:500!important; margin:0 0 12px!important;
+}
+html body .shell > aside.mk-side ul{list-style:none!important;margin:0!important;padding:0!important}
+html body .shell > aside.mk-side li{margin:0 0 2px!important}
+html body .shell > aside.mk-side a{
+  display:block!important; padding:6px 10px!important; border-radius:8px!important;
+  color:var(--ink-soft)!important; text-decoration:none!important;
+  font-family:var(--sans)!important; font-size:13px!important; line-height:1.5!important;
+  white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important;
+}
+html body .shell > aside.mk-side a:hover{color:var(--ink)!important;background:var(--accent-soft)!important}
+@media (max-width:820px){
+  html body .shell{grid-template-columns:1fr!important}
+  html body .shell > aside.mk-side{display:none!important}
+}
+
+/* 「她自己的时候」：日记页底部的一条，不混进日记正文 */
+html body .mk-private{
+  margin:44px 0 0!important; padding-top:18px!important; border-top:1px dashed var(--rule)!important;
+}
+html body .mk-private h2{
+  font-family:var(--sans)!important; font-size:12px!important; letter-spacing:.16em!important;
+  color:var(--ink-soft)!important; font-weight:500!important; margin:0 0 10px!important;
+}
+html body .mk-private h2 small{font-size:11px!important;opacity:.7;margin-left:8px}
+html body .mk-private ul{list-style:none!important;margin:0!important;padding:0!important}
+html body .mk-private li{
+  display:flex!important; gap:10px!important; align-items:baseline!important;
+  font-family:var(--sans)!important; font-size:12.5px!important; color:var(--ink-soft)!important;
+  padding:4px 0!important;
+}
+html body .mk-private li .d{opacity:.75}
+html body .mk-private li .t{color:var(--accent)!important;font-variant-numeric:tabular-nums}
+
+/* ── 正文标题统一：三个页面同一套（逛网页原来字体不对就是这里缺的）── */
+html body .shell > main h1,
+html body .shell > main h2,
+html body .shell > main h3{
+  font-family:var(--serif)!important; color:var(--ink)!important; font-weight:600!important;
+  letter-spacing:.04em!important;
+}
+html body .shell > main h1{font-size:22px!important;line-height:1.5!important;margin:0 0 14px!important}
+html body .shell > main h2{font-size:15.5px!important;line-height:1.6!important;margin:30px 0 10px!important;
+  display:flex!important;align-items:baseline!important;gap:8px!important}
+html body .shell > main h2 small{font-family:var(--sans)!important;font-size:11.5px!important;
+  color:var(--ink-soft)!important;font-weight:400!important;letter-spacing:.02em!important}
+html body .shell > main h3{font-size:14.5px!important;line-height:1.6!important;margin:20px 0 8px!important}
+
+/* ── 手机端自适应：不许横向溢出 ── */
+html body{overflow-x:hidden!important}
+html body .shell > main img,
+html body .shell > main video,
+html body .shell > main table,
+html body .shell > main pre{max-width:100%!important;height:auto!important}
+html body .shell > main pre{overflow-x:auto!important}
+html body .shell > main *{max-width:100%!important;box-sizing:border-box!important}
+@media (max-width:820px){
+  html body header.mk-head{padding:0 14px!important;gap:10px!important}
+  html body header.mk-head .mk-brand{font-size:16px!important;letter-spacing:.1em!important}
+  html body header.mk-head .mk-seg{gap:2px!important}
+  html body header.mk-head .mk-seg a{font-size:12.5px!important;padding:0 10px!important}
+  html body header.mk-head #themeBtn{padding:0 9px!important;font-size:11.5px!important}
+  html body .shell{grid-template-columns:1fr!important}
+  html body .shell > aside.mk-side{display:none!important}
+  html body .shell > main{padding:20px 16px 96px!important}
+  html body .shell > main h1{font-size:20px!important}
+  html body .shell > main h2{font-size:15px!important;margin:24px 0 8px!important}
+}
+
+/* ── 字体渲染方式统一：逛网页原来是 auto（亚像素，笔画偏粗），
+   另两页是 antialiased（灰度，偏细）。同一个字栈看着像两种字体就是这里。── */
+html, html body, html body header.mk-head, html body header.mk-head *,
+html body .shell > main, html body .shell > main *,
+html body .shell > aside.mk-side, html body .shell > aside.mk-side *{
+  -webkit-font-smoothing:antialiased!important;
+  -moz-osx-font-smoothing:grayscale!important;
+  text-rendering:geometricPrecision!important;
+}
+
+/* ── 正文字号/行高统一（逛网页原来是 16px/1.7，另两页 17px/1.95）── */
+html body{font-size:17px!important;line-height:1.95!important}
+html body .shell > main{font-size:17px!important;line-height:1.95!important}
+html body .shell > main p,
+html body .shell > main li{font-size:17px!important;line-height:1.95!important}
+@media (max-width:820px){
+  html body, html body .shell > main, html body .shell > main p, html body .shell > main li{font-size:16px!important;line-height:1.9!important}
+}
+
+/* ── 站名钉死：单一字体 + 不合成字重（否则各页落到不同的后备字体上）── */
+html body header.mk-head .mk-brand{
+  font-family:"Yozai"!important;
+  font-weight:400!important;
+  font-synthesis:none!important;
+  -webkit-text-stroke:0!important;
+  text-shadow:none!important;
+  font-size:18px!important;
+  letter-spacing:.16em!important;
+}
+html body header.mk-head .mk-seg a,
+html body header.mk-head #themeBtn{
+  font-family:"Yozai"!important;
+  font-weight:400!important;
+  font-synthesis:none!important;
+}
+
+/* 「她自己的时候」落在正文那一列（main 之后，不进 main，避免被 JS 覆盖） */
+html body .shell > .mk-private{
+  grid-column:2!important; width:100%!important; max-width:760px!important;
+  margin:0 auto!important; padding:0 24px 70px!important; box-sizing:border-box!important;
+  border-top:1px dashed var(--rule)!important;
+  margin-top:0!important;
+}
+@media (max-width:820px){
+  html body .shell > .mk-private{grid-column:1!important;padding:0 16px 60px!important}
+}
+</style>
 </head>
 <body>
-<header>
-  <div class="t" id="topTitle">日记</div>
-  <nav class="seg">
-    <a href="./index.html" class="on">日记</a>
-    <a href="./reading.html">在读</a>
-<a href="./web.html">逛网</a>
-  </nav>
+<header class="mk-head">
+  <a class="mk-brand" href="./index.html">茉子日记</a>
+  <nav class="mk-seg"><a href="./index.html" class="on">日记</a><a href="./reading.html">在读</a><a href="./web.html">逛网</a></nav>
   <button id="themeBtn" aria-label="切换主题">深浅</button>
 </header>
 
@@ -332,6 +508,18 @@ nav.bottom .go{border-color:var(--accent); color:var(--accent)}
   if (last) for (var k = 0; k < entries.length; k++) if (entries[k].date === last) { start = k; break; }
   show(start);
 })();
+</script>
+<script id="mk-theme">
+(function(){try{
+  var root=document.documentElement,key='mk.theme';
+  var saved=localStorage.getItem(key);
+  root.setAttribute('data-theme',saved||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+  var btn=document.getElementById('themeBtn');
+  if(btn&&!btn.dataset.mkBound){btn.dataset.mkBound='1';btn.addEventListener('click',function(){
+    var next=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);localStorage.setItem(key,next);
+  });}
+}catch(e){}})();
 </script>
 </body>
 </html>
